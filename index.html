@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>UoL Timetable</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" type="text/css" media="screen" href="style.css" />
+  <script src="script.js" defer></script>
+</head>
+
+<body>
+  <div class="container">
+    <div class="box"></div>
+    <div class="days">
+      <p>Monday</p>
+      <p>Tuesday</p>
+      <p>Wednesday</p>
+      <p>Thursday</p>
+      <p>Friday</p>
+      <p class="weekend">Saturday</p>
+      <p class="weekend">Sunday</p>
+    </div>
+    <div class="times">
+      <p>9 AM</p>
+      <p>10 AM</p>
+      <p>11 AM</p>
+      <p>12 PM</p>
+      <p>1 PM</p>
+      <p>2 PM</p>
+      <p>3 PM</p>
+      <p>4 PM</p>
+      <p>5 PM</p>
+      <p>6 PM</p>
+    </div>
+    <div class="classes">
+      <div class="day day0"></div>
+      <div class="day day1"></div>
+      <div class="day day2"></div>
+      <div class="day day3"></div>
+      <div class="day day4"></div>
+      <div class="day day5"></div>
+      <div class="day day6"></div>
+      <div class="line"></div>
+    </div>
+  </div>
+  <form>
+    <div>
+      <label for="link">Link to Timetable:</label>
+    </div>
+    <div>
+      <input id="link" name="link" type="text">
+      <button>Retrieve Timetable</button>
+    </div>
+  </form>
+</body>
+
+</html>

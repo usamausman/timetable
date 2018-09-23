@@ -1,0 +1,178 @@
+:root {
+  --time-slots: 10;
+  --time-slots-fr: 10fr;
+  --gap: 8px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+form {
+  margin: 8px;
+}
+
+form input, form button {
+  max-width: 50%;
+}
+
+.container {
+  display: grid;
+  grid-template: 0.5fr var(--time-slots-fr) / 0.5fr 7fr;
+}
+
+.box {
+  background: white;
+}
+
+.days {
+  grid-row: 1;
+  grid-column: 2;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  align-items: center;
+  padding: var(--gap);
+  grid-gap: var(--gap);
+  background: white;
+  color: rgb(40, 40, 40);
+  font-weight: bold;
+}
+
+.days .weekend {
+  opacity: 0.5;
+}
+
+.days .today {
+  color: red;
+}
+
+.times {
+  grid-row: 2;
+  grid-column: 1;
+  display: grid;
+  grid-template-rows: repeat(var(--time-slots), 1fr);
+  /* align-items: center; */
+  padding: var(--gap);
+  grid-gap: var(--gap);
+  background: white;
+  color: rgb(40, 40, 40);
+}
+
+.times p {
+  opacity: 0.75;
+  transition: color 0.25s ease, opacity 0.25s ease, font-weight 0.25s ease;
+}
+
+.times .now {
+  color: red;
+  font-weight: bold;
+  opacity: 1;
+}
+
+p {
+  margin: 8px;
+  text-align: center;
+}
+
+.classes {
+  position: relative;
+  grid-row: 2;
+  grid-column: 2; 
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  padding: var(--gap);
+  grid-gap: var(--gap);
+  background: white;
+
+  transition: grid-template-columns 0.25s ease;
+}
+
+.classes .line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  z-index: 1;
+  background: red;
+}
+
+.classes .day {
+  display: grid;
+  grid-template-rows: repeat(var(--time-slots), 1fr);
+  grid-template-areas: 
+  "t900"
+  "t1000"
+  "t1100"
+  "t1200"
+  "t1300"
+  "t1400"
+  "t1500"
+  "t1600"
+  "t1700"
+  "t1800";
+  grid-gap: var(--gap);
+  opacity: 0.5;
+  width: 100%;
+  transition: opacity 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.day.today {
+  opacity: 1;
+}
+
+.classes .class {
+  margin: 0;
+  border-radius: var(--gap);
+  background: rgb(240, 240, 240);
+  overflow: hidden;
+  opacity: 0.6;
+  transition: transform 0.25s ease;
+}
+
+.class.now {
+  transform: scale(1.1);
+  z-index: 2;
+  opacity: 1;
+  box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.25);
+}
+
+.class .code {
+  font-weight: bold;
+  font-size: 20px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.class .name {
+  font-size: 16px;
+}
+
+@media (max-width: 939px) {
+  .days p:not(.today) {
+    display: none;
+    visibility: hidden;
+  }
+
+  .classes .day:not(.today) {
+    display: none;
+    visibility: hidden;
+  }
+
+  .days {
+    grid-template-columns: 1fr !important;
+  }
+
+  .classes {
+    grid-template-columns: 1fr !important;
+  }
+
+  .class.now {
+    transform: none;
+    z-index: 2;
+    opacity: 1;
+    box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.25);
+  }
+}
