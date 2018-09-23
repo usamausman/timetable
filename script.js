@@ -16,7 +16,7 @@ const getAllInfo = classes => classes.map(singleClass =>
     .map(cell => cell.innerText)
 )
 
-const parseType = (type) => type.match(/^([\w]+)\D*?(\d)?$/)[1].toLowerCase()
+const parseType = (type) => type.match(/^([\w]+).*?(\d)?$/)[1].toLowerCase()
 
 const parseTime = (time) => time.split(":").join("")
 
