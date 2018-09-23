@@ -1,10 +1,3 @@
-const urlA = "http://timetable.leeds.ac.uk/teaching/201819/reporting/textspreadsheet;?objectclass=student%2Bset&idtype=id&identifier=1634114&t=SWSCUST%2BStudent%2Bset%2BIndividual%2Bweek&days=1-7&periods=1-21&template=SWSCUST%2Bstudent%2Bset%2BIndividual%2Bweek&periods=1-21&weeks=17"
-
-const url = "http://timetable.leeds.ac.uk/teaching/201819/reporting/textspreadsheet;?objectclass=student+set&idtype=id&identifier=1634114&template=SWSCUST+Student+Set+Individual+semester&days=1-7&periods=1-21&weeks=1-44"
-
-const corsURL = `https://cors-anywhere.herokuapp.com/${url}`
-
-
 const getClasses = table => Array.from(
   Array.from(
     table.querySelectorAll("tbody tr:not(.columnTitles)")
