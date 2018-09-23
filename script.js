@@ -110,32 +110,6 @@ const days = document.querySelector(".days").children
 const times = document.querySelector(".times").children
 const line = document.querySelector(".line")
 
-retrieve.addEventListener("submit", (e) => {
-  e.preventDefault()
-  if (!link.value) {
-    alert("Please paste the link to your timetable in the box")
-  } else {
-    let identifier = getIdentifier(link.value)
-    if (identifier) {
-      let url = getCORS(identifier)
-      clearInterval(drawInterval)
-      weekDraw = draw([])
-      drawInterval = setInterval(weekDraw, 50)
-      weekDraw()
-      Array.from(grid).map(day => {
-        if (!day.classList.contains("line")) {
-          let copy = day.cloneNode(false)
-          day.parentNode.replaceChild(copy, day)
-        }
-      })
-      localStorage.removeItem("cache")
-      buildTimetable(url)
-    } else {
-      alert("Invalid link or identifier parameter not set")
-    }
-  }
-})
-
 const haveColors = {}
 
 const getColor = (course) => {
@@ -252,6 +226,32 @@ const mount = async () => {
     console.error(message)
   }
 }
+
+retrieve.addEventListener("submit", (e) => {
+  e.preventDefault()
+  if (!link.value) {
+    alert("Please paste the link to your timetable in the box")
+  } else {
+    let identifier = getIdentifier(link.value)
+    if (identifier) {
+      let url = getCORS(identifier)
+      clearInterval(drawInterval)
+      weekDraw = draw([])
+      drawInterval = setInterval(weekDraw, 50)
+      weekDraw()
+      Array.from(grid).map(day => {
+        if (!day.classList.contains("line")) {
+          let copy = day.cloneNode(false)
+          day.parentNode.replaceChild(copy, day)
+        }
+      })
+      localStorage.removeItem("cache")
+      buildTimetable(url)
+    } else {
+      alert("Invalid link or identifier parameter not set")
+    }
+  }
+})
 
 buildTimetable()
 mount()
