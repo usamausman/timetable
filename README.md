@@ -1,8 +1,6 @@
 # timetable
 A cleaner layout for the University of Leeds timetable
 
-**Note:** Offset 1 week to show usage
-
 Refresh for new colours!
 
 ## Features:

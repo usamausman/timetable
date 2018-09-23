@@ -152,15 +152,25 @@ const showClass = (dayIndex) => (singleClass, classIndex) => {
   classDiv.className = "class"
   classDiv.style = `grid-row: t${singleClass.timeBegin}-start / t${singleClass.timeEnd}-start; background: ${getColor(singleClass.code)};`
 
-  let classDivCourseP = document.createElement("p")
-  classDivCourseP.className = "code"
-  classDivCourseP.textContent = singleClass.code
-  classDiv.appendChild(classDivCourseP)
+  let classDivCodeP = document.createElement("p")
+  classDivCodeP.className = "code"
+  classDivCodeP.textContent = singleClass.code
+  classDiv.appendChild(classDivCodeP)
+
+  let classDivNameP = document.createElement("p")
+  classDivNameP.className = "name"
+  classDivNameP.textContent = singleClass.name
+  classDiv.appendChild(classDivNameP)
 
   let classDivTypeP = document.createElement("p")
-  classDivTypeP.className = "name"
-  classDivTypeP.textContent = singleClass.name
+  classDivTypeP.className = "type"
+  classDivTypeP.textContent = singleClass.type
   classDiv.appendChild(classDivTypeP)
+
+  let classDivLocationP = document.createElement("p")
+  classDivLocationP.className = "location"
+  classDivLocationP.textContent = singleClass.location
+  classDiv.appendChild(classDivLocationP)
 
   grid[dayIndex].appendChild(classDiv)
 
@@ -174,7 +184,7 @@ const showDay = (day, dayIndex) => {
 const getCurrentWeekNumber = () => {
   const diff = new Date() - new Date(2018, 8, 24)
   const diffWeeks = Math.floor(diff / 1000 / 60 / 60 / 24 / 7)
-  return 6 + diffWeeks + 1
+  return 6 + diffWeeks
 }
 
 const getClassesForCurrentWeek = (currentWeekNumber) => (classesOnDay) => classesOnDay.filter(
@@ -235,12 +245,8 @@ const buildTimetable = async (url) => {
 
 const mount = async () => {
   try {
-    console.log("attempting")
-    console.log(navigator)
     if ("serviceWorker" in navigator) {
-      console.log("registering")
       const registration = await navigator.serviceWorker.register("cs30.js")
-      console.log("registered")
     }
   } catch ({ message }) {
     console.error(message)

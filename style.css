@@ -127,7 +127,7 @@ p {
   border-radius: var(--gap);
   background: rgb(240, 240, 240);
   overflow: hidden;
-  opacity: 0.6;
+  opacity: 0.75;
   transition: transform 0.25s ease;
 }
 
@@ -138,16 +138,26 @@ p {
   box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.25);
 }
 
-.class .code {
-  font-weight: bold;
-  font-size: 20px;
+.class p {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
+.class .code {
+  font-weight: bold;
+  font-size: 20px;
+}
+
 .class .name {
   font-size: 16px;
+}
+
+.class .type, .class .location {
+  font-size: 14px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 @media (max-width: 939px) {
