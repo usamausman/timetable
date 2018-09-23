@@ -233,4 +233,16 @@ const buildTimetable = async (url) => {
   }
 }
 
+const mount = async () => {
+  try {
+    if ("serviceWorker" in navigator) {
+      const registration = await navigator.serviceWorker.register("cs30.js")
+      console.log("registered")
+    }
+  } catch ({ message }) {
+    console.error(message)
+  }
+}
+
 buildTimetable()
+mount()
