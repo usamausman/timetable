@@ -204,6 +204,7 @@ const draw = (classes) => () => {
   days[shiftedDay].classList.add("today")
 
   if (shiftedHour >= 0 && shiftedHour < 10) {
+    line.style.visibility = ""
     times[shiftedHour].classList.add("now")
 
     const nowTime = () => Math.floor(now.getHours() * 100 + now.getMinutes() * 5 / 3)
@@ -217,6 +218,8 @@ const draw = (classes) => () => {
     }
 
     line.style.top = `${(nowTime() - 900) / 10}%`
+  } else {
+    line.style.visibility = "hidden"
   }
 }
 
