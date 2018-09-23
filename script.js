@@ -181,19 +181,16 @@ const showDay = (day, dayIndex) => {
 const getCurrentWeekNumber = () => {
   const diff = new Date() - new Date(2018, 8, 24)
   const diffWeeks = Math.floor(diff / 1000 / 60 / 60 / 24 / 7)
-  return 6 + diffWeeks + 2
+  return 6 + diffWeeks + 1
 }
 
 const getClassesForCurrentWeek = (currentWeekNumber) => (classesOnDay) => classesOnDay.filter(
   singleClass => singleClass.weeks.indexOf(currentWeekNumber) !== -1
 )
 
-let dNow = new Date()
-
 const draw = (classes) => () => {
-  // const now = new Date()
-  const now = dNow
-  const shiftedDay = (now.getDay() - 1 + 7 + 2) % 7
+  const now = new Date()
+  const shiftedDay = (now.getDay() - 1 + 7) % 7
   const shiftedHour = now.getHours() - 9
 
   Array.from(justGrid.querySelectorAll(".today")).map(div => div.classList.remove("today"))
@@ -220,10 +217,6 @@ const draw = (classes) => () => {
     }
 
     line.style.top = `${(nowTime() - 900) / 10}%`
-    dNow.setMinutes(dNow.getMinutes() + 1)
-  } else {
-    dNow.setHours(9)
-    dNow.setDate(dNow.getDate() + 1)
   }
 }
 
