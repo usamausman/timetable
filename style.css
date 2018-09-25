@@ -31,7 +31,7 @@ form input, form button {
   grid-row: 1;
   grid-column: 2;
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(3, 1fr) 2fr repeat(3, 1fr);
   align-items: center;
   padding: var(--gap);
   grid-gap: var(--gap);
@@ -81,7 +81,7 @@ p {
   grid-row: 2;
   grid-column: 2; 
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(3, 1fr) 2fr repeat(3, 1fr);
   padding: var(--gap);
   grid-gap: var(--gap);
   background: white;
@@ -127,7 +127,7 @@ p {
   border-radius: var(--gap);
   background: rgb(240, 240, 240);
   overflow: hidden;
-  opacity: 0.75;
+  opacity: 0.5;
   transition: transform 0.25s ease;
 }
 
@@ -160,29 +160,66 @@ p {
   text-overflow: ellipsis;
 }
 
-@media (max-width: 939px) {
-  .days p:not(.today) {
+@media (min-width: 640px) and (max-width: 939px) {
+  .days p {
     display: none;
     visibility: hidden;
   }
 
-  .classes .day:not(.today) {
+  .days p.today, .days p.yesterday, .days p.tomorrow {
+    display: block;
+    visibility: visible;
+  }
+
+  .classes .day {
     display: none;
     visibility: hidden;
+  }
+
+  .classes .day.today, .classes .day.yesterday, .classes .day.tomorrow {
+    display: grid;
+    visibility: visible;
   }
 
   .days {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: 1fr 2fr 1fr;
   }
 
   .classes {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: 1fr 2fr 1fr;
+  }
+}
+
+@media (max-width: 639px) {
+  .days p {
+    display: none;
+    visibility: hidden;
+  }
+
+  .days p.today {
+    display: block;
+    visibility: visible;
+  }
+
+  .classes .day {
+    display: none;
+    visibility: hidden;
+  }
+
+  .classes .day.today {
+    display: grid;
+    visibility: visible;
+  }
+
+  .days {
+    grid-template-columns: 1fr;
+  }
+
+  .classes {
+    grid-template-columns: 1fr;
   }
 
   .class.now {
     transform: none;
-    z-index: 2;
-    opacity: 1;
-    box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.25);
   }
 }

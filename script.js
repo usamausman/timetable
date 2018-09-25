@@ -1,3 +1,13 @@
+const dayNames = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday"
+]
+
 const getClasses = table => Array.from(
   Array.from(
     table.querySelectorAll("tbody tr:not(.columnTitles)")
@@ -31,13 +41,15 @@ const parseWeeks = (weeks) => weeks.split(", ").reduce(
 const shiftWeeks = (weeks) => weeks.map(
   weekNumber => {
     if (weekNumber <= 11) {
-      return weekNumber + 6
+      return weekNumber
     } else if (weekNumber <= 22) {
-      return weekNumber + 10
+      return weekNumber + 4
     } else {
-      return weekNumber + 14
+      return weekNumber + 8
     }
   })
+
+const parseDays = (weekday, weeks) => weeks.map(weekNumber => weekNumber * 7 + weekday)
 
 const getInfo = (classes, weekday) => classes.map(classInfo => ({
   code: classInfo[0],
@@ -47,8 +59,7 @@ const getInfo = (classes, weekday) => classes.map(classInfo => ({
   location: classInfo[3],
   timeBegin: parseTime(classInfo[7]),
   timeEnd: parseTime(classInfo[8]),
-  weekday,
-  weeks: shiftWeeks(parseWeeks(classInfo[9]))
+  days: parseDays(weekday, shiftWeeks(parseWeeks(classInfo[9])))
 }))
 
 const getTimetable = async (url) => {
@@ -177,50 +188,105 @@ const showClass = (dayIndex) => (singleClass, classIndex) => {
   singleClass.div = classDiv
 }
 
-const showDay = (day, dayIndex) => {
-  day.map(showClass(dayIndex))
+const showClasses = (classes, dayIndex) => {
+  classes.map(showClass(dayIndex))
 }
 
-const getCurrentWeekNumber = () => {
-  const diff = new Date() - new Date(2018, 8, 24)
-  const diffWeeks = Math.floor(diff / 1000 / 60 / 60 / 24 / 7)
-  return 6 + diffWeeks
+const time = (now) => Math.floor(now.getHours() * 100 + now.getMinutes() * 5 / 3)
+
+const isNow = (now) => (singleClass) => Number(singleClass.timeBegin) <= time(now) && time(now) < Number(singleClass.timeEnd)
+
+const clearClasses = () => {
+  Array.from(grid).map(div => {
+    if (!div.classList.contains("line")) {
+      const copy = div.cloneNode(false)
+      div.parentNode.replaceChild(copy, div)
+    }
+  })
 }
 
-const getClassesForCurrentWeek = (currentWeekNumber) => (classesOnDay) => classesOnDay.filter(
-  singleClass => singleClass.weeks.indexOf(currentWeekNumber) !== -1
-)
+const showDays = (periodDays) => {
+  Array.from(days).map((day, dayIndex) => {
+    day.textContent = dayNames[periodDays[dayIndex]]
+    if (periodDays[dayIndex] > 4) {
+      day.classList.add("weekend")
+    } else {
+      day.classList.remove("weekend")
+    }
+  })
+}
+
+const getDayNumber = (date) => {
+  const diff = date - new Date(2018, 8, 24)
+  const diffDays = Math.floor(diff / 1000 / 60 / 60 / 24)
+  return diffDays
+}
+
+const getClassesForDayNumber = (dayNumber) => (singleClass) => singleClass.days.indexOf(dayNumber) !== -1
+
+const getClassesForPeriodAround = (allClasses, day) => {
+  let classesForPeriod = []
+  let periodDays = []
+  for (let i = 0; i < 7; ++i) {
+    let checkDay = day + i - 3
+    classesForPeriod.push(allClasses.filter(getClassesForDayNumber(checkDay)))
+    periodDays.push((checkDay + 7) % 7)
+  }
+  return [classesForPeriod, periodDays]
+}
+
+const drawDays = (allClasses, now) => {
+  const today = getDayNumber(now)
+  const [classes, days] = getClassesForPeriodAround(allClasses, today)
+  clearClasses()
+  classes.map(showClasses)
+  showDays(days)
+}
+
+const drawNow = (allClasses, now) => {
+  Array.from(document.querySelectorAll(".class.now")).map(div => div.classList.remove("now"))
+
+  const today = getDayNumber(now)
+  const [classes, days] = getClassesForPeriodAround(allClasses, today)
+  if (classes.length !== 0) {
+    let nowClass = classes[3].filter(isNow(now)).map(singleClass => singleClass.div.classList.add("now"))
+  }
+}
+
+let lastDate = undefined
 
 const draw = (classes) => () => {
   const now = new Date()
   const shiftedDay = (now.getDay() - 1 + 7) % 7
   const shiftedHour = now.getHours() - 9
 
-  Array.from(justGrid.querySelectorAll(".today")).map(div => div.classList.remove("today"))
-  Array.from(justDays.querySelectorAll(".today")).map(div => div.classList.remove("today"))
   Array.from(justTimes.querySelectorAll(".now")).map(div => div.classList.remove("now"))
 
-  justDays.style.gridTemplateColumns = `${"0.5fr ".repeat(shiftedDay)}1fr ${"0.5fr ".repeat(6 - shiftedDay)}`
-  justGrid.style.gridTemplateColumns = `${"0.5fr ".repeat(shiftedDay)}1fr ${"0.5fr ".repeat(6 - shiftedDay)}`
+  if (!lastDate) {
+    lastDate = new Date(now)
+    drawDays(classes, now)
+    drawNow(classes, now)
+  }
 
-  grid[shiftedDay].classList.add("today")
-  days[shiftedDay].classList.add("today")
+  if (lastDate.getDate() !== now.getDate()) {
+    console.log("First run for new day")
+    lastDate.setDate(now.getDate())
+
+    drawDays(classes, now)
+  }
 
   if (shiftedHour >= 0 && shiftedHour < 10) {
+    if (lastDate.getHours() !== now.getHours()) {
+      console.log("First run for new hour")
+      lastDate.setHours(now.getHours())
+
+      drawNow(classes, now)
+    }
+
     line.style.visibility = ""
     times[shiftedHour].classList.add("now")
 
-    const nowTime = () => Math.floor(now.getHours() * 100 + now.getMinutes() * 5 / 3)
-
-    Array.from(document.querySelectorAll(".class.now")).map(div => div.classList.remove("now"))
-
-    if (classes.length !== 0) {
-      let nowClass = classes[shiftedDay].filter(singleClass =>
-        Number(singleClass.timeBegin) <= nowTime() && nowTime() < Number(singleClass.timeEnd)
-      ).map(singleClass => singleClass.div.classList.add("now"))
-    }
-
-    line.style.top = `${(nowTime() - 900) / 10}%`
+    line.style.top = `${(time(now) - 900) / 10}%`
   } else {
     line.style.visibility = "hidden"
   }
@@ -231,15 +297,13 @@ const draw = (classes) => () => {
 const buildTimetable = async (url) => {
   try {
     const [classesByDay, classes] = await getTimetable(url)
-    const classesThisWeek = classesByDay.map(getClassesForCurrentWeek(getCurrentWeekNumber()))
-    classesThisWeek.map(showDay)
 
     clearInterval(drawInterval)
-    weekDraw = draw(classesThisWeek)
+    weekDraw = draw(classes)
     drawInterval = setInterval(weekDraw, 50)
     weekDraw()
-  } catch ({ message }) {
-    console.error(message)
+  } catch (e) {
+    console.error(e)
   }
 }
 
