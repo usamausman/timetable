@@ -121,32 +121,6 @@ const days = document.querySelector(".days").children
 const times = document.querySelector(".times").children
 const line = document.querySelector(".line")
 
-retrieve.addEventListener("submit", (e) => {
-  e.preventDefault()
-  if (!link.value) {
-    alert("Please paste the link to your timetable in the box")
-  } else {
-    let identifier = getIdentifier(link.value)
-    if (identifier) {
-      let url = getCORS(identifier)
-      clearInterval(drawInterval)
-      weekDraw = draw([])
-      drawInterval = setInterval(weekDraw, 50)
-      weekDraw()
-      Array.from(grid).map(day => {
-        if (!day.classList.contains("line")) {
-          let copy = day.cloneNode(false)
-          day.parentNode.replaceChild(copy, day)
-        }
-      })
-      localStorage.removeItem("cache")
-      buildTimetable(url)
-    } else {
-      alert("Invalid link or identifier parameter not set")
-    }
-  }
-})
-
 const haveColors = {}
 
 const getColor = (course) => {
@@ -263,12 +237,17 @@ const draw = (classes) => () => {
   Array.from(justTimes.querySelectorAll(".now")).map(div => div.classList.remove("now"))
 
   if (!lastDate) {
-    lastDate = new Date(now)
-    drawDays(classes, now)
-    drawNow(classes, now)
+    if (classes.length !== 0) {
+      lastDate = new Date(now)
+      drawDays(classes, now)
+      drawNow(classes, now)
+    } else {
+      drawDays([], now)
+      drawNow([], now)
+    }
   }
 
-  if (lastDate.getDate() !== now.getDate()) {
+  if (lastDate && lastDate.getDate() !== now.getDate()) {
     console.log("First run for new day")
     lastDate.setDate(now.getDate())
 
@@ -276,7 +255,7 @@ const draw = (classes) => () => {
   }
 
   if (shiftedHour >= 0 && shiftedHour < 10) {
-    if (lastDate.getHours() !== now.getHours()) {
+    if (lastDate && lastDate.getHours() !== now.getHours()) {
       console.log("First run for new hour")
       lastDate.setHours(now.getHours())
 
@@ -316,6 +295,28 @@ const mount = async () => {
     console.error(message)
   }
 }
+
+retrieve.addEventListener("submit", (e) => {
+  e.preventDefault()
+  if (!link.value) {
+    alert("Please paste the link to your timetable in the box")
+  } else {
+    let identifier = getIdentifier(link.value)
+    if (identifier) {
+      let url = getCORS(identifier)
+
+      clearClasses()
+      clearInterval(drawInterval)
+      weekDraw = draw([])
+      weekDraw()
+
+      localStorage.removeItem("cache")
+      buildTimetable(url)
+    } else {
+      alert("Invalid link or identifier parameter not set")
+    }
+  }
+})
 
 buildTimetable()
 mount()
