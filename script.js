@@ -90,14 +90,16 @@ const getTimetable = async (url) => {
     if (url) {
       rawResponse = await fetch(url)
       if (rawResponse.ok) {
+        localStorage.setItem("identifier", getIdentifier(url))
         rawHTML = await rawResponse.text()
       } else {
+        localStorage.setItem("identifier", "")
         alert("400 error, check that the link works")
         return [[], []]
       }
       localStorage.setItem("cache", rawHTML)
     } else {
-      alert("Copy timetable link from Student Services into box at the bottom\nLooks like http://timetable.leeds.ac.uk/...")
+      alert("Copy timetable link from Student Services into the box at the bottom\nLooks like http://timetable.leeds.ac.uk/...")
       return [[], []]
     }
   }
@@ -224,17 +226,19 @@ const drawDays = (allClasses, now) => {
 const drawNow = (allClasses, now) => {
   let shiftedHour = now.getHours() - 9
   let oldClasses = Array.from(document.querySelectorAll(".class.now"))
-
-  if (!times[shiftedHour].classList.contains("now")) {
-    if (times[shiftedHour - 1]) {
-      times[shiftedHour - 1].removeAttribute("class")
+  
+  if (times[shiftedHour]) {
+    if (!times[shiftedHour].classList.contains("now")) {
+      if (times[shiftedHour - 1]) {
+        times[shiftedHour - 1].removeAttribute("class")
+      }
+      times[shiftedHour].classList.add("now")
     }
-    times[shiftedHour].classList.add("now")
   }
-
+  
   const today = getDayNumber(now)
   const [classes, days] = getClassesForPeriodAround(allClasses, today)
-  if (classes.length !== 0) {
+  if (allClasses.length !== 0) {
     let nowClasses = classes[3].filter(isNow(now)).map(singleClass => singleClass.div)
     if (oldClasses[0] !== nowClasses[0]) {
       oldClasses.forEach(singleDiv => singleDiv.classList.remove("now"))
@@ -245,11 +249,11 @@ const drawNow = (allClasses, now) => {
 
 let dNow = new Date(2018, 8, 28, 9, 30)
 
-const draw = (classes) => () => {
+const draw = (classes) => (initial = false) => {
   const now = new Date(dNow)
   const shiftedHour = now.getHours() - 9
 
-  if (!lastDate) {
+  if (initial || !lastDate) {
     if (classes.length !== 0) {
       lastDate = new Date(now)
       drawDays(classes, now)
@@ -262,7 +266,6 @@ const draw = (classes) => () => {
 
   if (lastDate && lastDate.getDate() !== now.getDate()) {
     lastDate.setDate(now.getDate())
-
     drawDays(classes, now)
   }
 
@@ -288,11 +291,11 @@ const draw = (classes) => () => {
 const buildTimetable = async (url) => {
   try {
     const [classesByDay, classes] = await getTimetable(url)
-
+    
     clearInterval(drawInterval)
     weekDraw = draw(classes)
     drawInterval = setInterval(weekDraw, 50)
-    weekDraw()
+    weekDraw(true)
   } catch (e) {
     console.error(e)
   }
@@ -311,7 +314,7 @@ const mount = async () => {
 retrieve.addEventListener("submit", (e) => {
   e.preventDefault()
   if (!link.value) {
-    alert("Please paste the link to your timetable in the box")
+    alert("Please copy timetable link from Student Services into this box\nLooks like http://timetable.leeds.ac.uk/...")
   } else {
     let identifier = getIdentifier(link.value)
     if (identifier) {
@@ -320,13 +323,32 @@ retrieve.addEventListener("submit", (e) => {
       clearClasses()
       clearInterval(drawInterval)
       weekDraw = draw([])
-      weekDraw()
+      drawInterval = setInterval(weekDraw, 50)
+      weekDraw(true)
 
       localStorage.removeItem("cache")
       buildTimetable(url)
     } else {
       alert("Invalid link or identifier parameter not set")
     }
+  }
+})
+
+update.addEventListener("click", async (e) => {
+  options.classList.add("updating")
+  const identifier = localStorage.getItem("identifier")
+  if (!identifier) {
+    options.classList.remove("updating")
+    return alert("Please copy timetable link from Student Services into the box at the bottom\nLooks like http://timetable.leeds.ac.uk/...")
+  }
+  if (!navigator.onLine) {
+    options.classList.remove("updating")
+    return alert("Network is offline")
+  } else {
+    let url = getCORS(identifier)
+    localStorage.removeItem("cache")
+    await buildTimetable(url)
+    options.classList.remove("updating")
   }
 })
 

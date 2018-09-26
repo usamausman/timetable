@@ -51,7 +51,6 @@ body.dark .class {
 
 .options svg {
   width: 28px;
-  opacity: 0.5;
   cursor: pointer;
   transition: opacity 0.25s ease, transform 0.25s ease;
 }
@@ -67,8 +66,7 @@ body.dark .class {
   to   { transform: rotateZ(360deg) }
 }
 
-.options.updating svg {
-  opacity: 1;
+.options.updating svg.update {
   animation: spin 1s linear infinite;
 }
 
@@ -96,7 +94,7 @@ body.dark .options svg.dim {
   transition: fill 0.25s ease;
 }
 
-body.dark svg.dim .light {
+body.dark svg.dim .switch {
   fill: #aaa;
 }
 
