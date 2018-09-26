@@ -1,68 +1,67 @@
 <!DOCTYPE html>
 <html>
-
-<head>
-  <meta charset="utf-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
-  <link rel="manifest" href="icons/site.webmanifest">
-  <link rel="mask-icon" href="icons/safari-pinned-tab.svg" color="#222222">
-  <link rel="shortcut icon" href="favicon.ico">
-  <meta name="msapplication-TileColor" content="#b91d47">
-  <meta name="msapplication-config" content="icons/browserconfig.xml">
-  <meta name="theme-color" content="#ffffff">
-  <title>UoL Timetable</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" type="text/css" media="screen" href="style.css" />
-  <script src="script.js" defer></script>
-</head>
-
-<body>
-  <div class="container">
-    <div class="box"></div>
-    <div class="days">
-      <p>Monday</p>
-      <p>Tuesday</p>
-      <p>Wednesday</p>
-      <p>Thursday</p>
-      <p>Friday</p>
-      <p class="weekend">Saturday</p>
-      <p class="weekend">Sunday</p>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
+    <link rel="manifest" href="icons/site.webmanifest">
+    <link rel="mask-icon" href="icons/safari-pinned-tab.svg" color="#222222">
+    <link rel="shortcut icon" href="favicon.ico">
+    <meta name="msapplication-TileColor" content="#b91d47">
+    <meta name="msapplication-config" content="icons/browserconfig.xml">
+    <meta name="theme-color" content="#ffffff">
+    <title>UoL Timetable</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" media="screen" href="style.css" />
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="box">
+        <img src="refresh.svg" />
+      </div>
+      <div class="days">
+        <p></p>
+        <p></p>
+        <p class="yesterday"></p>
+        <p class="today"></p>
+        <p class="tomorrow"></p>
+        <p></p>
+        <p></p>
+      </div>
+      <div class="times">
+        <p>9 AM</p>
+        <p>10 AM</p>
+        <p>11 AM</p>
+        <p>12 PM</p>
+        <p>1 PM</p>
+        <p>2 PM</p>
+        <p>3 PM</p>
+        <p>4 PM</p>
+        <p>5 PM</p>
+        <p>6 PM</p>
+      </div>
+      <div class="classes">
+        <div class="day"></div>
+        <div class="day"></div>
+        <div class="day yesterday"></div>
+        <div class="day today"></div>
+        <div class="day tomorrow"></div>
+        <div class="day"></div>
+        <div class="day"></div>
+        <div class="line"></div>
+      </div>
     </div>
-    <div class="times">
-      <p>9 AM</p>
-      <p>10 AM</p>
-      <p>11 AM</p>
-      <p>12 PM</p>
-      <p>1 PM</p>
-      <p>2 PM</p>
-      <p>3 PM</p>
-      <p>4 PM</p>
-      <p>5 PM</p>
-      <p>6 PM</p>
-    </div>
-    <div class="classes">
-      <div class="day day0"></div>
-      <div class="day day1"></div>
-      <div class="day day2"></div>
-      <div class="day day3"></div>
-      <div class="day day4"></div>
-      <div class="day day5"></div>
-      <div class="day day6"></div>
-      <div class="line"></div>
-    </div>
-  </div>
-  <form>
-    <div>
-      <label for="link">Link to Timetable:</label>
-    </div>
-    <div>
-      <input id="link" name="link" type="text">
-      <button>Retrieve Timetable</button>
-    </div>
-  </form>
-</body>
-
+    <form>
+      <div>
+        <label for="link">Link to Timetable:</label>
+      </div>
+      <div>
+        <input id="link" name="link" type="text">
+        <button>Retrieve Timetable</button>
+      </div>
+    </form>
+  </body>
 </html>
