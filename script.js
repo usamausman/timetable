@@ -1,3 +1,18 @@
+const link = document.querySelector("input#link")
+const retrieve = document.querySelector("form")
+
+const justGrid = document.querySelector(".classes")
+const justDays = document.querySelector(".days")
+const justTimes = document.querySelector(".times")
+
+const options = document.querySelector(".options")
+const update = options.querySelector(".update")
+const dim = options.querySelector(".dim")
+const grid = document.querySelector(".classes").children
+const days = document.querySelector(".days").children
+const times = document.querySelector(".times").children
+const line = document.querySelector(".line")
+
 const dayNames = [
   "Monday",
   "Tuesday",
@@ -7,6 +22,12 @@ const dayNames = [
   "Saturday",
   "Sunday"
 ]
+
+const haveColors = {}
+
+let weekDraw
+let drawInterval
+let lastDate = undefined
 
 const getClasses = table => Array.from(
   Array.from(
@@ -97,9 +118,6 @@ const getTimetable = async (url) => {
 
 const getCORS = (identifier) => `https://cors-anywhere.herokuapp.com/http://timetable.leeds.ac.uk/teaching/201819/reporting/textspreadsheet;?objectclass=student+set&idtype=id&identifier=${identifier}&template=SWSCUST+Student+Set+Individual+semester&days=1-7&periods=1-21&weeks=1-44`
 
-let weekDraw
-let drawInterval
-
 const getIdentifier = (url) => {
   let match = url.match(/(?:.*identifier=)(\d+)(?:.*)/)
   if (match) {
@@ -108,20 +126,6 @@ const getIdentifier = (url) => {
     return undefined
   }
 }
-
-const link = document.querySelector("input#link")
-const retrieve = document.querySelector("form")
-
-const justGrid = document.querySelector(".classes")
-const justDays = document.querySelector(".days")
-const justTimes = document.querySelector(".times")
-
-const grid = document.querySelector(".classes").children
-const days = document.querySelector(".days").children
-const times = document.querySelector(".times").children
-const line = document.querySelector(".line")
-
-const haveColors = {}
 
 const getColor = (course) => {
   const randHex = () => Math.random() * 155 + 100
@@ -218,23 +222,32 @@ const drawDays = (allClasses, now) => {
 }
 
 const drawNow = (allClasses, now) => {
-  Array.from(document.querySelectorAll(".class.now")).map(div => div.classList.remove("now"))
+  let shiftedHour = now.getHours() - 9
+  let oldClasses = Array.from(document.querySelectorAll(".class.now"))
+
+  if (!times[shiftedHour].classList.contains("now")) {
+    if (times[shiftedHour - 1]) {
+      times[shiftedHour - 1].removeAttribute("class")
+    }
+    times[shiftedHour].classList.add("now")
+  }
 
   const today = getDayNumber(now)
   const [classes, days] = getClassesForPeriodAround(allClasses, today)
   if (classes.length !== 0) {
-    let nowClass = classes[3].filter(isNow(now)).map(singleClass => singleClass.div.classList.add("now"))
+    let nowClasses = classes[3].filter(isNow(now)).map(singleClass => singleClass.div)
+    if (oldClasses[0] !== nowClasses[0]) {
+      oldClasses.forEach(singleDiv => singleDiv.classList.remove("now"))
+    }
+    nowClasses.forEach(singleDiv => singleDiv.classList.add("now"))
   }
 }
 
-let lastDate = undefined
+let dNow = new Date(2018, 8, 28, 9, 30)
 
 const draw = (classes) => () => {
-  const now = new Date()
-  const shiftedDay = (now.getDay() - 1 + 7) % 7
+  const now = new Date(dNow)
   const shiftedHour = now.getHours() - 9
-
-  Array.from(justTimes.querySelectorAll(".now")).map(div => div.classList.remove("now"))
 
   if (!lastDate) {
     if (classes.length !== 0) {
@@ -248,27 +261,26 @@ const draw = (classes) => () => {
   }
 
   if (lastDate && lastDate.getDate() !== now.getDate()) {
-    console.log("First run for new day")
     lastDate.setDate(now.getDate())
 
     drawDays(classes, now)
   }
 
   if (shiftedHour >= 0 && shiftedHour < 10) {
-    if (lastDate && lastDate.getHours() !== now.getHours()) {
-      console.log("First run for new hour")
+    if (lastDate && lastDate.getMinutes() !== now.getMinutes()) {
       lastDate.setHours(now.getHours())
 
       drawNow(classes, now)
     }
 
     line.style.visibility = ""
-    times[shiftedHour].classList.add("now")
 
     line.style.top = `${(time(now) - 900) / 10}%`
   } else {
     line.style.visibility = "hidden"
+    Array.from(times).forEach(time => time.classList.remove("now"))
   }
+  dNow.setMinutes(dNow.getMinutes() + 1)
 }
 
 /* BUILD */
@@ -315,6 +327,16 @@ retrieve.addEventListener("submit", (e) => {
     } else {
       alert("Invalid link or identifier parameter not set")
     }
+  }
+})
+
+dim.addEventListener("click", (e) => {
+  document.body.classList.toggle("dark")
+  let themeColor = document.head.querySelector("meta[name=\"theme-color\"]")
+  if (themeColor.content === "#ffffff") {
+    themeColor.content = "#222222"
+  } else {
+    themeColor.content = "#ffffff"
   }
 })
 
