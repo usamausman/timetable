@@ -29,7 +29,9 @@ self.addEventListener("install", (e) => {
 
 self.addEventListener("fetch", (event) => {
   event.respondWith(fromCache(event.request))
-  event.waitUntil(update(event.request))
+  if (event.request.url.indexOf("heroku") === -1) {
+    event.waitUntil(update(event.request))
+  }
 })
 
 const fromCache = (request) => {

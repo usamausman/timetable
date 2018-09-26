@@ -5,11 +5,10 @@ Refresh for new colours!
 
 ## Features:
 * Less cluttered display
-* Shows classes for the current week
+* Shows classes for a sliding 7-day window
 * Offline support
 
 ## Future ideas?
-* Display 3 days backwards/forwards instead of week display
 * Searching
 * Filtering
 * Persistent colours
