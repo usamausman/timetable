@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 const cacheName = "timetable"
 
 self.addEventListener("install", (e) => {
@@ -6,12 +5,6 @@ self.addEventListener("install", (e) => {
     caches.open(cacheName).then((cache) => {
       return cache.addAll([
         "/timetable/",
-=======
-self.addEventListener("install", (e) => {
-  e.waitUntil(
-    caches.open("timetable").then((cache) => {
-      return cache.addAll([
->>>>>>> c2fc5af... Offline use with serviceWorker
         "index.html",
         "script.js",
         "style.css",
