@@ -247,10 +247,8 @@ const drawNow = (allClasses, now) => {
   }
 }
 
-let dNow = new Date(2018, 8, 28, 9, 30)
-
 const draw = (classes) => (initial = false) => {
-  const now = new Date(dNow)
+  const now = new Date()
   const shiftedHour = now.getHours() - 9
 
   if (initial || !lastDate) {
@@ -283,7 +281,6 @@ const draw = (classes) => (initial = false) => {
     line.style.visibility = "hidden"
     Array.from(times).forEach(time => time.classList.remove("now"))
   }
-  dNow.setMinutes(dNow.getMinutes() + 1)
 }
 
 /* BUILD */
