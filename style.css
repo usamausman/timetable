@@ -8,14 +8,28 @@
 body {
   margin: 0;
   padding: 0;
+
+  --background: rgb(255, 255, 255);
+  --background-fade: rgba(255, 255, 255, 0.8);
+  --text: #222;
+  --class-text: #222;
+  --now: red;
+
+  background: var(--background);
+
+  transition: background 0.25s ease;
 }
 
-form {
-  margin: 8px;
+body.dark {
+  --background: rgb(34, 34, 34);
+  --background-fade: rgba(34, 34, 34, 0.8);
+  --text: #aaa;
+  --class-text: #888;
+  --now: rgb(140, 0, 0);
 }
 
-form input, form button {
-  max-width: 50%;
+body.dark .class {
+  background: #111 !important;
 }
 
 .container {
@@ -23,11 +37,75 @@ form input, form button {
   grid-template: 0.5fr var(--time-slots-fr) / 0.5fr 7fr;
 }
 
-.box {
-  background: white;
+.options {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--background-fade);
+
+  transition: background 0.25s ease;
+}
+
+.options svg {
+  width: 28px;
+  cursor: pointer;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.options svg path {
+  fill: var(--text);
+
+  transition: fill 0.25s ease;
+}
+
+@keyframes spin {
+  from { transform: rotateZ(0deg) }
+  to   { transform: rotateZ(360deg) }
+}
+
+.options.updating svg.update {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes back {
+  from { transform: rotateZ(0deg) }
+  to   { transform: rotateZ(180deg) }
+}
+
+body .options svg.dim {
+  animation: back 0.25s forwards ease;
+}
+
+@keyframes half {
+  from { transform: rotateZ(180deg) }
+  to   { transform: rotateZ(360deg) }
+}
+
+body.dark .options svg.dim {
+  animation: half 0.25s forwards ease;
+}
+
+.options svg.dim .switch {
+  fill: #fff;
+  
+  transition: fill 0.25s ease;
+}
+
+body.dark svg.dim .switch {
+  fill: #aaa;
+}
+
+.options svg.dim .dark {
+  fill: #222;
 }
 
 .days {
+  position: sticky;
+  top: 0;
+  z-index: 3;
   grid-row: 1;
   grid-column: 2;
   display: grid;
@@ -35,9 +113,17 @@ form input, form button {
   align-items: center;
   padding: var(--gap);
   grid-gap: var(--gap);
-  background: white;
+  background: var(--background-fade);
   color: rgb(40, 40, 40);
   font-weight: bold;
+
+  transition: background 0.25s ease;
+}
+
+.days p {
+  color: var(--text);
+
+  transition: color 0.25s ease;
 }
 
 .days .weekend {
@@ -45,7 +131,9 @@ form input, form button {
 }
 
 .days .today {
-  color: red;
+  color: var(--now);
+
+  transition: color 0.25s ease;
 }
 
 .times {
@@ -53,20 +141,19 @@ form input, form button {
   grid-column: 1;
   display: grid;
   grid-template-rows: repeat(var(--time-slots), 1fr);
-  /* align-items: center; */
   padding: var(--gap);
   grid-gap: var(--gap);
-  background: white;
   color: rgb(40, 40, 40);
 }
 
 .times p {
+  color: var(--text);
   opacity: 0.75;
   transition: color 0.25s ease, opacity 0.25s ease, font-weight 0.25s ease;
 }
 
 .times .now {
-  color: red;
+  color: var(--now);
   font-weight: bold;
   opacity: 1;
 }
@@ -84,7 +171,6 @@ p {
   grid-template-columns: repeat(3, 1fr) 2fr repeat(3, 1fr);
   padding: var(--gap);
   grid-gap: var(--gap);
-  background: white;
 
   transition: grid-template-columns 0.25s ease;
 }
@@ -95,7 +181,9 @@ p {
   right: 0;
   height: 1px;
   z-index: 1;
-  background: red;
+  background: var(--now);
+
+  transition: background 0.25s ease;
 }
 
 .classes .day {
@@ -128,7 +216,7 @@ p {
   background: rgb(240, 240, 240);
   overflow: hidden;
   opacity: 0.5;
-  transition: transform 0.25s ease;
+  transition: transform 0.25s ease, background 0.25s ease;
 }
 
 .class.now {
@@ -139,9 +227,12 @@ p {
 }
 
 .class p {
+  color: var(--class-text);
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+
+  transition: color 0.25s ease;
 }
 
 .class .code {
@@ -158,6 +249,28 @@ p {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+
+form {
+  margin: 8px;
+}
+
+form input, form button {
+  max-width: 50%;
+}
+
+form, input, button {
+  color: var(--text);
+
+  transition: color 0.25s ease;
+}
+
+input, button {
+  background: var(--background);
+  border: none;
+  border-bottom: solid 2px var(--text);
+
+  transition: background 0.25s ease;
 }
 
 @media (min-width: 640px) and (max-width: 939px) {

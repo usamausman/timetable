@@ -1,3 +1,18 @@
+const link = document.querySelector("input#link")
+const retrieve = document.querySelector("form")
+
+const justGrid = document.querySelector(".classes")
+const justDays = document.querySelector(".days")
+const justTimes = document.querySelector(".times")
+
+const options = document.querySelector(".options")
+const update = options.querySelector(".update")
+const dim = options.querySelector(".dim")
+const grid = document.querySelector(".classes").children
+const days = document.querySelector(".days").children
+const times = document.querySelector(".times").children
+const line = document.querySelector(".line")
+
 const dayNames = [
   "Monday",
   "Tuesday",
@@ -7,6 +22,12 @@ const dayNames = [
   "Saturday",
   "Sunday"
 ]
+
+const haveColors = {}
+
+let weekDraw
+let drawInterval
+let lastDate = undefined
 
 const getClasses = table => Array.from(
   Array.from(
@@ -69,14 +90,16 @@ const getTimetable = async (url) => {
     if (url) {
       rawResponse = await fetch(url)
       if (rawResponse.ok) {
+        localStorage.setItem("identifier", getIdentifier(url))
         rawHTML = await rawResponse.text()
       } else {
+        localStorage.setItem("identifier", "")
         alert("400 error, check that the link works")
         return [[], []]
       }
       localStorage.setItem("cache", rawHTML)
     } else {
-      alert("Copy timetable link from Student Services into box at the bottom\nLooks like http://timetable.leeds.ac.uk/...")
+      alert("Copy timetable link from Student Services into the box at the bottom\nLooks like http://timetable.leeds.ac.uk/...")
       return [[], []]
     }
   }
@@ -97,9 +120,6 @@ const getTimetable = async (url) => {
 
 const getCORS = (identifier) => `https://cors-anywhere.herokuapp.com/http://timetable.leeds.ac.uk/teaching/201819/reporting/textspreadsheet;?objectclass=student+set&idtype=id&identifier=${identifier}&template=SWSCUST+Student+Set+Individual+semester&days=1-7&periods=1-21&weeks=1-44`
 
-let weekDraw
-let drawInterval
-
 const getIdentifier = (url) => {
   let match = url.match(/(?:.*identifier=)(\d+)(?:.*)/)
   if (match) {
@@ -108,20 +128,6 @@ const getIdentifier = (url) => {
     return undefined
   }
 }
-
-const link = document.querySelector("input#link")
-const retrieve = document.querySelector("form")
-
-const justGrid = document.querySelector(".classes")
-const justDays = document.querySelector(".days")
-const justTimes = document.querySelector(".times")
-
-const grid = document.querySelector(".classes").children
-const days = document.querySelector(".days").children
-const times = document.querySelector(".times").children
-const line = document.querySelector(".line")
-
-const haveColors = {}
 
 const getColor = (course) => {
   const randHex = () => Math.random() * 155 + 100
@@ -218,25 +224,34 @@ const drawDays = (allClasses, now) => {
 }
 
 const drawNow = (allClasses, now) => {
-  Array.from(document.querySelectorAll(".class.now")).map(div => div.classList.remove("now"))
-
+  let shiftedHour = now.getHours() - 9
+  let oldClasses = Array.from(document.querySelectorAll(".class.now"))
+  
+  if (times[shiftedHour]) {
+    if (!times[shiftedHour].classList.contains("now")) {
+      if (times[shiftedHour - 1]) {
+        times[shiftedHour - 1].removeAttribute("class")
+      }
+      times[shiftedHour].classList.add("now")
+    }
+  }
+  
   const today = getDayNumber(now)
   const [classes, days] = getClassesForPeriodAround(allClasses, today)
-  if (classes.length !== 0) {
-    let nowClass = classes[3].filter(isNow(now)).map(singleClass => singleClass.div.classList.add("now"))
+  if (allClasses.length !== 0) {
+    let nowClasses = classes[3].filter(isNow(now)).map(singleClass => singleClass.div)
+    if (oldClasses[0] !== nowClasses[0]) {
+      oldClasses.forEach(singleDiv => singleDiv.classList.remove("now"))
+    }
+    nowClasses.forEach(singleDiv => singleDiv.classList.add("now"))
   }
 }
 
-let lastDate = undefined
-
-const draw = (classes) => () => {
+const draw = (classes) => (initial = false) => {
   const now = new Date()
-  const shiftedDay = (now.getDay() - 1 + 7) % 7
   const shiftedHour = now.getHours() - 9
 
-  Array.from(justTimes.querySelectorAll(".now")).map(div => div.classList.remove("now"))
-
-  if (!lastDate) {
+  if (initial || !lastDate) {
     if (classes.length !== 0) {
       lastDate = new Date(now)
       drawDays(classes, now)
@@ -248,26 +263,23 @@ const draw = (classes) => () => {
   }
 
   if (lastDate && lastDate.getDate() !== now.getDate()) {
-    console.log("First run for new day")
     lastDate.setDate(now.getDate())
-
     drawDays(classes, now)
   }
 
   if (shiftedHour >= 0 && shiftedHour < 10) {
-    if (lastDate && lastDate.getHours() !== now.getHours()) {
-      console.log("First run for new hour")
+    if (lastDate && lastDate.getMinutes() !== now.getMinutes()) {
       lastDate.setHours(now.getHours())
 
       drawNow(classes, now)
     }
 
     line.style.visibility = ""
-    times[shiftedHour].classList.add("now")
 
     line.style.top = `${(time(now) - 900) / 10}%`
   } else {
     line.style.visibility = "hidden"
+    Array.from(times).forEach(time => time.classList.remove("now"))
   }
 }
 
@@ -276,11 +288,11 @@ const draw = (classes) => () => {
 const buildTimetable = async (url) => {
   try {
     const [classesByDay, classes] = await getTimetable(url)
-
+    
     clearInterval(drawInterval)
     weekDraw = draw(classes)
     drawInterval = setInterval(weekDraw, 50)
-    weekDraw()
+    weekDraw(true)
   } catch (e) {
     console.error(e)
   }
@@ -299,7 +311,7 @@ const mount = async () => {
 retrieve.addEventListener("submit", (e) => {
   e.preventDefault()
   if (!link.value) {
-    alert("Please paste the link to your timetable in the box")
+    alert("Please copy timetable link from Student Services into this box\nLooks like http://timetable.leeds.ac.uk/...")
   } else {
     let identifier = getIdentifier(link.value)
     if (identifier) {
@@ -308,13 +320,42 @@ retrieve.addEventListener("submit", (e) => {
       clearClasses()
       clearInterval(drawInterval)
       weekDraw = draw([])
-      weekDraw()
+      drawInterval = setInterval(weekDraw, 50)
+      weekDraw(true)
 
       localStorage.removeItem("cache")
       buildTimetable(url)
     } else {
       alert("Invalid link or identifier parameter not set")
     }
+  }
+})
+
+update.addEventListener("click", async (e) => {
+  options.classList.add("updating")
+  const identifier = localStorage.getItem("identifier")
+  if (!identifier) {
+    options.classList.remove("updating")
+    return alert("Please copy timetable link from Student Services into the box at the bottom\nLooks like http://timetable.leeds.ac.uk/...")
+  }
+  if (!navigator.onLine) {
+    options.classList.remove("updating")
+    return alert("Network is offline")
+  } else {
+    let url = getCORS(identifier)
+    localStorage.removeItem("cache")
+    await buildTimetable(url)
+    options.classList.remove("updating")
+  }
+})
+
+dim.addEventListener("click", (e) => {
+  document.body.classList.toggle("dark")
+  let themeColor = document.head.querySelector("meta[name=\"theme-color\"]")
+  if (themeColor.content === "#ffffff") {
+    themeColor.content = "#222222"
+  } else {
+    themeColor.content = "#ffffff"
   }
 })
 

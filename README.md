@@ -5,8 +5,9 @@ Refresh for new colours!
 
 ## Features:
 * Less cluttered display
-* Shows classes for a sliding 7-day window
+* Dark mode
 * Offline support
+* Shows classes for a sliding 7-day window
 
 ## Future ideas?
 * Searching
