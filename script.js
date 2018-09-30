@@ -1,17 +1,19 @@
 const link = document.querySelector("input#link")
 const retrieve = document.querySelector("form")
 
-const justGrid = document.querySelector(".classes")
-const justDays = document.querySelector(".days")
-const justTimes = document.querySelector(".times")
-
 const options = document.querySelector(".options")
 const update = options.querySelector(".update")
 const dim = options.querySelector(".dim")
 const grid = document.querySelector(".classes").children
-const days = document.querySelector(".days").children
+const days = Array.from(document.querySelectorAll(".days div"))
+const dayParts = (el) => [el.querySelector(".day"), el.querySelector(".date")]
 const times = document.querySelector(".times").children
 const line = document.querySelector(".line")
+
+const prev = document.querySelector(".prev")
+const next = document.querySelector(".next")
+
+let weekOffset = 0
 
 const dayNames = [
   "Monday",
@@ -21,6 +23,21 @@ const dayNames = [
   "Friday",
   "Saturday",
   "Sunday"
+]
+
+const monthNames = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec"
 ]
 
 const haveColors = {}
@@ -130,7 +147,7 @@ const getIdentifier = (url) => {
 }
 
 const getColor = (course) => {
-  const randHex = () => Math.random() * 155 + 100
+  const randHex = () => Math.round(Math.random() * 155 + 100)
 
   if (!haveColors.hasOwnProperty(course)) {
     haveColors[course] = `rgb(${randHex()}, ${randHex()}, ${randHex()})`
@@ -142,6 +159,11 @@ const showClass = (dayIndex) => (singleClass, classIndex) => {
   let classDiv = document.createElement("div")
   classDiv.className = "class"
   classDiv.style = `grid-row: t${singleClass.timeBegin}-start / t${singleClass.timeEnd}-start; background: ${getColor(singleClass.code)};`
+
+  let classDivLocationP = document.createElement("p")
+  classDivLocationP.className = "location"
+  classDivLocationP.textContent = singleClass.location
+  classDiv.appendChild(classDivLocationP)
 
   let classDivCodeP = document.createElement("p")
   classDivCodeP.className = "code"
@@ -158,11 +180,6 @@ const showClass = (dayIndex) => (singleClass, classIndex) => {
   classDivTypeP.textContent = singleClass.type
   classDiv.appendChild(classDivTypeP)
 
-  let classDivLocationP = document.createElement("p")
-  classDivLocationP.className = "location"
-  classDivLocationP.textContent = singleClass.location
-  classDiv.appendChild(classDivLocationP)
-
   grid[dayIndex].appendChild(classDiv)
 
   singleClass.div = classDiv
@@ -174,7 +191,7 @@ const showClasses = (classes, dayIndex) => {
 
 const time = (now) => Math.floor(now.getHours() * 100 + now.getMinutes() * 5 / 3)
 
-const isNow = (now) => (singleClass) => Number(singleClass.timeBegin) <= time(now) && time(now) < Number(singleClass.timeEnd)
+const isNow = (now) => (singleClass) => weekOffset === 0 && Number(singleClass.timeBegin) <= time(now) && time(now) < Number(singleClass.timeEnd)
 
 const clearClasses = () => {
   Array.from(grid).map(div => {
@@ -186,14 +203,23 @@ const clearClasses = () => {
 }
 
 const showDays = (periodDays) => {
-  Array.from(days).map((day, dayIndex) => {
-    day.textContent = dayNames[periodDays[dayIndex]]
-    if (periodDays[dayIndex] > 4) {
-      day.classList.add("weekend")
+  days.map((el, dayIndex) => {
+    let [day, date] = dayParts(el)
+    day.textContent = periodDays[dayIndex][0]
+    date.textContent = periodDays[dayIndex][1]
+    if (periodDays[dayIndex][0] === dayNames[5] || periodDays[dayIndex][0] === dayNames[6]) {
+      el.classList.add("weekend")
     } else {
-      day.classList.remove("weekend")
+      el.classList.remove("weekend")
     }
   })
+  if (weekOffset === 0) {
+    days[0].classList.add("today")
+    grid[0].classList.add("today")
+  } else {
+    days[0].classList.remove("today")
+    grid[0].classList.remove("today")
+  }
 }
 
 const getDayNumber = (date) => {
@@ -208,9 +234,11 @@ const getClassesForPeriodAround = (allClasses, day) => {
   let classesForPeriod = []
   let periodDays = []
   for (let i = 0; i < 7; ++i) {
-    let checkDay = day + i - 3
+    let checkDay = day + i
     classesForPeriod.push(allClasses.filter(getClassesForDayNumber(checkDay)))
-    periodDays.push((checkDay + 7) % 7)
+    let d = new Date(2018, 8, 24)
+    d.setDate(d.getDate() + checkDay)
+    periodDays.push([`${dayNames[(checkDay + 7) % 7]}`, `${monthNames[d.getMonth()]} ${d.getDate()}`])
   }
   return [classesForPeriod, periodDays]
 }
@@ -239,7 +267,7 @@ const drawNow = (allClasses, now) => {
   const today = getDayNumber(now)
   const [classes, days] = getClassesForPeriodAround(allClasses, today)
   if (allClasses.length !== 0) {
-    let nowClasses = classes[3].filter(isNow(now)).map(singleClass => singleClass.div)
+    let nowClasses = classes[0].filter(isNow(now)).map(singleClass => singleClass.div)
     if (oldClasses[0] !== nowClasses[0]) {
       oldClasses.forEach(singleDiv => singleDiv.classList.remove("now"))
     }
@@ -249,6 +277,7 @@ const drawNow = (allClasses, now) => {
 
 const draw = (classes) => (initial = false) => {
   const now = new Date()
+  now.setDate(now.getDate() + weekOffset * 7)
   const shiftedHour = now.getHours() - 9
 
   if (initial || !lastDate) {
@@ -308,6 +337,18 @@ const mount = async () => {
   }
 }
 
+const checkMode = () => {
+  const mode = localStorage.getItem("mode")
+  const themeColor = document.head.querySelector("meta[name=\"theme-color\"]")
+
+  if (mode === "dark") {
+    document.body.classList.add("dark")
+  } else {
+    document.body.classList.remove("dark")
+  }
+  themeColor.content = getComputedStyle(document.body).getPropertyValue("--background")
+}
+
 retrieve.addEventListener("submit", (e) => {
   e.preventDefault()
   if (!link.value) {
@@ -350,14 +391,24 @@ update.addEventListener("click", async (e) => {
 })
 
 dim.addEventListener("click", (e) => {
-  document.body.classList.toggle("dark")
-  let themeColor = document.head.querySelector("meta[name=\"theme-color\"]")
-  if (themeColor.content === "#ffffff") {
-    themeColor.content = "#222222"
+  if (document.body.classList.contains("dark")) {
+    localStorage.setItem("mode", "")
   } else {
-    themeColor.content = "#ffffff"
+    localStorage.setItem("mode", "dark")
   }
+  checkMode()
 })
 
+prev.addEventListener("click", () => {
+  weekOffset -= 1
+  lastDate = undefined
+})
+
+next.addEventListener("click", () => {
+  weekOffset += 1
+  lastDate = undefined
+})
+
+checkMode()
 buildTimetable()
 mount()

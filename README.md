@@ -7,7 +7,8 @@ Refresh for new colours!
 * Less cluttered display
 * Dark mode
 * Offline support
-* Shows classes for a sliding 7-day window
+* Shows classes for the next 7 days
+* Navigation for previous/next week
 
 ## Future ideas?
 * Searching
