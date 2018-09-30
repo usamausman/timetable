@@ -277,7 +277,7 @@ const drawNow = (allClasses, now) => {
 }
 
 const draw = (classes) => (initial = false) => {
-  const now = new Date(2018, 9, 1, 10, 30)
+  const now = new Date()
   now.setDate(now.getDate() + weekOffset * 7)
   const shiftedHour = now.getHours() - 9
 
