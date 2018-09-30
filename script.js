@@ -97,7 +97,8 @@ const getInfo = (classes, weekday) => classes.map(classInfo => ({
   location: classInfo[3],
   timeBegin: parseTime(classInfo[7]),
   timeEnd: parseTime(classInfo[8]),
-  days: parseDays(weekday, shiftWeeks(parseWeeks(classInfo[9])))
+  days: parseDays(weekday, shiftWeeks(parseWeeks(classInfo[9]))),
+  teacher: classInfo[10]
 }))
 
 const getTimetable = async (url) => {
@@ -276,7 +277,7 @@ const drawNow = (allClasses, now) => {
 }
 
 const draw = (classes) => (initial = false) => {
-  const now = new Date()
+  const now = new Date(2018, 9, 1, 10, 30)
   now.setDate(now.getDate() + weekOffset * 7)
   const shiftedHour = now.getHours() - 9
 
