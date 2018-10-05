@@ -125,8 +125,7 @@ body.dark svg.dim .switch {
   display: grid;
   grid-template-columns: 2fr repeat(6, 1fr);
   align-items: center;
-  padding: var(--gap);
-  grid-gap: var(--gap);
+  padding: var(--gap) 0;
   background: var(--background-fade);
   color: rgb(40, 40, 40);
   font-weight: bold;
@@ -341,23 +340,23 @@ input, button {
 
 @media (max-width: 939px) {
   :root {
-    --show: 2;
-    --width-one: calc((100vw - var(--left-bar) - (var(--show) + 2) * var(--gap)) / var(--show));
-    --show-one: repeat(7, var(--width-one));
+    --show-num: 2;
+    --width-one: calc((100vw - var(--left-bar) - 2 * var(--gap)) / var(--show-num));
+    --show: repeat(7, var(--width-one));
   }
 
   .days {
-    grid-template-columns: var(--show-one);
+    grid-template-columns: var(--show);
   }
   
   .classes {
-    grid-template-columns: var(--show-one);
+    grid-template-columns: var(--show);
   }
 }
 
 @media (max-width: 639px) {
   :root {
-    --show: 1;
+    --show-num: 1;
   }
 
   .class.now {

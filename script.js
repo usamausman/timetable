@@ -7,7 +7,7 @@ const dim = options.querySelector(".dim")
 const grid = document.querySelector(".classes").children
 const days = Array.from(document.querySelectorAll(".days div"))
 const dayParts = (el) => [el.querySelector(".day"), el.querySelector(".date")]
-const times = document.querySelector(".times").children
+const times = Array.from(document.querySelector(".times").children)
 const line = document.querySelector(".line")
 
 const prev = document.querySelector(".prev")
@@ -256,10 +256,12 @@ const drawNow = (allClasses, now) => {
   let shiftedHour = now.getHours() - 9
   let oldClasses = Array.from(document.querySelectorAll(".class.now"))
   
+  let lastTimeDiv = times.filter(time => time.classList.contains("now"))[0]
+  
   if (times[shiftedHour]) {
     if (!times[shiftedHour].classList.contains("now")) {
-      if (times[shiftedHour - 1]) {
-        times[shiftedHour - 1].removeAttribute("class")
+      if (lastTimeDiv && lastTimeDiv !== times[shiftedHour]) {
+        lastTimeDiv.removeAttribute("class")
       }
       times[shiftedHour].classList.add("now")
     }
