@@ -293,27 +293,21 @@ p {
 .class .location {
   font-size: 12px;
   text-align: left;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
   margin-bottom: var(--gap);
 }
 
-.class .code {
+.class .name {
   font-weight: bold;
   font-size: 20px;
   margin-bottom: var(--gap);
 }
 
-.class .name {
+.class .info {
   font-size: 14px;
 }
 
-.class .type {
-  font-size: 14px;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+.class .code {
+  font-size: 12px;
 }
 
 form {

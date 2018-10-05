@@ -91,14 +91,14 @@ const parseDays = (weekday, weeks) => weeks.map(weekNumber => weekNumber * 7 + w
 
 const getInfo = (classes, weekday) => classes.map(classInfo => ({
   code: classInfo[0],
-  name: classInfo[1],
+  name: classInfo[0].length > 8 ? classInfo[0] : classInfo[1],
+  teacher: classInfo[10],
   type: classInfo[2],
   typeShort: parseType(classInfo[2]),
   location: classInfo[3],
   timeBegin: parseTime(classInfo[7]),
   timeEnd: parseTime(classInfo[8]),
-  days: parseDays(weekday, shiftWeeks(parseWeeks(classInfo[9]))),
-  teacher: classInfo[10]
+  days: parseDays(weekday, shiftWeeks(parseWeeks(classInfo[9])))
 }))
 
 const getTimetable = async (url) => {
@@ -166,20 +166,20 @@ const showClass = (dayIndex) => (singleClass, classIndex) => {
   classDivLocationP.textContent = singleClass.location
   classDiv.appendChild(classDivLocationP)
 
-  let classDivCodeP = document.createElement("p")
-  classDivCodeP.className = "code"
-  classDivCodeP.textContent = singleClass.code
-  classDiv.appendChild(classDivCodeP)
-
   let classDivNameP = document.createElement("p")
   classDivNameP.className = "name"
   classDivNameP.textContent = singleClass.name
   classDiv.appendChild(classDivNameP)
 
   let classDivTypeP = document.createElement("p")
-  classDivTypeP.className = "type"
-  classDivTypeP.textContent = singleClass.type
+  classDivTypeP.className = "info"
+  classDivTypeP.textContent = `${singleClass.type} - ${singleClass.teacher}`
   classDiv.appendChild(classDivTypeP)
+  
+  let classDivCodeP = document.createElement("p")
+  classDivCodeP.className = "code"
+  classDivCodeP.textContent = singleClass.code
+  classDiv.appendChild(classDivCodeP)
 
   grid[dayIndex].appendChild(classDiv)
 
