@@ -309,7 +309,7 @@ p {
   content: ' ';
   width: 10px;
   height: 10px;
-  background-image: url(location.svg);
+  background-image: url(/svg/location.svg);
   background-repeat: no-repeat;
 }
 
@@ -337,7 +337,7 @@ p {
   width: 12px;
   height: 12px;
   background-size: 12px 12px;
-  background-image: url(alternate.svg);
+  background-image: url(/svg/alternate.svg);
   background-repeat: no-repeat;
 }
 
