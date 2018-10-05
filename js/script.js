@@ -174,7 +174,6 @@ const getTimetable = async (url) => {
     .map(getInfo)
   
   const classes = classesByDay.reduce((full, day) => full.concat(day), [])
-  console.log(classes.filter(singleClass => singleClass.alternate))
   return [classesByDay, classes]
 }
 
