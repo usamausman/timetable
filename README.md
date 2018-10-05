@@ -9,6 +9,8 @@ Refresh for new colours!
 * Offline support
 * Shows classes for the next 7 days
 * Navigation for previous/next week
+* Link for directions to class
+* Link for alternate times
 
 ## Future ideas?
 * Searching
