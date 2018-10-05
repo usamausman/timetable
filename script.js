@@ -1,3 +1,5 @@
+const base = "http://timetable.leeds.ac.uk/teaching/201819/reporting"
+
 const link = document.querySelector("input#link")
 const retrieve = document.querySelector("form")
 
@@ -47,15 +49,13 @@ let drawInterval
 let lastDate = undefined
 
 const getClasses = table => Array.from(
-  Array.from(
-    table.querySelectorAll("tbody tr:not(.columnTitles)")
-  )
+  table.querySelectorAll("tbody tr:not(.columnTitles)")
 )
 
-const getAllInfo = classes => classes.map(singleClass =>
-  Array.from(singleClass.cells)
-    .map(cell => cell.innerText)
-)
+const getAllInfo = classes => classes.map(singleClass => {
+  return Array.from(singleClass.cells)
+    .map(cell => cell.innerHTML)
+})
 
 const parseType = (type) => type.match(/^([\w]+).*?(\d)?$/)[1].toLowerCase()
 
@@ -89,16 +89,56 @@ const shiftWeeks = (weeks) => weeks.map(
 
 const parseDays = (weekday, weeks) => weeks.map(weekNumber => weekNumber * 7 + weekday)
 
+const getContent = (text) => {
+  let el = document.createElement("span")
+  el.innerHTML = text
+  return el.innerText.replace(/\s/g, ' ')
+}
+
+const getLink = (text) => {
+  const match = text.match(/href="([^"]*)/)
+  if (!match) {
+    return undefined
+  } else {
+    return match[1]
+  }
+}
+
+const getHasAlternate = (text) => {
+  text = getContent(text).replace(/\s/g, '')
+
+  if (text == "") {
+    return false
+  } else {
+    if (text == ";") {
+      return false
+    } else {
+      return text
+    }
+  }
+}
+
+const getAlternateLink = (text) => {
+  let url = getLink(text)
+  if (url) {
+    url = url.slice(1).replace(/&amp;/g, '&')
+  }
+  return url
+}
+
 const getInfo = (classes, weekday) => classes.map(classInfo => ({
-  code: classInfo[0],
-  name: classInfo[0].length > 8 ? classInfo[0] : classInfo[1],
-  teacher: classInfo[10],
+  code: getContent(classInfo[0]),
+  name: getContent(classInfo[0]).length > 8 ? getContent(classInfo[0]) : classInfo[1],
+  teacher: getContent(classInfo[10]),
   type: classInfo[2],
   typeShort: parseType(classInfo[2]),
-  location: classInfo[3],
+  location: getContent(classInfo[3]),
+  locationLink: getLink(classInfo[3]),
   timeBegin: parseTime(classInfo[7]),
   timeEnd: parseTime(classInfo[8]),
-  days: parseDays(weekday, shiftWeeks(parseWeeks(classInfo[9])))
+  days: parseDays(weekday, shiftWeeks(parseWeeks(classInfo[9]))),
+  alternate: getHasAlternate(classInfo[4]),
+  alternateLink: getAlternateLink(classInfo[4])
 }))
 
 const getTimetable = async (url) => {
@@ -132,11 +172,13 @@ const getTimetable = async (url) => {
     .map(getClasses)
     .map(getAllInfo)
     .map(getInfo)
+  
   const classes = classesByDay.reduce((full, day) => full.concat(day), [])
+  console.log(classes.filter(singleClass => singleClass.alternate))
   return [classesByDay, classes]
 }
 
-const getCORS = (identifier) => `https://cors-anywhere.herokuapp.com/http://timetable.leeds.ac.uk/teaching/201819/reporting/textspreadsheet;?objectclass=student+set&idtype=id&identifier=${identifier}&template=SWSCUST+Student+Set+Individual+semester&days=1-7&periods=1-21&weeks=1-44`
+const getCORS = (identifier) => `https://cors-anywhere.herokuapp.com/${base}/textspreadsheet;?objectclass=student+set&idtype=id&identifier=${identifier}&template=SWSCUST+Student+Set+Individual+semester&days=1-7&periods=1-21&weeks=1-44`
 
 const getIdentifier = (url) => {
   let match = url.match(/(?:.*identifier=)(\d+)(?:.*)/)
@@ -161,10 +203,19 @@ const showClass = (dayIndex) => (singleClass, classIndex) => {
   classDiv.className = "class"
   classDiv.style = `grid-row: t${singleClass.timeBegin}-start / t${singleClass.timeEnd}-start; background: ${getColor(singleClass.code)};`
 
-  let classDivLocationP = document.createElement("p")
-  classDivLocationP.className = "location"
-  classDivLocationP.textContent = singleClass.location
-  classDiv.appendChild(classDivLocationP)
+  let classDivTop = document.createElement("div")
+  classDivTop.className = "top"
+  classDiv.appendChild(classDivTop)
+
+  let classDivLocationA = document.createElement("a")
+  classDivLocationA.className = "location"
+  if (singleClass.locationLink) {
+    classDivLocationA.classList.add("linked")
+    classDivLocationA.href = singleClass.locationLink
+    classDivLocationA.target = '_blank'
+  }
+  classDivLocationA.textContent = singleClass.location
+  classDivTop.appendChild(classDivLocationA)
 
   let classDivNameP = document.createElement("p")
   classDivNameP.className = "name"
@@ -180,6 +231,14 @@ const showClass = (dayIndex) => (singleClass, classIndex) => {
   classDivCodeP.className = "code"
   classDivCodeP.textContent = singleClass.code
   classDiv.appendChild(classDivCodeP)
+
+  if (singleClass.alternate) {
+    let classDivAlternateA = document.createElement("a")
+    classDivAlternateA.className = "alternate"
+    classDivAlternateA.href = `${base}${singleClass.alternateLink}`
+    classDivAlternateA.target = '_blank'
+    classDivTop.appendChild(classDivAlternateA)
+  }
 
   grid[dayIndex].appendChild(classDiv)
 

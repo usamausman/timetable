@@ -265,6 +265,7 @@ p {
 }
 
 .classes .class {
+  position: relative;
   margin: calc(var(--gap) * 0.5);
   padding: var(--gap);
   border-radius: var(--gap);
@@ -281,7 +282,8 @@ p {
   box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.25);
 }
 
-.class p {
+.class p, .class a {
+  display: block;
   color: var(--class-text);
   overflow: hidden;
   white-space: nowrap;
@@ -290,10 +292,25 @@ p {
   transition: color 0.25s ease;
 }
 
+.class .top {
+  display: flex;
+  margin-bottom: var(--gap);
+}
+
 .class .location {
   font-size: 12px;
   text-align: left;
-  margin-bottom: var(--gap);
+
+  flex: 1;
+}
+
+.class .location.linked:before {
+  display: inline-block;
+  content: ' ';
+  width: 10px;
+  height: 10px;
+  background-image: url(location.svg);
+  background-repeat: no-repeat;
 }
 
 .class .name {
@@ -308,6 +325,20 @@ p {
 
 .class .code {
   font-size: 12px;
+}
+
+.class .alternate {
+  display: block;
+}
+
+.class .alternate:before {
+  display: block;
+  content: ' ';
+  width: 12px;
+  height: 12px;
+  background-size: 12px 12px;
+  background-image: url(alternate.svg);
+  background-repeat: no-repeat;
 }
 
 form {

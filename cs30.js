@@ -9,6 +9,8 @@ self.addEventListener("install", (e) => {
         "script.js",
         "style.css",
         "favicon.ico",
+        "location.svg",
+        "alternate.svg",
         "icons/android-chrome-192x192.png",
         "icons/android-chrome-512x512.png",
         "icons/apple-touch-icon.png",
