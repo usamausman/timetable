@@ -1,4 +1,5 @@
 const base = "http://timetable.leeds.ac.uk/teaching/201819/reporting"
+const nextClassMinutes = 5
 
 const link = document.querySelector("input#link")
 const retrieve = document.querySelector("form")
@@ -252,6 +253,12 @@ const time = (now) => Math.floor(now.getHours() * 100 + now.getMinutes() * 5 / 3
 
 const isNow = (now) => (singleClass) => weekOffset === 0 && Number(singleClass.timeBegin) <= time(now) && time(now) < Number(singleClass.timeEnd)
 
+const isNext = (now) => (singleClass) => {
+  const then = new Date(now)
+  then.setMinutes(now.getMinutes() + 10)
+  return weekOffset === 0 && Number(singleClass.timeBegin) == time(then)
+}
+
 const clearClasses = () => {
   Array.from(grid).map(div => {
     if (!div.classList.contains("line")) {
@@ -327,13 +334,19 @@ const drawNow = (allClasses, now) => {
   
   const today = getDayNumber(now)
   const [classes, days] = getClassesForPeriodAround(allClasses, today)
+
+  let nowClasses = []
+
   if (allClasses.length !== 0) {
-    let nowClasses = classes[0].filter(isNow(now)).map(singleClass => singleClass.div)
+    nowClasses = classes[0].filter(isNow(now))
+    let nowDivs = nowClasses.map(singleClass => singleClass.div)
     if (oldClasses[0] !== nowClasses[0]) {
       oldClasses.forEach(singleDiv => singleDiv.classList.remove("now"))
     }
-    nowClasses.forEach(singleDiv => singleDiv.classList.add("now"))
+    nowDivs.forEach(singleDiv => singleDiv.classList.add("now"))
   }
+
+  return classes[0]
 }
 
 const draw = (classes) => (initial = false) => {
@@ -370,6 +383,13 @@ const draw = (classes) => (initial = false) => {
   } else {
     line.style.visibility = "hidden"
     Array.from(times).forEach(time => time.classList.remove("now"))
+  }
+
+  const classesToday = getClassesForPeriodAround(classes, getDayNumber(now))[0][0]
+  const nowClasses = classesToday.filter(isNow(now))
+  const nextClasses = classesToday.filter(isNext(now))
+  if (JSON.stringify(nextClasses) != JSON.stringify(nowClasses)) {
+    nextClasses.forEach(notify)
   }
 }
 
@@ -470,6 +490,36 @@ next.addEventListener("click", () => {
   lastDate = undefined
 })
 
+const checkForPermission = async () => {
+  if (!("Notification" in window)) {
+    return console.log("Notifications are not supported in this browser")
+  }
+
+  if (Notification.permission === "granted") {
+    console.log("Permission for notifications already granted")
+  } else if(Notification.permission !== "denied") {
+    const permission = await Notification.requestPermission()
+  }
+}
+
+const notify = (singleClass) => {
+  console.log(`Notifying for ${singleClass.code}${singleClass.timeBegin}, ${Notification.permission}`)
+  if ("Notification" in window) {
+    if (Notification.permission === "granted") {
+      const notification = new Notification(`${singleClass.name} starts in ${nextClassMinutes} minutes`, {
+        tag: `${singleClass.code}${singleClass.timeBegin}`,
+        body: `Head to ${singleClass.location}`,
+        badge: "icons/android-chrome-512x512.png",
+        icon: "icons/android-chrome-512x512.png",
+        image: "icons/android-chrome-512x512.png",
+        // renotify: true
+      })
+    }
+  }
+}
+
 checkMode()
 buildTimetable()
 mount()
+
+checkForPermission()

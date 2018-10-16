@@ -50,6 +50,7 @@ body.dark .class {
 }
 
 .options {
+  position: -webkit-sticky;
   position: sticky;
   top: 0;
   left: 0;
@@ -117,6 +118,7 @@ body.dark svg.dim .switch {
 }
 
 .days {
+  position: -webkit-sticky;
   position: sticky;
   top: 0;
   z-index: 10;
@@ -178,6 +180,7 @@ body.dark svg.dim .switch {
 }
 
 .times {
+  position: -webkit-sticky;
   position: sticky;
   left: 0;
   width: var(--left-bar);
