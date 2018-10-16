@@ -16,6 +16,15 @@ const line = document.querySelector(".line")
 const prev = document.querySelector(".prev")
 const next = document.querySelector(".next")
 
+let nowClasses
+let nextClasses
+
+const notifyCheckbox = document.querySelector(".notifications input")
+
+let shouldNotify = notifyCheckbox.checked
+
+let alreadyNotified = {}
+
 let weekOffset = 0
 
 const dayNames = [
@@ -173,7 +182,7 @@ const getTimetable = async (url) => {
     .map(getClasses)
     .map(getAllInfo)
     .map(getInfo)
-  
+
   const classes = classesByDay.reduce((full, day) => full.concat(day), [])
   return [classesByDay, classes]
 }
@@ -226,7 +235,7 @@ const showClass = (dayIndex) => (singleClass, classIndex) => {
   classDivTypeP.className = "info"
   classDivTypeP.textContent = `${singleClass.type} - ${singleClass.teacher}`
   classDiv.appendChild(classDivTypeP)
-  
+
   let classDivCodeP = document.createElement("p")
   classDivCodeP.className = "code"
   classDivCodeP.textContent = singleClass.code
@@ -255,7 +264,7 @@ const isNow = (now) => (singleClass) => weekOffset === 0 && Number(singleClass.t
 
 const isNext = (now) => (singleClass) => {
   const then = new Date(now)
-  then.setMinutes(now.getMinutes() + 10)
+  then.setMinutes(now.getMinutes() + nextClassMinutes)
   return weekOffset === 0 && Number(singleClass.timeBegin) == time(then)
 }
 
@@ -320,9 +329,9 @@ const drawDays = (allClasses, now) => {
 const drawNow = (allClasses, now) => {
   let shiftedHour = now.getHours() - 9
   let oldClasses = Array.from(document.querySelectorAll(".class.now"))
-  
+
   let lastTimeDiv = times.filter(time => time.classList.contains("now"))[0]
-  
+
   if (times[shiftedHour]) {
     if (!times[shiftedHour].classList.contains("now")) {
       if (lastTimeDiv && lastTimeDiv !== times[shiftedHour]) {
@@ -331,7 +340,7 @@ const drawNow = (allClasses, now) => {
       times[shiftedHour].classList.add("now")
     }
   }
-  
+
   const today = getDayNumber(now)
   const [classes, days] = getClassesForPeriodAround(allClasses, today)
 
@@ -386,11 +395,8 @@ const draw = (classes) => (initial = false) => {
   }
 
   const classesToday = getClassesForPeriodAround(classes, getDayNumber(now))[0][0]
-  const nowClasses = classesToday.filter(isNow(now))
-  const nextClasses = classesToday.filter(isNext(now))
-  if (JSON.stringify(nextClasses) != JSON.stringify(nowClasses)) {
-    nextClasses.forEach(notify)
-  }
+  nowClasses = classesToday.filter(isNow(now))
+  nextClasses = classesToday.filter(isNext(now))
 }
 
 /* BUILD */
@@ -398,7 +404,7 @@ const draw = (classes) => (initial = false) => {
 const buildTimetable = async (url) => {
   try {
     const [classesByDay, classes] = await getTimetable(url)
-    
+
     clearInterval(drawInterval)
     weekDraw = draw(classes)
     drawInterval = setInterval(weekDraw, 50)
@@ -495,31 +501,63 @@ const checkForPermission = async () => {
     return console.log("Notifications are not supported in this browser")
   }
 
-  if (Notification.permission === "granted") {
-    console.log("Permission for notifications already granted")
-  } else if(Notification.permission !== "denied") {
+  if (Notification.permission !== "denied") {
     const permission = await Notification.requestPermission()
   }
 }
 
-const notify = (singleClass) => {
-  console.log(`Notifying for ${singleClass.code}${singleClass.timeBegin}, ${Notification.permission}`)
+const attachNotifier = () => {
+  if (JSON.stringify(nextClasses) != JSON.stringify(nowClasses)) {
+    nextClasses.forEach(notify)
+  }
+}
+
+const checkNotify = () => {
+  if ("Notification" in window && navigator.serviceWorker) {
+    notifyCheckbox.addEventListener("click", () => {
+      shouldNotify = notifyCheckbox.checked
+      localStorage.setItem("shouldNotify", shouldNotify)
+    })
+
+    shouldNotify = localStorage.getItem("shouldNotify") !== "false"
+
+    notifyCheckbox.checked = shouldNotify
+
+    setInterval(attachNotifier, 500)
+  } else {
+    notifyCheckbox.parentElement.className = "notifications not supported"
+  }
+}
+
+const notify = async (singleClass) => {
   if ("Notification" in window) {
-    if (Notification.permission === "granted") {
-      const notification = new Notification(`${singleClass.name} starts in ${nextClassMinutes} minutes`, {
-        tag: `${singleClass.code}${singleClass.timeBegin}`,
-        body: `Head to ${singleClass.location}`,
-        badge: "icons/android-chrome-512x512.png",
-        icon: "icons/android-chrome-512x512.png",
-        image: "icons/android-chrome-512x512.png",
-        // renotify: true
-      })
+    if (Notification.permission === "granted" && shouldNotify) {
+      const reg = await navigator.serviceWorker.getRegistration()
+
+      const tag = `${singleClass.code}${singleClass.timeBegin}`
+
+      if (alreadyNotified[tag] !== true) {
+        console.log(`Notifying ${tag}`)
+        reg.showNotification(`${singleClass.name} starts in ${nextClassMinutes} minutes`, {
+          tag,
+          body: singleClass.location.length > 2 ? `Head to ${singleClass.location}` : `No location given`,
+          badge: "icons/badge.png",
+          icon: "icons/android-chrome-512x512.png"
+        })
+
+        alreadyNotified[tag] = true
+      }
     }
   }
 }
+
+setInterval(() => {
+  alreadyNotified = []
+}, 60000)
 
 checkMode()
 buildTimetable()
 mount()
 
 checkForPermission()
+checkNotify()

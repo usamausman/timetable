@@ -49,6 +49,32 @@ body.dark .class {
   overflow-x: scroll;
 }
 
+.notifications {
+  position: fixed;
+  display: flex;
+  align-items: center;
+  background: var(--background-fade);
+  bottom: 0;
+  right: 0;
+  padding: var(--gap);
+  border-top-left-radius: var(--gap);
+
+  transition: background 0.25s ease;
+}
+
+.notifications.not.supported {
+  display: none;
+  visibility: hidden;
+}
+
+.notifications label, .notifications input {
+  color: var(--class-text);
+  display: inline-block;
+  margin: 0 4px;
+
+  transition: color 0.25s ease;
+}
+
 .options {
   position: -webkit-sticky;
   position: sticky;
