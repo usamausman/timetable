@@ -11,6 +11,7 @@ Refresh for new colours!
 * Navigation for previous/next week
 * Link for directions to class
 * Link for alternate times
+* Notifications for next class (if supported)
 
 ## Future ideas?
 * Searching

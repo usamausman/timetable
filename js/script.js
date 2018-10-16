@@ -359,6 +359,7 @@ const drawNow = (allClasses, now) => {
 }
 
 const draw = (classes) => (initial = false) => {
+  // const now = new Date(2018, 9, 18, 9, 55)
   const now = new Date()
   now.setDate(now.getDate() + weekOffset * 7)
   const shiftedHour = now.getHours() - 9
@@ -417,7 +418,7 @@ const buildTimetable = async (url) => {
 const mount = async () => {
   try {
     if ("serviceWorker" in navigator) {
-      const registration = await navigator.serviceWorker.register("cs30.js")
+      await navigator.serviceWorker.register("cs30.js")
     }
   } catch ({ message }) {
     console.error(message)
@@ -542,7 +543,11 @@ const notify = async (singleClass) => {
           tag,
           body: singleClass.location.length > 2 ? `Head to ${singleClass.location}` : `No location given`,
           badge: "icons/badge.png",
-          icon: "icons/android-chrome-512x512.png"
+          icon: "icons/android-chrome-512x512.png",
+          data: {
+            url: window.location.href
+          },
+          // renotify: true
         })
 
         alreadyNotified[tag] = true
