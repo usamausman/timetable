@@ -52,6 +52,7 @@ body.dark .class {
 .notifications {
   position: fixed;
   display: flex;
+  z-index: 20;
   align-items: center;
   background: var(--background-fade);
   bottom: 0;
