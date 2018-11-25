@@ -277,23 +277,31 @@ const clearClasses = () => {
   })
 }
 
-const showDays = (periodDays) => {
+const showDays = (periodDays, today) => {
   days.map((el, dayIndex) => {
     let [day, date] = dayParts(el)
     day.textContent = periodDays[dayIndex][0]
     date.textContent = periodDays[dayIndex][1]
-    if (periodDays[dayIndex][0] === dayNames[5] || periodDays[dayIndex][0] === dayNames[6]) {
+    if (dayIndex == 5 || dayIndex == 6) {
       el.classList.add("weekend")
     } else {
       el.classList.remove("weekend")
     }
   })
+  const daysEl = document.querySelector(".days")
+  const gridEl = document.querySelector(".classes")
+  const weekDay = getWeekDayNumber(today)
   if (weekOffset === 0) {
-    days[0].classList.add("today")
-    grid[0].classList.add("today")
+    days[weekDay].classList.add("today")
+    grid[weekDay].classList.add("today")
+    let size = `--size: ${weekDay ? `repeat(${weekDay}, 1fr) `: ''}2fr${6 - weekDay ? ` repeat(${6 - weekDay}, 1fr)` : ''}`
+    daysEl.style = size
+    gridEl.style = size
   } else {
-    days[0].classList.remove("today")
-    grid[0].classList.remove("today")
+    days[weekDay].classList.remove("today")
+    grid[weekDay].classList.remove("today")
+    daysEl.removeAttribute('style')
+    gridEl.removeAttribute('style')
   }
 }
 
@@ -303,13 +311,17 @@ const getDayNumber = (date) => {
   return diffDays
 }
 
+const getWeekNumber = (date) => Math.floor(getDayNumber(date) / 7) * 7
+
+const getWeekDayNumber = (date) => getDayNumber(date) - getWeekNumber(date)
+
 const getClassesForDayNumber = (dayNumber) => (singleClass) => singleClass.days.indexOf(dayNumber) !== -1
 
-const getClassesForPeriodAround = (allClasses, day) => {
+const getClassesForWeek = (allClasses, weekNumber) => {
   let classesForPeriod = []
   let periodDays = []
   for (let i = 0; i < 7; ++i) {
-    let checkDay = day + i
+    let checkDay = weekNumber + i
     classesForPeriod.push(allClasses.filter(getClassesForDayNumber(checkDay)))
     let d = new Date(2018, 8, 24)
     d.setDate(d.getDate() + checkDay)
@@ -319,11 +331,10 @@ const getClassesForPeriodAround = (allClasses, day) => {
 }
 
 const drawDays = (allClasses, now) => {
-  const today = getDayNumber(now)
-  const [classes, days] = getClassesForPeriodAround(allClasses, today)
+  const [classes, days] = getClassesForWeek(allClasses, getWeekNumber(now))
   clearClasses()
   classes.map(showClasses)
-  showDays(days)
+  showDays(days, now)
 }
 
 const drawNow = (allClasses, now) => {
@@ -342,7 +353,7 @@ const drawNow = (allClasses, now) => {
   }
 
   const today = getDayNumber(now)
-  const [classes, days] = getClassesForPeriodAround(allClasses, today)
+  const [classes, days] = getClassesForWeek(allClasses, getWeekNumber(today))
 
   let nowClasses = []
 
@@ -359,7 +370,7 @@ const drawNow = (allClasses, now) => {
 }
 
 const draw = (classes) => (initial = false) => {
-  // const now = new Date(2018, 9, 18, 9, 55)
+  // const now = new Date(2018, 9, 21, 17, 55)
   const now = new Date()
   now.setDate(now.getDate() + weekOffset * 7)
   const shiftedHour = now.getHours() - 9
@@ -395,7 +406,7 @@ const draw = (classes) => (initial = false) => {
     Array.from(times).forEach(time => time.classList.remove("now"))
   }
 
-  const classesToday = getClassesForPeriodAround(classes, getDayNumber(now))[0][0]
+  const classesToday = getClassesForWeek(classes, getWeekNumber(now))[0][0]
   nowClasses = classesToday.filter(isNow(now))
   nextClasses = classesToday.filter(isNext(now))
 }
@@ -566,3 +577,18 @@ mount()
 
 checkForPermission()
 checkNotify()
+
+const goToday = () => {
+  const today = document.querySelector(".day.today")
+  
+  if (today) {
+    document.querySelector(".day.today").scrollIntoView({
+      behavior: "smooth",
+      block: "nearest",
+      inline: "end"
+    })
+  }
+}
+
+window.addEventListener("resize", goToday)
+setTimeout(goToday, 250)

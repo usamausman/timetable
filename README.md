@@ -7,7 +7,7 @@ Refresh for new colours!
 * Less cluttered display
 * Dark mode
 * Offline support
-* Shows classes for the next 7 days
+* Shows classes for the current week
 * Navigation for previous/next week
 * Link for directions to class
 * Link for alternate times
