@@ -199,10 +199,8 @@ const getIdentifier = (url) => {
 }
 
 const getColor = (course) => {
-  const randHex = () => Math.round(Math.random() * 155 + 100)
-
   if (!haveColors.hasOwnProperty(course)) {
-    haveColors[course] = `rgb(${randHex()}, ${randHex()}, ${randHex()})`
+    haveColors[course] = `hsl(${Math.round(Math.random() * 360)}, 50%, 75%)`
   }
   return haveColors[course]
 }
