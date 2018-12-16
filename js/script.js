@@ -304,8 +304,9 @@ const showDays = (periodDays, today) => {
 }
 
 const getDayNumber = (date) => {
-  date.setHours(12)
-  const diff = date - new Date(2018, 8, 24)
+  const local = new Date(date.getTime())
+  local.setHours(12)
+  const diff = local - new Date(2018, 8, 24)
   const diffDays = Math.floor(diff / 1000 / 60 / 60 / 24)
   return diffDays
 }
@@ -352,7 +353,7 @@ const drawNow = (allClasses, now) => {
   }
 
   const today = getDayNumber(now)
-  const [classes, days] = getClassesForWeek(allClasses, getWeekNumber(today))
+  const [classes, days] = getClassesForWeek(allClasses, getWeekNumber(now))
 
   let nowClasses = []
 
