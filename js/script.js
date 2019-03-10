@@ -1,6 +1,8 @@
 const base = "http://timetable.leeds.ac.uk/teaching/201819/reporting"
 const nextClassMinutes = 5
 
+const copyLink = () => console.log("Follow link, submit and copy URL for timetable\nLooks like `http://timetable.leeds.ac.uk/...`", "https://studentservices.leeds.ac.uk/pls/banprod/timetable_uol")
+
 const link = document.querySelector("input#link")
 const retrieve = document.querySelector("form")
 
@@ -114,24 +116,13 @@ const getLink = (text) => {
   }
 }
 
-const getHasAlternate = (text) => {
-  text = getContent(text).replace(/\s/g, '')
-
-  if (text == "") {
-    return false
-  } else {
-    if (text == ";") {
-      return false
-    } else {
-      return text
-    }
-  }
-}
+const getHasAlternate = (text) => text.indexOf("href") != -1
 
 const getAlternateLink = (text) => {
   let url = getLink(text)
   if (url) {
     url = url.slice(1).replace(/&amp;/g, '&')
+    console.log(url)
   }
   return url
 }
@@ -165,9 +156,10 @@ const getTimetable = async (url) => {
         alert("400 error, check that the link works")
         return [[], []]
       }
+      document.body.classList.remove("noInfo")
       localStorage.setItem("cache", rawHTML)
     } else {
-      alert("Copy timetable link from Student Services into the box at the bottom\nLooks like http://timetable.leeds.ac.uk/...")
+      document.body.classList.add("noInfo")
       return [[], []]
     }
   }
@@ -451,7 +443,7 @@ const checkMode = () => {
 retrieve.addEventListener("submit", (e) => {
   e.preventDefault()
   if (!link.value) {
-    alert("Please copy timetable link from Student Services into this box\nLooks like http://timetable.leeds.ac.uk/...")
+    alert("No link provided")
   } else {
     let identifier = getIdentifier(link.value)
     if (identifier) {
@@ -476,7 +468,8 @@ update.addEventListener("click", async (e) => {
   const identifier = localStorage.getItem("identifier")
   if (!identifier) {
     options.classList.remove("updating")
-    return alert("Please copy timetable link from Student Services into the box at the bottom\nLooks like http://timetable.leeds.ac.uk/...")
+    document.body.classList.add("noInfo")
+    return alert("Identifier is missing, please paste link again")
   }
   if (!navigator.onLine) {
     options.classList.remove("updating")
@@ -573,7 +566,7 @@ setInterval(() => {
 
 checkMode()
 buildTimetable()
-mount()
+// mount()
 
 checkForPermission()
 checkNotify()
@@ -590,5 +583,5 @@ const goToday = () => {
   }
 }
 
-window.addEventListener("resize", goToday)
+window.addEventListener("resize", goToday, true)
 setTimeout(goToday, 250)
