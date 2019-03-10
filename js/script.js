@@ -292,7 +292,7 @@ const showDays = (periodDays, today) => {
   if (weekOffset === 0) {
     days[weekDay].classList.add("today")
     grid[weekDay].classList.add("today")
-    let size = `--size: ${weekDay ? `repeat(${weekDay}, 1fr) `: ''}2fr${6 - weekDay ? ` repeat(${6 - weekDay}, 1fr)` : ''}`
+    let size = `--size: ${weekDay ? `repeat(${weekDay}, 1fr) ` : ''}2fr${6 - weekDay ? ` repeat(${6 - weekDay}, 1fr)` : ''}`
     daysEl.style = size
     gridEl.style = size
   } else {
@@ -358,7 +358,7 @@ const drawNow = (allClasses, now) => {
   let nowClasses = []
 
   if (allClasses.length !== 0) {
-    nowClasses = classes[0].filter(isNow(now))
+    nowClasses = classes[getWeekDayNumber(now)].filter(isNow(now))
     let nowDivs = nowClasses.map(singleClass => singleClass.div)
     if (oldClasses[0] !== nowClasses[0]) {
       oldClasses.forEach(singleDiv => singleDiv.classList.remove("now"))
@@ -370,7 +370,7 @@ const drawNow = (allClasses, now) => {
 }
 
 const draw = (classes) => (initial = false) => {
-  // const now = new Date(2018, 9, 21, 17, 55)
+  // const now = new Date(2019, 2, 5, 12, 00)
   const now = new Date()
   now.setDate(now.getDate() + weekOffset * 7)
   const shiftedHour = now.getHours() - 9
@@ -406,7 +406,7 @@ const draw = (classes) => (initial = false) => {
     Array.from(times).forEach(time => time.classList.remove("now"))
   }
 
-  const classesToday = getClassesForWeek(classes, getWeekNumber(now))[0][0]
+  const classesToday = getClassesForWeek(classes, getWeekNumber(now))[0][getWeekDayNumber(now)]
   nowClasses = classesToday.filter(isNow(now))
   nextClasses = classesToday.filter(isNext(now))
 }
@@ -580,7 +580,7 @@ checkNotify()
 
 const goToday = () => {
   const today = document.querySelector(".day.today")
-  
+
   if (today) {
     document.querySelector(".day.today").scrollIntoView({
       behavior: "smooth",
