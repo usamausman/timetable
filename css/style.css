@@ -13,7 +13,7 @@ body {
   margin: 0;
   padding: 0;
 
-  --background: rgb(255, 255, 255);
+  --background: #ffffff;
   --background-fade: rgba(255, 255, 255, 0.8);
   --text: #222;
   --class-text: #222;
@@ -30,7 +30,7 @@ body * {
 }
 
 body.dark {
-  --background: rgb(34, 34, 34);
+  --background: #222222;
   --background-fade: rgba(34, 34, 34, 0.8);
   --text: #aaa;
   --class-text: #888;
