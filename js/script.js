@@ -1,7 +1,7 @@
 const base = "http://timetable.leeds.ac.uk/teaching/201819/reporting"
 const nextClassMinutes = 5
 
-const copyLink = () => console.log("Follow link, submit and copy URL for timetable\nLooks like `http://timetable.leeds.ac.uk/...`", "https://studentservices.leeds.ac.uk/pls/banprod/timetable_uol")
+// const copyLink = () => console.log("Follow link, submit and copy URL for timetable\nLooks like `http://timetable.leeds.ac.uk/...`", "https://studentservices.leeds.ac.uk/pls/banprod/timetable_uol")
 
 const link = document.querySelector("input#link")
 const retrieve = document.querySelector("form")
@@ -122,7 +122,6 @@ const getAlternateLink = (text) => {
   let url = getLink(text)
   if (url) {
     url = url.slice(1).replace(/&amp;/g, '&')
-    console.log(url)
   }
   return url
 }
