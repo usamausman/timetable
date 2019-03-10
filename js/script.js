@@ -566,7 +566,7 @@ setInterval(() => {
 
 checkMode()
 buildTimetable()
-// mount()
+mount()
 
 checkForPermission()
 checkNotify()
