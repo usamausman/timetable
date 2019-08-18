@@ -24,11 +24,11 @@ const STRINGS = {
   ],
 }
 
-let off = 0
+const off = 0
 const getNow = () => {
   const base = new Date(2019, 9, 16, 10, 30)
   const offset = new Date(base.getTime() + off * 200 * 1000)
-  off += 1
+  // off += 1
   return offset
 }
 const baseDate = new Date(2018, 8, 24)
@@ -54,6 +54,7 @@ const buildURL = (identifier) =>
 
 const getCache = () => {
   const mode = localStorage.getItem('mode')
+  const notify = JSON.parse(localStorage.getItem('notify')) || false
   const identifier = localStorage.getItem('identifier')
   const yearRange = localStorage.getItem('yearRange')
   const cached = JSON.parse(localStorage.getItem('cached')) || false
@@ -61,13 +62,23 @@ const getCache = () => {
   try {
     timetable = JSON.parse(localStorage.getItem('timetable'))
   } finally {
-    return {mode, identifier, cached, yearRange, timetable}
+    return {mode, notify, identifier, cached, yearRange, timetable}
   }
 }
 
-const setCache = ({mode, identifier, cached, yearRange, timetable}) => {
+const setCache = ({
+  mode,
+  notify,
+  identifier,
+  cached,
+  yearRange,
+  timetable,
+}) => {
   if (mode !== undefined) {
     localStorage.setItem('mode', mode)
+  }
+  if (notify !== undefined) {
+    localStorage.setItem('notify', notify)
   }
   if (identifier !== undefined) {
     localStorage.setItem('identifier', identifier)
@@ -158,10 +169,38 @@ const attachNavigation = () => {
   next.addEventListener('click', () => (offset += 1))
 }
 
+const attachNotify = () => {
+  const notifyDiv = document.querySelector('div.notifications')
+  const shouldNotify = document.querySelector('input#notify')
+
+  const {notify} = getCache()
+  shouldNotify.checked = notify
+
+  if ('Notification' in window && navigator.serviceWorker) {
+    shouldNotify.addEventListener('change', async () => {
+      if (shouldNotify.checked) {
+        if (Notification.permission === 'denied') {
+          alert('Permission for Notifications has been denied by your browser')
+          shouldNotify.checked = false
+        } else {
+          const permission = await Notification.requestPermission()
+          if (permission !== 'granted') {
+            shouldNotify.checked = false
+          }
+        }
+      }
+      setCache({notify: shouldNotify.checked})
+    })
+  } else {
+    notifyDiv.style.visibility = 'hidden'
+  }
+}
+
 const once = () => {
   attachToForm()
   attachOptions()
   attachNavigation()
+  attachNotify()
   localStorage.removeItem('year')
   localStorage.removeItem('cache')
 }
@@ -287,19 +326,20 @@ const getTimetable = async () => {
   return cachedTimetable
 }
 
+const options = {
+  start: 9,
+  end: 19,
+  show: 7,
+  sliding: true,
+  notifyBefore: 5,
+  // sliding: false,
+}
+
 let offset = 0
 let lastHour = -1
 let lastStart = -1
 const haveColours = {}
 const drawTimetable = (timetable) => {
-  const options = {
-    start: 9,
-    end: 19,
-    show: 7,
-    sliding: true,
-    // sliding: false,
-  }
-
   const now = getNow()
 
   const getColour = (code) => {
@@ -537,6 +577,33 @@ const drawTimetable = (timetable) => {
   drawLine()
 }
 
+const notify = async (classInfo) => {
+  const reg = await navigator.serviceWorker.getRegistration()
+  const tag = `${classInfo.code}@${classInfo.start}`
+
+  const now = getNow()
+  const timeNow = now.getHours() + now.getMinutes() / 60
+  const minutesLeft = Math.floor((classInfo.start - timeNow) * 60)
+
+  console.log(`Notifying ${tag}`)
+  const notification = await reg.showNotification(
+    `${classInfo.code} starts in ${minutesLeft} minutes`,
+    {
+      tag,
+      body: classInfo.location
+        ? `Head to ${classInfo.location}`
+        : 'No location given',
+      badge: 'icons/badge.png',
+      icon: 'icons/android-chrome-512x512.png',
+      data: {
+        url: window.location.href,
+        location: classInfo.locationLink,
+      },
+      actions: [{action: 'location', title: 'Where\'s that?', icon: 'svg/location.svg'}],
+    }
+  )
+}
+
 const go = async () => {
   const {identifier} = getCache()
   if (identifier) {
@@ -545,6 +612,11 @@ const go = async () => {
       const timetable = await getTimetable()
       setCache({cached: true, yearRange: toRange(getYear()), timetable})
       try {
+        setTimeout(() => notify(timetable[0]), 200)
+        setTimeout(() => notify(timetable[0]), 400)
+        setTimeout(() => notify(timetable[0]), 600)
+        setTimeout(() => notify(timetable[0]), 800)
+        setTimeout(() => notify(timetable[0]), 1000)
         drawTimetable(timetable)
         setInterval(() => drawTimetable(timetable), 100)
       } catch (e) {
@@ -559,6 +631,18 @@ const go = async () => {
     document.body.classList.add('noInfo')
   }
 }
+
+const mount = async () => {
+  try {
+    if ('serviceWorker' in navigator) {
+      await navigator.serviceWorker.register('cs30.js')
+    }
+  } catch ({message}) {
+    console.error(message)
+  }
+}
+
+mount()
 
 once()
 go()

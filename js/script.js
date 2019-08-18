@@ -163,7 +163,7 @@ const getLink = (text) => {
   if (!match) {
     return undefined
   }
-  return match[1]
+  re turn match[1]
 }
 
 const getHasalternative = (text) => text.indexOf('href') !== -1
@@ -603,7 +603,7 @@ const checkNotify = () => {
 
     setInterval(attachNotifier, 500)
   } else {
-    notifyCheckbox.parentElement.className = 'notifications not supported'
+    notifyCheckbox.style.visibility = 'hidden'
   }
 }
 

@@ -78,11 +78,6 @@ body.dark .class {
   transition: background 0.25s ease;
 }
 
-.notifications.not.supported {
-  display: none;
-  visibility: hidden;
-}
-
 .notifications label, .notifications input {
   color: var(--class-text);
   display: inline-block;
