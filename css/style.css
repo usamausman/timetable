@@ -123,7 +123,7 @@ body.dark .class {
   to   { transform: rotateZ(360deg) }
 }
 
-.options.updating svg.update {
+svg#update.updating {
   animation: spin 1s linear infinite;
 }
 
@@ -132,7 +132,7 @@ body.dark .class {
   to   { transform: rotateZ(180deg) }
 }
 
-body .options svg.dim {
+body .options svg#mode {
   animation: back 0.25s forwards ease;
 }
 
@@ -141,21 +141,21 @@ body .options svg.dim {
   to   { transform: rotateZ(360deg) }
 }
 
-body.dark .options svg.dim {
+body.dark .options svg#mode {
   animation: half 0.25s forwards ease;
 }
 
-.options svg.dim .switch {
+.options svg#mode .switch {
   fill: #fff;
 
   transition: fill 0.25s ease;
 }
 
-body.dark svg.dim .switch {
+body.dark svg#mode .switch {
   fill: #aaa;
 }
 
-.options svg.dim .dark {
+.options svg#mode .dark {
   fill: #222;
 }
 
@@ -290,16 +290,16 @@ p {
   display: grid;
   grid-template-rows: repeat(var(--time-slots), 1fr);
   grid-template-areas:
-  "t900"
-  "t1000"
-  "t1100"
-  "t1200"
-  "t1300"
-  "t1400"
-  "t1500"
-  "t1600"
-  "t1700"
-  "t1800";
+  "t9"
+  "t10"
+  "t11"
+  "t12"
+  "t13"
+  "t14"
+  "t15"
+  "t16"
+  "t17"
+  "t18";
   opacity: 0.75;
   width: 100%;
   transition: opacity 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
@@ -372,17 +372,17 @@ p {
   font-size: 12px;
 }
 
-.class .alternate {
+.class .alternative {
   display: block;
 }
 
-.class .alternate:before {
+.class .alternative:before {
   display: block;
   content: ' ';
   width: 12px;
   height: 12px;
   background-size: 12px 12px;
-  background-image: url(../svg/alternate.svg);
+  background-image: url(../svg/alternative.svg);
   background-repeat: no-repeat;
 }
 
