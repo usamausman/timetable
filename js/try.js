@@ -24,11 +24,11 @@ const STRINGS = {
   ],
 }
 
-const off = 0
+let off = 0
 const getNow = () => {
-  const base = new Date(2019, 9, 16, 10, 30)
-  const offset = new Date(base.getTime() + off * 200 * 1000)
-  // off += 1
+  const base = new Date(2019, 9, 16, 10, 50)
+  const offset = new Date(base.getTime() + off * 4 * 1000)
+  off += 1
   return offset
 }
 const baseDate = new Date(2018, 8, 24)
@@ -335,6 +335,8 @@ const options = {
   // sliding: false,
 }
 
+const getOffset = (date) => Math.floor((date - baseDate) / 1000 / 60 / 60 / 24)
+
 let offset = 0
 let lastHour = -1
 let lastStart = -1
@@ -350,9 +352,6 @@ const drawTimetable = (timetable) => {
   }
 
   const visibleRange = () => {
-    const getOffset = (date) =>
-      Math.floor((date - baseDate) / 1000 / 60 / 60 / 24)
-
     const yearOffset = (getYear(now) - getYear(baseDate)) * 52 * 7
     const today = getOffset(now) - yearOffset
     const todayWeekday = now.getDay()
@@ -577,31 +576,69 @@ const drawTimetable = (timetable) => {
   drawLine()
 }
 
-const notify = async (classInfo) => {
+const notify = async ({classInfo, timeTo}) => {
   const reg = await navigator.serviceWorker.getRegistration()
   const tag = `${classInfo.code}@${classInfo.start}`
 
-  const now = getNow()
-  const timeNow = now.getHours() + now.getMinutes() / 60
-  const minutesLeft = Math.floor((classInfo.start - timeNow) * 60)
+  const title = `${classInfo.code} starts in ${timeTo} minute${
+    timeTo === 1 ? '' : 's'
+  }`
+  const options = {
+    tag,
+    body: classInfo.location
+      ? `Head to ${classInfo.location}`
+      : 'No location given',
+    badge: 'icons/badge.png',
+    icon: 'icons/android-chrome-512x512.png',
+    data: {
+      url: window.location.href,
+      location: classInfo.locationLink,
+    },
+  }
 
-  console.log(`Notifying ${tag}`)
-  const notification = await reg.showNotification(
-    `${classInfo.code} starts in ${minutesLeft} minutes`,
-    {
-      tag,
-      body: classInfo.location
-        ? `Head to ${classInfo.location}`
-        : 'No location given',
-      badge: 'icons/badge.png',
-      icon: 'icons/android-chrome-512x512.png',
-      data: {
-        url: window.location.href,
-        location: classInfo.locationLink,
-      },
-      actions: [{action: 'location', title: 'Where\'s that?', icon: 'svg/location.svg'}],
+  if (timeTo > 0) {
+    console.log(`Notifying ${tag} ${timeTo}`)
+    if (reg.showNotificationa) {
+      options.actions = [
+        {
+          action: 'location',
+          title: 'Where\'s that?',
+          icon: 'svg/location.svg',
+        },
+      ]
+      reg.showNotification(title, options)
+    } else {
+      const not = new Notification(title, options)
+      setTimeout(() => not.close(), 4000)
     }
-  )
+  }
+}
+
+const getNext = (timetable) => {
+  const getTimeTo = (classInfo) => Math.round((classInfo.start - nowTime) * 60)
+
+  const now = getNow()
+  const nowTime = now.getHours() + now.getMinutes() / 60
+  const yearOffset = (getYear(now) - getYear(baseDate)) * 52 * 7
+  const today = getOffset(now) - yearOffset
+
+  const nextClass = timetable
+    .filter((classInfo) => classInfo.days.includes(today))
+    .map((classInfo) => ({classInfo, timeTo: getTimeTo(classInfo)}))
+    .filter(({timeTo}) => 0 <= timeTo && timeTo <= options.notifyBefore)
+  // .filter((classInfo) => {
+  //   const timeTo = getTimeTo(classInfo)
+  //   return 0 < timeTo && timeTo <= options.notifyBefore
+  // })
+
+  return nextClass
+}
+
+const notifyNext = (timetable) => {
+  const nextClasses = getNext(timetable)
+  if (nextClasses) {
+    nextClasses.map(notify)
+  }
 }
 
 const go = async () => {
@@ -612,13 +649,14 @@ const go = async () => {
       const timetable = await getTimetable()
       setCache({cached: true, yearRange: toRange(getYear()), timetable})
       try {
-        setTimeout(() => notify(timetable[0]), 200)
-        setTimeout(() => notify(timetable[0]), 400)
-        setTimeout(() => notify(timetable[0]), 600)
-        setTimeout(() => notify(timetable[0]), 800)
-        setTimeout(() => notify(timetable[0]), 1000)
+        notifyNext(timetable)
         drawTimetable(timetable)
         setInterval(() => drawTimetable(timetable), 100)
+        setInterval(() => notifyNext(timetable), 1000)
+
+        requestAnimationFrame(() => {
+          setTimeout(goToToday, 100)
+        })
       } catch (e) {
         console.error(e)
       }
@@ -664,9 +702,5 @@ const goToToday = () => {
     })
   }
 }
-
-requestAnimationFrame(() => {
-  setTimeout(goToToday, 100)
-})
 
 window.addEventListener('resize', goToToday, {passive: true})
