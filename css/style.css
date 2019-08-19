@@ -17,7 +17,7 @@ body {
   --background-fade: rgba(255, 255, 255, 0.8);
   --text: #222;
   --class-text: #222;
-  --now: red;
+  --now: rgb(201, 54, 54);
   --hour: #eee;
 
   background: var(--background);
@@ -32,9 +32,9 @@ body * {
 body.dark {
   --background: #222222;
   --background-fade: rgba(34, 34, 34, 0.8);
-  --text: #aaa;
-  --class-text: #888;
-  --now: rgb(140, 0, 0);
+  --text: #ccc;
+  --class-text: #aaa;
+  --now: rgb(240, 105, 87);
   --hour: #282828;
 }
 
@@ -207,7 +207,7 @@ body.dark svg#mode .switch {
 }
 
 .days .weekend p {
-  opacity: 0.5;
+  opacity: 0.75;
 }
 
 .days .today p {
@@ -344,12 +344,27 @@ p {
   flex: 1;
 }
 
-.class .location.linked:before {
+.class .location[href]:before {
   display: inline-block;
   content: ' ';
   width: 10px;
   height: 10px;
   background-image: url(../svg/location.svg);
+  background-repeat: no-repeat;
+}
+
+.class .alternative {
+  font-size: 12px;
+  text-align: right;
+}
+
+.class .alternative:after {
+  display: inline-block;
+  content: ' ';
+  width: 10px;
+  height: 10px;
+  margin-left: 4px;
+  background-image: url(../svg/alternative.svg);
   background-repeat: no-repeat;
 }
 
@@ -365,20 +380,6 @@ p {
 
 .class .code {
   font-size: 12px;
-}
-
-.class .alternative {
-  display: block;
-}
-
-.class .alternative:before {
-  display: block;
-  content: ' ';
-  width: 12px;
-  height: 12px;
-  background-size: 12px 12px;
-  background-image: url(../svg/alternative.svg);
-  background-repeat: no-repeat;
 }
 
 form {
@@ -405,6 +406,14 @@ form, input, button {
   display: flex;
 }
 
+form label {
+  font-size: 1em;
+  color: var(--text);
+  padding: 0.1em 0.5em;
+
+  transition: color 0.25s ease;
+}
+
 input {
   font-size: 1em;
   background: var(--background);
@@ -421,7 +430,7 @@ button {
   background: var(--text);
   color: var(--background);
   border: none;
-  padding: 0.2em 0.5em;
+  padding: 0.1em 0.5em;
 
   transition: background 0.25s ease;
 }

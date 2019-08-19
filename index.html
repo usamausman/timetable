@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -28,6 +28,7 @@
     <meta name="theme-color" content="#ffffff" />
     <title>UoL Timetable</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="Description" content="A clearer layout for the University of Leeds timetable. Also available offline!">
     <link
       rel="stylesheet"
       type="text/css"
@@ -46,13 +47,10 @@
         } else {
           document.body.classList.remove('dark')
         }
-        themeColor.content = getComputedStyle(document.body)
-          .getPropertyValue('--background')
-          .trim()
       }
       checkMode()
     </script>
-    <div class="container">
+    <main class="container">
       <div class="options">
         <svg id="update" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
           <title>Refresh timetable</title>
@@ -164,7 +162,7 @@
         <label for="notify">Notifications?</label>
         <input type="checkbox" id="notify" name="notify" />
       </div>
-    </div>
+    </main>
     <form>
       <ol>
         <li>
@@ -175,12 +173,13 @@
           >
         </li>
         <li>Click any "Submit" button</li>
-        <li>Copy entire "timetable.leeds.ac.uk/..." URL</li>
-        <li>Paste URL below</li>
+        <li>Copy entire link</li>
+        <li>Paste link below</li>
         <li>Click "Retrieve Timetable"</li>
       </ol>
       <div id="content">
-        <input id="link" name="link" type="text" placeholder="Timetable Link" />
+        <label for="link">Link:</label>
+        <input id="link" name="link" type="text" placeholder="timetable.leeds.ac.uk/..." />
         <button>Retrieve Timetable</button>
       </div>
     </form>

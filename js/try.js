@@ -182,7 +182,7 @@ const attachNotify = () => {
         if (Notification.permission === 'denied') {
           alert('Permission for Notifications has been denied by your browser')
           shouldNotify.checked = false
-        } else {
+        } else if (Notification.permission !== 'granted') {
           const permission = await Notification.requestPermission()
           if (permission !== 'granted') {
             shouldNotify.checked = false
@@ -479,16 +479,20 @@ const drawTimetable = (timetable) => {
         text: classInfo.location,
       })
       if (classInfo.locationLink) {
-        location.classList.add('linked')
         location.target = '_blank'
+        location.rel = 'noopener'
         location.href = classInfo.locationLink
       }
 
       const top = make('div', {className: 'top', children: [location]})
 
       if (classInfo.alternativeTimesLink) {
-        const alternativeTimes = make('a', {className: 'alternative'})
+        const alternativeTimes = make('a', {
+          className: 'alternative',
+          text: 'Alt. times',
+        })
         alternativeTimes.target = '_blank'
+        alternativeTimes.rel = 'noopener'
         alternativeTimes.href = classInfo.alternativeTimesLink
         top.appendChild(alternativeTimes)
       }
@@ -496,7 +500,9 @@ const drawTimetable = (timetable) => {
       const name = make('p', {className: 'name', text: classInfo.title})
       const info = make('p', {
         className: 'info',
-        text: `${classInfo.type} - ${classInfo.teacher}`,
+        text: `${classInfo.type}${
+          classInfo.teacher ? ` - ${classInfo.teacher}` : ''
+        }`,
       })
       const code = make('p', {className: 'code', text: classInfo.code})
       const div = make('div', {
@@ -524,15 +530,8 @@ const drawTimetable = (timetable) => {
         visible.filter((classInfo) => classInfo.days.includes(start + i))
       )
     const classDivs = Array.from(document.querySelectorAll('div.classes .day'))
-    const gridTemplateAreas =
-      'grid-template-areas: ' +
-      Array(options.end - options.start)
-        .fill()
-        .map((_, i) => `"t${options.start + i}"`)
-        .join('')
 
     classDivs.forEach((div, i) => {
-      div.style = gridTemplateAreas
       div.classList.remove('today')
       if (offset === 0 && i === todayOffset) {
         div.classList.add('today')
@@ -609,7 +608,7 @@ const notify = async ({classInfo, timeTo}) => {
       reg.showNotification(title, options)
     } else {
       const not = new Notification(title, options)
-      setTimeout(() => not.close(), 4000)
+      setTimeout(() => not.close(), 5000)
     }
   }
 }
@@ -626,10 +625,6 @@ const getNext = (timetable) => {
     .filter((classInfo) => classInfo.days.includes(today))
     .map((classInfo) => ({classInfo, timeTo: getTimeTo(classInfo)}))
     .filter(({timeTo}) => 0 <= timeTo && timeTo <= options.notifyBefore)
-  // .filter((classInfo) => {
-  //   const timeTo = getTimeTo(classInfo)
-  //   return 0 < timeTo && timeTo <= options.notifyBefore
-  // })
 
   return nextClass
 }
