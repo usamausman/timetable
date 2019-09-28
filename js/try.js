@@ -24,12 +24,12 @@ const STRINGS = {
   ],
 }
 
-let off = 0
+// let off = 0
 const getNow = () => {
-  const base = new Date(2019, 9, 16, 10, 50)
-  const offset = new Date(base.getTime() + off * 4 * 1000)
-  off += 1
-  return offset
+  // const base = new Date(2019, 9, 16, 10, 50)
+  // const offset = new Date(base.getTime() + off * 4 * 1000)
+  // off += 1
+  return new Date()
 }
 const baseDate = new Date(2018, 8, 24)
 
@@ -698,4 +698,4 @@ const goToToday = () => {
   }
 }
 
-window.addEventListener('resize', goToToday, {passive: true})
+window.addEventListener('resize', goToToday, { passive: true })
