@@ -705,5 +705,6 @@ const goToToday = () => {
 window.addEventListener('resize', goToToday, { passive: true })
 
 window.addEventListener('beforeinstallprompt', (e) => {
-  e.prompt()
+  alert('before')
+  // e.prompt()
 })
