@@ -6,7 +6,7 @@ self.addEventListener('install', (e) => {
       .open(cacheName)
       .then((cache) => {
         return cache.addAll([
-          '/timetable/',
+          '/timetable-dev/',
           'index.html',
           'js/script.js',
           'css/style.css',
