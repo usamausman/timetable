@@ -406,10 +406,32 @@ form, input, button {
   display: flex;
 }
 
+#content {
+  display: grid;
+  grid-template: repeat(2, auto) / repeat(2, 1fr);
+  grid-template-areas:
+    'link link'
+    'retrieve download';
+  gap: 1em;
+}
+
+#box {
+  grid-area: link;
+  display: flex;
+}
+
+#retrieve {
+  grid-area: retrieve;
+}
+
+#download {
+  grid-area: download;
+}
+
 form label {
   font-size: 1em;
   color: var(--text);
-  padding: 0.1em 0.5em;
+  padding: 0.1em 0.5em 0.1em 0;
 
   transition: color 0.25s ease;
 }
@@ -419,9 +441,13 @@ input {
   background: var(--background);
   border: none;
   border-bottom: solid 2px var(--text);
-  margin-right: 1em;
 
   transition: background 0.25s ease;
+}
+
+input::placeholder {
+  color: currentColor;
+  opacity: 0.6;
 }
 
 button {
@@ -464,13 +490,11 @@ button {
     font-size: 18px;
   }
 
-  input {
-    margin-right: 0;
-    margin-bottom: 1em;
-  }
-
   #content {
-    /* width: 100%; */
-    flex-direction: column;
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'link'
+      'retrieve'
+      'download';
   }
 }
