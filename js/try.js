@@ -24,7 +24,6 @@ const STRINGS = {
   ],
 }
 
-// let off = 0
 const getNow = () => {
   // const base = new Date(2019, 9, 16, 10, 50)
   // const offset = new Date(base.getTime() + off * 4 * 1000)
@@ -52,6 +51,10 @@ const timetableLink = `http://timetable.leeds.ac.uk/teaching/${toRange(
 const buildURL = (identifier) =>
   `https://cors-anywhere.herokuapp.com/${timetableLink}/textspreadsheet;?objectclass=student+set&idtype=id&identifier=${identifier}&template=SWSCUST+Student+Set+Individual+semester&days=1-7&periods=1-21&weeks=1-44`
 
+const buildWeekURL = (identifier, week) =>
+  `https://cors-anywhere.herokuapp.com/${timetableLink}/textspreadsheet;?objectclass=student+set&idtype=id&identifier=${identifier}&template=SWSCUST+Student+Set+Individual+week&periods=1-21&weeks=${week}`;
+
+
 const getCache = () => {
   const mode = localStorage.getItem('mode')
   const notify = JSON.parse(localStorage.getItem('notify')) || false
@@ -67,13 +70,13 @@ const getCache = () => {
 }
 
 const setCache = ({
-  mode,
-  notify,
-  identifier,
-  cached,
-  yearRange,
-  timetable,
-}) => {
+                    mode,
+                    notify,
+                    identifier,
+                    cached,
+                    yearRange,
+                    timetable,
+                  }) => {
   if (mode !== undefined) {
     localStorage.setItem('mode', mode)
   }
@@ -94,6 +97,59 @@ const setCache = ({
   }
 }
 
+const doDownload = async (downloadButton) => {
+  try {
+    const {
+      identifier,
+    } = getCache();
+
+    let classes = [];
+    for (let i = 0; i <= 35; i++) { // say there's 35 weeks
+      const url = buildWeekURL(identifier, i);
+      downloadButton.textContent = `Fetching week ${i}`;
+      const timetable = await fetchAndParseTimetable(url);
+      const weekClassArray = Object.values(timetable);
+      classes = classes.concat(weekClassArray)
+    }
+
+    const cal = ics();
+    for (let i = 0; i < classes.length; i++) {
+      const {
+        title,
+        code,
+        location,
+        locationLink,
+        note,
+        teacher,
+        type,
+        startDate,
+        endDate,
+        alternativeTimesLink
+      } = classes[i];
+
+      const subject = title;
+      const description = `${type} - ${teacher} (${code}) ${
+        alternativeTimesLink ? ("Alternative times: " + alternativeTimesLink + " ") : ""
+        }${note}`;
+      const formattedLocationLink = locationLink ? ` (${locationLink})` : "";
+      const formattedLocation = `${location}${formattedLocationLink}`;
+
+      cal.addEvent(
+        subject,
+        description,
+        formattedLocation,
+        startDate.toString(),
+        endDate.toString()
+      );
+    }
+    cal.download(`uol_timetable_${getYear()}.ics`);
+
+  } catch (e) {
+    console.error(e)
+    alert('There was a problem fetching your timetable, please try again')
+  }
+};
+
 const attachToForm = () => {
   const getIdentifier = (text) => {
     const match = text.match(/.*identifier=(\d+).*/)
@@ -102,7 +158,24 @@ const attachToForm = () => {
 
   const linkInput = document.querySelector('input#link')
   const linkForm = document.querySelector('form')
-  const retrieveButton = document.querySelector('form button')
+  const retrieveButton = document.querySelector('#retrieve');
+  const downloadButton = document.querySelector('#download');
+
+  downloadButton.addEventListener("click", async (e) => {
+    const identifier = getIdentifier(linkInput.value);
+    if (identifier) {
+      linkInput.disabled = true;
+      downloadButton.disabled = true;
+
+      setCache({identifier});
+      await doDownload(downloadButton);
+
+      linkInput.disabled = false;
+      downloadButton.textContent = 'Download complete!'
+    } else {
+      alert('Invalid link or `identifier` parameter is missing')
+    }
+  });
 
   linkForm.addEventListener('submit', async (e) => {
     e.preventDefault()
@@ -214,11 +287,31 @@ const fetchAndParseTimetable = async (url) => {
       .replace(/"/g, '\'')
       .trim()
 
+  const response = await fetch(url)
+  if (!response.ok) {
+    throw new Error('Can\'t fetch timetable')
+  }
+  const text = await response.text()
+
+  const parser = new DOMParser()
+  const root = parser.parseFromString(text, 'text/html').body
+  const timetableElements = Array.from(
+    root.querySelectorAll('table.spreadsheet')
+  )
+
+  let date = false;
+  const dateMatch = /^(\d+) ([a-zA-Z]+) (\d+)$/;
+  const dateElement = root.getElementsByClassName("header-3-0-22")[0];
+  const dateString = dateElement.innerText;
+  // check if a date is specified (only appears in week view)
+  if (dateMatch.exec(dateString)) {
+    date = new Date(dateString)
+  }
+
   const toClass = ({info, dayIndex}) => {
     const extractLink = (text) => {
       const match = text.match(/.*href='([^']*).*/)
       return match ? encodeURI(match[1]) : ''
-      // return match ? match[1] : ''
     }
 
     const extractTime = (text) => Number(text.split(':')[0])
@@ -261,6 +354,17 @@ const fetchAndParseTimetable = async (url) => {
       )
       .join(', ')
 
+    const startHour = extractTime(info[7].text);
+    const endHour = extractTime(info[8].text);
+
+    const day = new Date(date);
+    day.setDate(day.getDate() + dayIndex);
+
+    const startDate = new Date(day);
+    startDate.setHours(startHour);
+    const endDate = new Date(day);
+    endDate.setHours(endHour);
+
     return {
       code: commafy(info[0].text),
       title: commafy(info[1].text),
@@ -268,25 +372,15 @@ const fetchAndParseTimetable = async (url) => {
       location: info[3].text,
       locationLink: extractLink(info[3].html),
       note: info[5].text,
-      start: extractTime(info[7].text),
-      end: extractTime(info[8].text),
+      start: startHour,
+      end: endHour,
       alternativeTimesLink,
       days,
       teacher,
+      startDate,
+      endDate,
     }
   }
-
-  const response = await fetch(url)
-  if (!response.ok) {
-    throw new Error('Can\'t fetch timetable')
-  }
-  const text = await response.text()
-
-  const parser = new DOMParser()
-  const root = parser.parseFromString(text, 'text/html').body
-  const timetableElements = Array.from(
-    root.querySelectorAll('table.spreadsheet')
-  )
 
   const classesInfo = timetableElements
     .map((el) =>
@@ -414,7 +508,7 @@ const drawTimetable = (timetable) => {
         const day = STRINGS.days[currentDay.getDay()]
         const date = `${
           STRINGS.months[currentDay.getMonth()]
-        } ${currentDay.getDate()}`
+          } ${currentDay.getDate()}`
         return {day, date}
       })
 
@@ -502,7 +596,7 @@ const drawTimetable = (timetable) => {
         className: 'info',
         text: `${classInfo.type}${
           classInfo.teacher ? ` - ${classInfo.teacher}` : ''
-        }`,
+          }`,
       })
       const code = make('p', {className: 'code', text: classInfo.code})
       const div = make('div', {
@@ -512,7 +606,7 @@ const drawTimetable = (timetable) => {
 
       div.style = `grid-row: t${classInfo.start}-start / t${
         classInfo.end
-      }-start; background: ${getColour(classInfo.code)}`
+        }-start; background: ${getColour(classInfo.code)}`
 
       div.dataset.start = classInfo.start
       div.dataset.end = classInfo.end
@@ -581,7 +675,7 @@ const notify = async ({classInfo, timeTo}) => {
 
   const title = `${classInfo.code} starts in ${timeTo} minute${
     timeTo === 1 ? '' : 's'
-  }`
+    }`
   const options = {
     tag,
     body: classInfo.location
@@ -698,4 +792,4 @@ const goToToday = () => {
   }
 }
 
-window.addEventListener('resize', goToToday, { passive: true })
+window.addEventListener('resize', goToToday, {passive: true})
