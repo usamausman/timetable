@@ -47,6 +47,7 @@
         } else {
           document.body.classList.remove('dark')
         }
+        themeColor.content = getComputedStyle(document.body).getPropertyValue('--background')
       }
       checkMode()
     </script>
