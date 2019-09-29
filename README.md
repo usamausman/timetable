@@ -10,3 +10,4 @@ Refresh for new colours!
 * Links to find class locations
 * Links to alternate times for classes
 * Notification of next class and its location (if enabled)
+* Downloading all classes in the iCalendar .ics format, which you can import into your favorite calendar app!
