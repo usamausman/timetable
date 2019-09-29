@@ -649,9 +649,9 @@ const go = async () => {
         setInterval(() => drawTimetable(timetable), 100)
         setInterval(() => notifyNext(timetable), 1000)
 
-        if ('Notification' in window && navigator.serviceWorker) {
-          alert('Class notifications can be enabled in the bottom right.\n\nIf enabled, class notifications will fire 5 minutes before the start of class, with the location of the class.')
-        }
+        // if ('Notification' in window && navigator.serviceWorker) {
+        //   alert('Class notifications can be enabled in the bottom right.\n\nIf enabled, class notifications will fire 5 minutes before the start of class, with the location of the class.')
+        // }
 
         requestAnimationFrame(() => {
           setTimeout(goToToday, 100)
@@ -705,6 +705,5 @@ const goToToday = () => {
 window.addEventListener('resize', goToToday, { passive: true })
 
 window.addEventListener('beforeinstallprompt', (e) => {
-  alert('before')
   // e.prompt()
 })
