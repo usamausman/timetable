@@ -128,9 +128,8 @@ const doDownload = async (downloadButton) => {
       } = classes[i];
 
       const subject = title;
-      const description = `${type} - ${teacher} (${code}) ${
-        alternativeTimesLink ? ("Alternative times: " + alternativeTimesLink + " ") : ""
-        }${note}`;
+      const formattedAlternativeTimes = alternativeTimesLink ? (`Alternative times: ${alternativeTimesLink} `) : "";
+      const description = `${type} - ${teacher} (${code}) ${formattedAlternativeTimes}${note}`;
       const formattedLocationLink = locationLink ? ` (${locationLink})` : "";
       const formattedLocation = `${location}${formattedLocationLink}`;
 
