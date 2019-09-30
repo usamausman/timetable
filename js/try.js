@@ -70,13 +70,13 @@ const getCache = () => {
 }
 
 const setCache = ({
-                    mode,
-                    notify,
-                    identifier,
-                    cached,
-                    yearRange,
-                    timetable,
-                  }) => {
+  mode,
+  notify,
+  identifier,
+  cached,
+  yearRange,
+  timetable,
+}) => {
   if (mode !== undefined) {
     localStorage.setItem('mode', mode)
   }
@@ -507,7 +507,7 @@ const drawTimetable = (timetable) => {
         const day = STRINGS.days[currentDay.getDay()]
         const date = `${
           STRINGS.months[currentDay.getMonth()]
-          } ${currentDay.getDate()}`
+        } ${currentDay.getDate()}`
         return {day, date}
       })
 
@@ -595,7 +595,7 @@ const drawTimetable = (timetable) => {
         className: 'info',
         text: `${classInfo.type}${
           classInfo.teacher ? ` - ${classInfo.teacher}` : ''
-          }`,
+        }`,
       })
       const code = make('p', {className: 'code', text: classInfo.code})
       const div = make('div', {
@@ -605,7 +605,7 @@ const drawTimetable = (timetable) => {
 
       div.style = `grid-row: t${classInfo.start}-start / t${
         classInfo.end
-        }-start; background: ${getColour(classInfo.code)}`
+      }-start; background: ${getColour(classInfo.code)}`
 
       div.dataset.start = classInfo.start
       div.dataset.end = classInfo.end
@@ -674,7 +674,7 @@ const notify = async ({classInfo, timeTo}) => {
 
   const title = `${classInfo.code} starts in ${timeTo} minute${
     timeTo === 1 ? '' : 's'
-    }`
+  }`
   const options = {
     tag,
     body: classInfo.location
