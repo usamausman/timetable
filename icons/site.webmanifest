@@ -1,7 +1,7 @@
 {
   "name": "Timetable",
   "short_name": "Timetable",
-  "start_url": "/",
+  "start_url": "/timetable/",
   "icons": [
     {
       "src": "android-chrome-192x192.png",

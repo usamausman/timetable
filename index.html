@@ -49,6 +49,7 @@
         } else {
           document.body.classList.remove('dark')
         }
+        themeColor.content = getComputedStyle(document.body).getPropertyValue('--background')
       }
       checkMode()
     </script>
@@ -180,10 +181,12 @@
         <li>Click "Retrieve Timetable"</li>
       </ol>
       <div id="content">
-        <label for="link">Link:</label>
-        <input id="link" name="link" type="text" placeholder="timetable.leeds.ac.uk/..." />
-        <button id="retrieve" type="submit">Retrieve Timetable</button>
-        <button id="download" type="button">Download .ics</button>
+        <div id="box">
+          <label for="link">Link:</label>
+          <input id="link" name="link" type="text" placeholder="timetable.leeds.ac.uk/..." />
+        </div>
+        <button id="retrieve">Retrieve Timetable</button>
+        <button id="download">Download .ics</button>
       </div>
       <p>This tool uses the <a href="https://github.com/nwcell/ics.js/">ics.js</a> library, which is licensed under <a href="./ics-js-license.txt">the MIT license</a>. </p>
     </form>
