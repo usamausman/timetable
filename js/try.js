@@ -104,7 +104,7 @@ const doDownload = async (downloadButton) => {
     } = getCache();
 
     let classes = [];
-    for (let i = 0; i <= 35; i++) { // say there's 35 weeks
+    for (let i = 0; i <= 44; i++) { // there's 44 weeks
       const url = buildWeekURL(identifier, i);
       downloadButton.textContent = `Fetching week ${i}`;
       const timetable = await fetchAndParseTimetable(url);
@@ -113,7 +113,7 @@ const doDownload = async (downloadButton) => {
     }
 
     const cal = ics();
-    for (let i = 0; i < classes.length; i++) {
+    classes.forEach((classData) => {
       const {
         title,
         code,
@@ -125,7 +125,7 @@ const doDownload = async (downloadButton) => {
         startDate,
         endDate,
         alternativeTimesLink
-      } = classes[i];
+      } = classData;
 
       const subject = title;
       const formattedAlternativeTimes = alternativeTimesLink ? (`Alternative times: ${alternativeTimesLink} `) : "";
@@ -140,8 +140,8 @@ const doDownload = async (downloadButton) => {
         startDate.toString(),
         endDate.toString()
       );
-    }
-    cal.download(`uol_timetable_${getYear()}.ics`);
+    });
+    cal.download(`uol_timetable_${getYear()}`);
 
   } catch (e) {
     console.error(e)
@@ -161,6 +161,7 @@ const attachToForm = () => {
   const downloadButton = document.querySelector('#download');
 
   downloadButton.addEventListener("click", async (e) => {
+    e.preventDefault();
     const identifier = getIdentifier(linkInput.value);
     if (identifier) {
       linkInput.disabled = true;
