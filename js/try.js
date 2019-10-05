@@ -597,7 +597,7 @@ const notify = async ({classInfo, timeTo}) => {
 
   if (timeTo > 0) {
     console.log(`Notifying ${tag} ${timeTo}`)
-    if (reg.showNotificationa) {
+    if (reg.showNotification) {
       options.actions = [
         {
           action: 'location',
