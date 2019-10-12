@@ -163,7 +163,7 @@ const getLink = (text) => {
   if (!match) {
     return undefined
   }
-  re turn match[1]
+  return match[1]
 }
 
 const getHasalternative = (text) => text.indexOf('href') !== -1
