@@ -9,6 +9,8 @@ self.addEventListener('install', (e) => {
           '/timetable-dev/',
           'index.html',
           'js/script.js',
+          'js/lib/ics.deps.min.js',
+          'js/lib/ics.min.js',
           'css/style.css',
           'favicon.ico',
           'svg/location.svg',

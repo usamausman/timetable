@@ -392,6 +392,7 @@ form a {
 
 form input, form button {
   flex: 1;
+  margin-bottom: 2em;
 }
 
 form, input, button {
