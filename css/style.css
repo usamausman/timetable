@@ -5,7 +5,8 @@
   --left-bar: 70px;
   --size: repeat(7, 1fr);
 
-  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
   font-family: var(--font);
 }
 
@@ -78,7 +79,8 @@ body.dark .class {
   transition: background 0.25s ease;
 }
 
-.notifications label, .notifications input {
+.notifications label,
+.notifications input {
   color: var(--class-text);
   display: inline-block;
   margin: 0 4px;
@@ -114,8 +116,12 @@ body.dark .class {
 }
 
 @keyframes spin {
-  from { transform: rotateZ(0deg) }
-  to   { transform: rotateZ(360deg) }
+  from {
+    transform: rotateZ(0deg);
+  }
+  to {
+    transform: rotateZ(360deg);
+  }
 }
 
 svg#update.updating {
@@ -123,8 +129,12 @@ svg#update.updating {
 }
 
 @keyframes back {
-  from { transform: rotateZ(0deg) }
-  to   { transform: rotateZ(180deg) }
+  from {
+    transform: rotateZ(0deg);
+  }
+  to {
+    transform: rotateZ(180deg);
+  }
 }
 
 body .options svg#mode {
@@ -132,8 +142,12 @@ body .options svg#mode {
 }
 
 @keyframes half {
-  from { transform: rotateZ(180deg) }
-  to   { transform: rotateZ(360deg) }
+  from {
+    transform: rotateZ(180deg);
+  }
+  to {
+    transform: rotateZ(360deg);
+  }
 }
 
 body.dark .options svg#mode {
@@ -256,6 +270,8 @@ p {
   display: grid;
   grid-template-columns: var(--size);
 
+  scroll-snap-type: x mandatory;
+
   transition: background 0.25s ease;
 }
 
@@ -285,18 +301,21 @@ p {
   display: grid;
   grid-template-rows: repeat(var(--time-slots), 1fr);
   grid-template-areas:
-  "t9"
-  "t10"
-  "t11"
-  "t12"
-  "t13"
-  "t14"
-  "t15"
-  "t16"
-  "t17"
-  "t18";
+    't9'
+    't10'
+    't11'
+    't12'
+    't13'
+    't14'
+    't15'
+    't16'
+    't17'
+    't18';
   opacity: 0.75;
   width: 100%;
+
+  scroll-snap-align: end;
+
   transition: opacity 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
 }
 
@@ -322,7 +341,8 @@ p {
   box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.25);
 }
 
-.class p, .class a {
+.class p,
+.class a {
   display: block;
   color: var(--class-text);
   overflow: hidden;
@@ -386,16 +406,29 @@ form {
   padding: 2em;
 }
 
+form ol {
+  margin: 0;
+}
+
 form a {
   color: var(--now);
 }
 
-form input, form button {
+form input,
+form button {
   flex: 1;
-  margin-bottom: 2em;
 }
 
-form, input, button {
+form button {
+  text-transform: uppercase;
+  font-size: 0.7em;
+  letter-spacing: 1px;
+  padding: 0.6em 1em;
+}
+
+form,
+input,
+button {
   font-family: var(--font);
   color: var(--text);
 
@@ -414,6 +447,7 @@ form, input, button {
     'link link'
     'retrieve download';
   gap: 1em;
+  margin: 1em 0;
 }
 
 #box {
@@ -448,7 +482,7 @@ input {
 
 input::placeholder {
   color: currentColor;
-  opacity: 0.6;
+  opacity: 0.5;
 }
 
 button {
@@ -465,7 +499,9 @@ button {
 @media (max-width: 939px) {
   :root {
     --show-num: 2;
-    --width-one: calc((100vw - var(--left-bar) - 2 * var(--gap)) / var(--show-num));
+    --width-one: calc(
+      (100vw - var(--left-bar) - 2 * var(--gap)) / var(--show-num)
+    );
     --show: repeat(7, var(--width-one));
   }
 
