@@ -765,14 +765,21 @@ go()
 const goToToday = () => {
   const today = document.querySelector('.day.today')
   const now = document.querySelector('.class.now')
-  if (today) {
-    today.scrollIntoView({
+  const line = document.querySelector('.line')
+  if (now) {
+    now.scrollIntoView({
       behavior: 'smooth',
       block: 'nearest',
       inline: 'end',
     })
-  } else if (now) {
-    now.scrollIntoView({
+  } else if (line) {
+    line.scrollIntoView({
+      behavior: 'smooth',
+      block: 'nearest',
+      inline: 'nearest',
+    })
+  } else if (today) {
+    today.scrollIntoView({
       behavior: 'smooth',
       block: 'nearest',
       inline: 'end',
