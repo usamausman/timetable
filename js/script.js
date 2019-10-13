@@ -763,17 +763,17 @@ once()
 go()
 
 const goToToday = () => {
-  const today = document.querySelector('.day.today')
   const now = document.querySelector('.class.now')
-  const line = document.querySelector('.line')
+  const time = document.querySelector('.times .now')
+  const today = document.querySelector('.day.today')
   if (now) {
     now.scrollIntoView({
       behavior: 'smooth',
       block: 'nearest',
       inline: 'end',
     })
-  } else if (line) {
-    line.scrollIntoView({
+  } else if (time) {
+    time.scrollIntoView({
       behavior: 'smooth',
       block: 'nearest',
       inline: 'nearest',
