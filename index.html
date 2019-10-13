@@ -43,7 +43,7 @@
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
         const mode = localStorage.getItem('mode')
         const themeColor = document.head.querySelector('meta[name=theme-color]')
-        if (mode === 'dark' || !mode && prefersDark) {
+        if (mode === 'dark' || mode === null && prefersDark) {
           document.body.classList.add('dark')
         } else {
           document.body.classList.remove('dark')
