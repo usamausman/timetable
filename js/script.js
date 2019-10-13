@@ -463,7 +463,9 @@ const drawTimetable = (timetable) => {
   const setSize = () => {
     const { todayOffset } = visibleRange()
     const size =
-      `--size: repeat(${todayOffset}, 1fr) 2fr ` +
+      '--size: ' +
+      (options.sliding ? `repeat(${todayOffset}, 1fr) ` : '') +
+      '2fr ' +
       `repeat(${options.show - 1 - todayOffset}, 1fr)`
     const daysEl = document.querySelector('.days')
     const classesEl = document.querySelector('.classes')
