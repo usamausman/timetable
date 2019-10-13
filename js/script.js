@@ -1,508 +1,747 @@
-const nextClassMinutes = 5
+const STRINGS = {
+  months: [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ],
+  days: [
+    'Sunday',
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday',
+  ],
+}
+
+// let off = 0
+const getNow = () => {
+  // const base = new Date(2019, 9, 16, 10, 50)
+  // const offset = new Date(base.getTime() + off * 4 * 1000)
+  // off += 1
+  return new Date()
+}
 const baseDate = new Date(2018, 8, 24)
 
-const link = document.querySelector('input#link')
-const retrieve = document.querySelector('form')
-
-const options = document.querySelector('.options')
-const update = options.querySelector('#update')
-const changeMode = options.querySelector('#mode')
-const grid = document.querySelector('.classes').children
-const daysDivs = Array.from(document.querySelectorAll('.days div'))
-const dayParts = (el) => [el.querySelector('.day'), el.querySelector('.date')]
-const times = Array.from(document.querySelector('.times').children)
-const line = document.querySelector('.line')
-
-const prev = document.querySelector('.prev')
-const next = document.querySelector('.next')
-
-let nowClasses
-let nextClasses
-
-const notifyCheckbox = document.querySelector('.notifications input')
-
-let shouldNotify = notifyCheckbox.checked
-
-let alreadyNotified = {}
-
-let weekOffset = 0
-
-const getToday = () => new Date(2019, 9, 18, 11, 30)
-
-const getIdentifier = (url) => {
-  const match = url.match(/(?:.*identifier=)(\d+)(?:.*)/)
-  if (match) {
-    return match[1]
-  }
-  return undefined
-}
-
-const getYear = () => {
-  const today = getToday()
-  const month = today.getMonth()
-  const year = today.getFullYear() % 100
+const getYear = (date) => {
+  const day = date || getNow()
+  const month = day.getMonth()
+  const year = day.getFullYear()
   if (month < 7) {
-    return `20${year - 1}${year}`
+    return year - 1
   }
-  return `20${year}${year + 1}`
+  return year
 }
 
-const getBase = () =>
-  `http://timetable.leeds.ac.uk/teaching/${getYear()}/reporting`
+const toRange = (year) => `${year}${(year % 100) + 1}`
 
-const dayNames = [
-  'Monday',
-  'Tuesday',
-  'Wednesday',
-  'Thursday',
-  'Friday',
-  'Saturday',
-  'Sunday',
-]
+const timetableLink = `http://timetable.leeds.ac.uk/teaching/${toRange(
+  getYear()
+)}/reporting`
 
-const monthNames = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-]
+const buildURL = (identifier) =>
+  `https://cors-anywhere.herokuapp.com/${timetableLink}/textspreadsheet;?objectclass=student+set&idtype=id&identifier=${identifier}&template=SWSCUST+Student+Set+Individual+semester&days=1-7&periods=1-21&weeks=1-44`
 
-const haveColors = {}
-
-let weekDraw
-let drawInterval
-let lastDate
-
-const notify = async (singleClass) => {
-  if ('Notification' in window) {
-    if (Notification.permission === 'granted' && shouldNotify) {
-      const reg = await navigator.serviceWorker.getRegistration()
-
-      const tag = `${singleClass.code}${singleClass.timeBegin}`
-
-      if (alreadyNotified[tag] !== true) {
-        console.log(`Notifying ${tag}`)
-        reg.showNotification(
-          `${singleClass.name} starts in ${nextClassMinutes} minutes`,
-          {
-            tag,
-            body:
-              singleClass.location.length > 2
-                ? `Head to ${singleClass.location}`
-                : 'No location given',
-            badge: 'icons/badge.png',
-            icon: 'icons/android-chrome-512x512.png',
-            data: {
-              url: window.location.href,
-            },
-            // renotify: true
-          }
-        )
-
-        alreadyNotified[tag] = true
-      }
-    }
-  }
-}
-
-// const getClasses = (table) => Array.from(table.querySelectorAll('tbody tr:not(.columnTitles)'))
-const getClasses = (table) =>
-  Array.from(table.querySelectorAll('tbody tr:not(.columnTitles)'))
-
-const getAllInfo = (classes) =>
-  classes.map((singleClass) =>
-    Array.from(singleClass.cells).map((cell) => cell.innerHTML)
-  )
-
-const parseType = (type) => type.match(/^([\w]+).*?(\d)?$/)[1].toLowerCase()
-
-const parseTime = (time) => time.split(':')[0]
-
-const parseWeeks = (weeks) =>
-  weeks.split(', ').reduce((full, weekRange) => {
-    if (weekRange.indexOf('-') !== -1) {
-      const [start, end] = weekRange.split('-').map(Number)
-      const range = Array(end - start + 1)
-        .fill()
-        .map((_, i) => start + i)
-      return full.concat(range)
-    }
-    return full.concat(Number(weekRange))
-  }, [])
-
-const shiftWeeks = (weeks) =>
-  weeks.map((weekNumber) => {
-    if (weekNumber <= 11) {
-      return weekNumber
-    }
-    if (weekNumber <= 22) {
-      return weekNumber + 4
-    }
-    return weekNumber + 8
-  })
-
-const parseDays = (weekday, weeks) =>
-  weeks.map((weekNumber) => weekNumber * 7 + weekday)
-
-const getContent = (text) => {
-  const el = document.createElement('span')
-  el.innerHTML = text
-  return el.innerText.replace(/\s/g, ' ')
-}
-
-const getLink = (text) => {
-  const match = text.match(/href="([^"]*)/)
-  if (!match) {
-    return undefined
-  }
-  return match[1]
-}
-
-const getHasalternative = (text) => text.indexOf('href') !== -1
-
-const getalternativeLink = (text) => {
-  let url = getLink(text)
-  if (url) {
-    url = encodeURI(url.slice(1).replace(/&amp;/g, '&'))
-  }
-  return url
-}
-
-const getDayNumber = (date) => {
-  const midday = new Date(date.getTime())
-  midday.setHours(12)
-  const diff = midday - baseDate
-  const diffDays = Math.floor(diff / 1000 / 60 / 60 / 24)
-  return diffDays
-}
-
-const getWeekNumber = (date) => Math.floor(getDayNumber(date) / 7) * 7
-
-const getWeekDayNumber = (date) => getDayNumber(date) - getWeekNumber(date)
-
-const getInfo = (classes, weekday) =>
-  classes.map((classInfo) => ({
-    code: getContent(classInfo[0]),
-    name:
-      getContent(classInfo[0]).length > 8
-        ? getContent(classInfo[0])
-        : classInfo[1],
-    teacher: getContent(classInfo[10]),
-    type: classInfo[2],
-    typeShort: parseType(classInfo[2]),
-    location: getContent(classInfo[3]),
-    locationLink: getLink(classInfo[3]),
-    timeBegin: parseTime(classInfo[7]),
-    timeEnd: parseTime(classInfo[8]),
-    days: parseDays(weekday, shiftWeeks(parseWeeks(classInfo[9]))),
-    alternative: getHasalternative(classInfo[4]),
-    alternativeLink: getalternativeLink(classInfo[4]),
-  }))
-
-const setData = (identifier, year) => {
-  localStorage.setItem('identifier', identifier)
-  if (year) {
-    localStorage.setItem('year', year)
-  }
-}
-
-const addOffset = (offset) => (singleClass) => {
-  singleClass.days = singleClass.days.map((n) => n + offset * 52 * 7)
-}
-
-const getCORS = (identifier) =>
-  `https://cors-anywhere.herokuapp.com/${getBase()}/textspreadsheet;?objectclass=student+set&idtype=id&identifier=${identifier}&template=SWSCUST+Student+Set+Individual+semester&days=1-7&periods=1-21&weeks=1-44`
-
-const getTimetable = async () => {
+const getCache = () => {
+  const mode = localStorage.getItem('mode')
+  const notify = JSON.parse(localStorage.getItem('notify')) || false
   const identifier = localStorage.getItem('identifier')
-  const cached = localStorage.getItem('cache')
-  const year = localStorage.getItem('year')
-
-  if (!identifier) {
-    document.body.classList.add('noInfo')
-    return []
-  }
-  // ! ! ! - fetch
-  // ! y ! - fetch
-  // c ! ! - fetch
-  // c y ! - fetch
-  // c y m - no fetch
-
-  let rawHTML = ''
-  if (!cached || !(year === getYear())) {
-    const url = getCORS(identifier)
-    const rawResponse = await fetch(url)
-    if (rawResponse.ok) {
-      localStorage.setItem('identifier', getIdentifier(url))
-      localStorage.setItem('year', getYear())
-      rawHTML = await rawResponse.text()
-    } else {
-      localStorage.setItem('identifier', '')
-      localStorage.setItem('year', '')
-      alert('Can\'t connect, check that the provided link works')
-      document.body.classList.add('noInfo')
-      return []
-    }
-    document.body.classList.remove('noInfo')
-    localStorage.setItem('cache', rawHTML)
-  }
-  rawHTML = localStorage.getItem('cache')
-
-  const parser = new DOMParser()
-  const body = parser.parseFromString(rawHTML, 'text/html').body
-  const offset = getToday().getFullYear() - baseDate.getFullYear()
-
-  const classTables = Array.from(body.querySelectorAll('table.spreadsheet'))
-  const classes = classTables
-    .map(getClasses)
-    .map(getAllInfo)
-    .flatMap(getInfo)
-
-  classes.forEach(addOffset(offset))
-
-  return classes
-}
-
-const getColor = (course) => {
-  if (!haveColors.hasOwnProperty(course)) {
-    haveColors[course] = `hsl(${Math.round(Math.random() * 360)}, 50%, 75%)`
-  }
-  return haveColors[course]
-}
-
-const showClass = (dayIndex) => (singleClass) => {
-  const classDiv = document.createElement('div')
-  classDiv.className = 'class'
-  classDiv.style = `grid-row: t${singleClass.timeBegin}-start / t${
-    singleClass.timeEnd
-  }-start; background: ${getColor(singleClass.code)};`
-
-  const classDivTop = document.createElement('div')
-  classDivTop.className = 'top'
-  classDiv.appendChild(classDivTop)
-
-  const classDivLocationA = document.createElement('a')
-  classDivLocationA.className = 'location'
-  if (singleClass.locationLink) {
-    classDivLocationA.classList.add('linked')
-    classDivLocationA.href = singleClass.locationLink
-    classDivLocationA.target = '_blank'
-  }
-  classDivLocationA.textContent = singleClass.location
-  classDivTop.appendChild(classDivLocationA)
-
-  const classDivNameP = document.createElement('p')
-  classDivNameP.className = 'name'
-  classDivNameP.textContent = singleClass.name
-  classDiv.appendChild(classDivNameP)
-
-  const classDivTypeP = document.createElement('p')
-  classDivTypeP.className = 'info'
-  classDivTypeP.textContent = `${singleClass.type} - ${singleClass.teacher}`
-  classDiv.appendChild(classDivTypeP)
-
-  const classDivCodeP = document.createElement('p')
-  classDivCodeP.className = 'code'
-  classDivCodeP.textContent = singleClass.code
-  classDiv.appendChild(classDivCodeP)
-
-  if (singleClass.alternative) {
-    const classDivalternativeA = document.createElement('a')
-    classDivalternativeA.className = 'alternative'
-    classDivalternativeA.href = `${getBase()}${singleClass.alternativeLink}`
-    classDivalternativeA.target = '_blank'
-    classDivTop.appendChild(classDivalternativeA)
-  }
-
-  grid[dayIndex].appendChild(classDiv)
-
-  singleClass.div = classDiv
-}
-
-const showClasses = (classes, dayIndex) => {
-  classes.map(showClass(dayIndex))
-}
-
-const getTime = (now) =>
-  // Math.floor(now.getHours() * 100 + (now.getMinutes() * 5) / 3)
-  now.getHours() + now.getMinutes() / 60
-
-const isNow = (now) => (singleClass) =>
-  weekOffset === 0 &&
-  Number(singleClass.timeBegin) <= getTime(now) &&
-  getTime(now) < Number(singleClass.timeEnd)
-
-const isNext = (now) => (singleClass) => {
-  const then = new Date(now)
-  then.setMinutes(now.getMinutes() + nextClassMinutes)
-  return weekOffset === 0 && Number(singleClass.timeBegin) === getTime(then)
-}
-
-const clearClasses = () => {
-  Array.from(grid).forEach((div) => {
-    if (!div.classList.contains('line')) {
-      const copy = div.cloneNode(false)
-      div.parentNode.replaceChild(copy, div)
-    }
-  })
-}
-
-const showDays = (periodDays, today) => {
-  daysDivs.forEach((el, dayIndex) => {
-    const [day, date] = dayParts(el)
-    day.textContent = periodDays[dayIndex][0]
-    date.textContent = periodDays[dayIndex][1]
-    if (dayIndex === 5 || dayIndex === 6) {
-      el.classList.add('weekend')
-    } else {
-      el.classList.remove('weekend')
-    }
-  })
-  const daysEl = document.querySelector('.days')
-  const gridEl = document.querySelector('.classes')
-  const weekDay = getWeekDayNumber(today)
-  if (weekOffset === 0) {
-    daysDivs[weekDay].classList.add('today')
-    grid[weekDay].classList.add('today')
-    const size = `--size: ${weekDay ? `repeat(${weekDay}, 1fr) ` : ''}2fr${
-      6 - weekDay ? ` repeat(${6 - weekDay}, 1fr)` : ''
-    }`
-    daysEl.style = size
-    gridEl.style = size
-  } else {
-    daysDivs[weekDay].classList.remove('today')
-    grid[weekDay].classList.remove('today')
-    daysEl.removeAttribute('style')
-    gridEl.removeAttribute('style')
-  }
-}
-
-const getClassesForDayNumber = (dayNumber) => (singleClass) =>
-  singleClass.days.indexOf(dayNumber) !== -1
-
-const getClassesForWeek = (allClasses, weekNumber) => {
-  const classesForPeriod = []
-  const periodDays = []
-  for (let i = 0; i < 7; ++i) {
-    const checkDay = weekNumber + i
-    classesForPeriod.push(allClasses.filter(getClassesForDayNumber(checkDay)))
-    const d = new Date(2018, 8, 24)
-    d.setDate(d.getDate() + checkDay)
-    periodDays.push([
-      `${dayNames[(checkDay + 7) % 7]}`,
-      `${monthNames[d.getMonth()]} ${d.getDate()}`,
-    ])
-  }
-  return [classesForPeriod, periodDays]
-}
-
-const drawDays = (allClasses, now) => {
-  const [classes, days] = getClassesForWeek(allClasses, getWeekNumber(now))
-  clearClasses()
-  classes.map(showClasses)
-  showDays(days, now)
-}
-
-const drawNow = (allClasses, now) => {
-  const shiftedHour = now.getHours() - 9
-  const oldClasses = Array.from(document.querySelectorAll('.class.now'))
-
-  const lastTimeDiv = times.filter((time) => time.classList.contains('now'))[0]
-
-  if (times[shiftedHour]) {
-    if (!times[shiftedHour].classList.contains('now')) {
-      if (lastTimeDiv && lastTimeDiv !== times[shiftedHour]) {
-        lastTimeDiv.removeAttribute('class')
-      }
-      times[shiftedHour].classList.add('now')
-    }
-  }
-
-  // const today = getDayNumber(now)
-  // const [classes, days] = getClassesForWeek(allClasses, getWeekNumber(now))
-  const classes = getClassesForWeek(allClasses, getWeekNumber(now))[0]
-
-  nowClasses = []
-
-  if (allClasses.length !== 0) {
-    nowClasses = classes[getWeekDayNumber(now)].filter(isNow(now))
-    console.log(classes[getWeekDayNumber(now)])
-    const nowDivs = nowClasses.map((singleClass) => singleClass.div)
-    if (oldClasses[0] !== nowClasses[0]) {
-      oldClasses.forEach((singleDiv) => singleDiv.classList.remove('now'))
-    }
-    nowDivs.forEach((singleDiv) => singleDiv.classList.add('now'))
-  }
-
-  return classes[0]
-}
-
-const draw = (classes) => (initial = false) => {
-  // const now = new Date(2019, 2, 5, 12, 00)
-  const now = getToday()
-  now.setDate(now.getDate() + weekOffset * 7)
-  const shiftedHour = now.getHours() - 9
-
-  if (initial || !lastDate) {
-    if (classes.length !== 0) {
-      lastDate = new Date(now)
-      drawDays(classes, now)
-      drawNow(classes, now)
-    } else {
-      drawDays([], now)
-      drawNow([], now)
-    }
-  }
-
-  if (lastDate && lastDate.getDate() !== now.getDate()) {
-    lastDate.setDate(now.getDate())
-    drawDays(classes, now)
-  }
-
-  if (shiftedHour >= 0 && shiftedHour < 10) {
-    if (lastDate && lastDate.getMinutes() !== now.getMinutes()) {
-      lastDate.setHours(now.getHours())
-
-      drawNow(classes, now)
-    }
-
-    line.style.visibility = ''
-
-    line.style.top = `${(getTime(now) - 9) * 10}%`
-  } else {
-    line.style.visibility = 'hidden'
-    Array.from(times).forEach((time) => time.classList.remove('now'))
-  }
-
-  const classesToday = getClassesForWeek(classes, getWeekNumber(now))[0][
-    getWeekDayNumber(now)
-  ]
-  nowClasses = classesToday.filter(isNow(now))
-  nextClasses = classesToday.filter(isNext(now))
-}
-
-/* BUILD */
-
-const buildTimetable = async () => {
+  const yearRange = localStorage.getItem('yearRange')
+  const cached = JSON.parse(localStorage.getItem('cached')) || false
+  let timetable = ''
   try {
-    const classes = await getTimetable()
+    timetable = JSON.parse(localStorage.getItem('timetable'))
+  } finally {
+    return { mode, notify, identifier, cached, yearRange, timetable }
+  }
+}
 
-    clearInterval(drawInterval)
-    weekDraw = draw(classes)
-    drawInterval = setInterval(weekDraw, 50)
-    weekDraw(true)
+const setCache = ({
+  mode,
+  notify,
+  identifier,
+  cached,
+  yearRange,
+  timetable,
+}) => {
+  if (mode !== undefined) {
+    localStorage.setItem('mode', mode)
+  }
+  if (notify !== undefined) {
+    localStorage.setItem('notify', notify)
+  }
+  if (identifier !== undefined) {
+    localStorage.setItem('identifier', identifier)
+  }
+  if (cached !== undefined) {
+    localStorage.setItem('cached', cached)
+  }
+  if (yearRange !== undefined) {
+    localStorage.setItem('yearRange', yearRange)
+  }
+  if (timetable !== undefined) {
+    localStorage.setItem('timetable', JSON.stringify(timetable))
+  }
+}
 
-    goToday()
+const doDownload = async (downloadButton) => {
+  try {
+    const { identifier } = getCache()
+
+    const url = buildURL(identifier)
+    const timetable = await fetchAndParseTimetable(url)
+
+    const calendar = ics()
+    timetable.forEach(
+      ({
+        title,
+        code,
+        location,
+        locationLink,
+        note,
+        teacher,
+        type,
+        days,
+        start,
+        end,
+        alternativeTimesLink,
+      }) => {
+        const formattedAlternativeTimes = alternativeTimesLink
+          ? `Alternative times: ${alternativeTimesLink} `
+          : ''
+        const description = `${type} - ${teacher} (${code}) ${formattedAlternativeTimes}${note}`
+        const formattedLocation =
+          location + (locationLink ? ` (${locationLink})` : '')
+
+        const yearOffset = (getYear(getNow()) - getYear(baseDate)) * 52 * 7
+        days.forEach((day) => {
+          const startDate = new Date(baseDate)
+          startDate.setDate(startDate.getDate() + yearOffset + day)
+          startDate.setHours(start)
+
+          const endDate = new Date(startDate)
+          endDate.setHours(end)
+
+          calendar.addEvent(
+            title,
+            description,
+            formattedLocation,
+            startDate.toString(),
+            endDate.toString()
+          )
+        })
+      }
+    )
+    calendar.download(`uol_timetable_${getYear()}`)
   } catch (e) {
     console.error(e)
+    alert('There was a problem fetching your timetable, please try again')
+  }
+}
+
+const attachToForm = () => {
+  const getIdentifier = (text) => {
+    const match = text.match(/.*identifier=(\d+).*/)
+    return match ? match[1] : ''
+  }
+
+  const linkInput = document.querySelector('input#link')
+  const linkForm = document.querySelector('form')
+  const retrieveButton = document.querySelector('#retrieve')
+  const downloadButton = document.querySelector('#download')
+
+  downloadButton.addEventListener('click', async (e) => {
+    e.preventDefault()
+    const identifier = getIdentifier(linkInput.value)
+    if (identifier) {
+      downloadButton.textContent = 'Downloading...'
+      linkInput.disabled = true
+      downloadButton.disabled = true
+
+      setCache({ identifier })
+      await doDownload(downloadButton)
+      setCache({ identifier: undefined, timetable: undefined }) // for debugging
+
+      linkInput.disabled = false
+      downloadButton.disabled = false
+      downloadButton.textContent = 'Download .ics'
+    } else {
+      alert('Invalid link or `identifier` parameter is missing')
+    }
+  })
+
+  linkForm.addEventListener('submit', async (e) => {
+    e.preventDefault()
+    const identifier = getIdentifier(linkInput.value)
+    if (identifier) {
+      retrieveButton.textContent = 'Checking...'
+      linkInput.disabled = true
+      retrieveButton.disabled = true
+
+      const url = buildURL(identifier)
+      const response = await fetch(url)
+      if (response.ok) {
+        setCache({ identifier })
+        go()
+      } else {
+        alert('`identifier` parameter is incorrect')
+      }
+
+      linkInput.disabled = false
+      retrieveButton.disabled = false
+      retrieveButton.textContent = 'Retrieve Timetable'
+    } else {
+      alert('Invalid link or `identifier` parameter is missing')
+    }
+  })
+}
+
+const attachOptions = () => {
+  const update = document.querySelector('#update')
+  const mode = document.querySelector('#mode')
+
+  update.addEventListener('click', async () => {
+    update.classList.add('updating')
+    const { identifier } = getCache()
+    if (!identifier) {
+      document.body.classList.add('noInfo')
+      alert('`identifier` is missing, please paste link again')
+    } else {
+      if (!navigator.onLine) {
+        alert('Network is offline')
+      } else {
+        setCache({ cached: false })
+        await go()
+      }
+    }
+    update.classList.remove('updating')
+  })
+
+  mode.addEventListener('click', () => {
+    if (document.body.classList.contains('dark')) {
+      setCache({ mode: '' })
+    } else {
+      setCache({ mode: 'dark' })
+    }
+    checkMode()
+  })
+}
+
+const attachNavigation = () => {
+  const prev = document.querySelector('svg.prev')
+  const next = document.querySelector('svg.next')
+
+  prev.addEventListener('click', () => (offset -= 1))
+  next.addEventListener('click', () => (offset += 1))
+}
+
+const attachNotify = () => {
+  const notifyDiv = document.querySelector('div.notifications')
+  const shouldNotify = document.querySelector('input#notify')
+
+  const { notify } = getCache()
+  shouldNotify.checked = notify
+
+  if ('Notification' in window && navigator.serviceWorker) {
+    shouldNotify.addEventListener('change', async () => {
+      if (shouldNotify.checked) {
+        if (Notification.permission === 'denied') {
+          alert('Permission for Notifications has been denied by your browser')
+          shouldNotify.checked = false
+        } else if (Notification.permission !== 'granted') {
+          const permission = await Notification.requestPermission()
+          if (permission !== 'granted') {
+            shouldNotify.checked = false
+          }
+        }
+      }
+      setCache({ notify: shouldNotify.checked })
+    })
+  } else {
+    notifyDiv.style.visibility = 'hidden'
+  }
+}
+
+const once = () => {
+  attachToForm()
+  attachOptions()
+  attachNavigation()
+  attachNotify()
+  localStorage.removeItem('year')
+  localStorage.removeItem('cache')
+}
+
+// consider merge into getTimetable
+const fetchAndParseTimetable = async (url) => {
+  const clean = (text) =>
+    text
+      .replace(/\&nbsp;/g, '')
+      .replace(/;;+/g, '')
+      .replace(/"/g, "'")
+      .trim()
+
+  const toClass = ({ info, dayIndex }) => {
+    const extractLink = (text) => {
+      const match = text.match(/.*href='([^']*).*/)
+      return match ? encodeURI(match[1]) : ''
+    }
+
+    const extractTime = (text) => Number(text.split(':')[0])
+
+    const commafy = (text) => text.replace(/;/g, ', ')
+
+    const link = extractLink(info[4].html)
+    const alternativeTimesLink = link ? timetableLink + link.slice(1) : ''
+
+    const days = info[9].text
+      .split(', ')
+      .flatMap((range) => {
+        if (range.indexOf('-') !== -1) {
+          const [start, end] = range.split('-').map(Number)
+          return Array(end - start + 1)
+            .fill()
+            .map((_, i) => i + start)
+        }
+        return Number(range)
+      })
+      .map((week) => {
+        if (week <= 11) {
+          return week
+        } else if (week <= 22) {
+          return week + 4
+        }
+        return week + 8
+      })
+      .map((week) => week * 7 + dayIndex)
+
+    const teacher = info[10].text
+      .split(';')
+      .map((name) =>
+        name
+          .split(',')
+          .reverse()
+          .map((el) => el.split(' ')[0])
+          .filter((el) => el !== 'Dr' && el !== 'Prof')
+          .join(' ')
+      )
+      .join(', ')
+
+    return {
+      code: commafy(info[0].text),
+      title: commafy(info[1].text),
+      type: info[2].text.split(';')[0],
+      location: info[3].text,
+      locationLink: extractLink(info[3].html),
+      note: info[5].text,
+      start: extractTime(info[7].text),
+      end: extractTime(info[8].text),
+      alternativeTimesLink,
+      days,
+      teacher,
+    }
+  }
+
+  const response = await fetch(url)
+  if (!response.ok) {
+    throw new Error("Can't fetch timetable")
+  }
+  const text = await response.text()
+
+  const parser = new DOMParser()
+  const root = parser.parseFromString(text, 'text/html').body
+  const timetableElements = Array.from(
+    root.querySelectorAll('table.spreadsheet')
+  )
+
+  const classesInfo = timetableElements
+    .map((el) =>
+      Array.from(el.querySelectorAll('tr')).filter(
+        (el) => el.className.indexOf('columnTitles') === -1
+      )
+    )
+    .flatMap((timetableForDay, dayIndex) =>
+      timetableForDay.map((el) => {
+        const info = Array.from(el.children)
+          .filter((el) => el.innerHTML)
+          .map((el) => ({
+            html: clean(el.innerHTML),
+            text: clean(el.innerText),
+          }))
+        return { info, dayIndex }
+      })
+    )
+
+  return classesInfo.map(toClass)
+}
+
+const getTimetable = async () => {
+  const {
+    identifier,
+    cached,
+    yearRange: cachedYearRange,
+    timetable: cachedTimetable,
+  } = getCache()
+  const yearRange = toRange(getYear())
+  if (!cached || yearRange !== cachedYearRange || !cachedTimetable) {
+    const url = buildURL(identifier)
+    const timetable = await fetchAndParseTimetable(url)
+    return timetable
+  }
+
+  return cachedTimetable
+}
+
+const options = {
+  start: 9,
+  end: 19,
+  show: 7,
+  sliding: false,
+  atStart: true,
+  notifyBefore: 5,
+  // sliding: false,
+}
+
+const getOffset = (date) => Math.floor((date - baseDate) / 1000 / 60 / 60 / 24)
+
+let offset = 0
+let lastHour = -1
+let lastStart = -1
+const haveColours = {}
+const drawTimetable = (timetable) => {
+  const now = getNow()
+
+  const getColour = (code) => {
+    if (!haveColours.hasOwnProperty(code)) {
+      haveColours[code] = `hsl(${Math.round(Math.random() * 360)}, 50%, 75%)`
+    }
+    return haveColours[code]
+  }
+
+  const visibleRange = () => {
+    const yearOffset = (getYear(now) - getYear(baseDate)) * 52 * 7
+    const today = getOffset(now) - yearOffset
+    const todayWeekday = now.getDay()
+
+    const show = options.show
+    const showEachSide = Math.floor(show / 2)
+
+    let start = 0
+    let startWeekday = 0
+    // let end = 0
+    if (options.sliding || show !== 7) {
+      start = today - showEachSide
+      startWeekday = (todayWeekday - showEachSide + 7) % 7
+      end = today + showEachSide
+    } else if (!options.atStart) {
+      start = today - todayWeekday + 1
+      startWeekday = 1
+      // end = start + show
+    } else {
+      start = today
+      startWeekday = todayWeekday
+      // end = (todayWeekday + 7) % 7
+    }
+    start += offset * show
+    // end += offset * show
+    return {
+      start,
+      startWeekday,
+      todayOffset: (todayWeekday - startWeekday + 7) % 7,
+    }
+  }
+
+  const setSize = () => {
+    const { todayOffset } = visibleRange()
+    const size =
+      `--size: repeat(${todayOffset}, 1fr) 2fr ` +
+      `repeat(${options.show - 1 - todayOffset}, 1fr)`
+    const daysEl = document.querySelector('.days')
+    const classesEl = document.querySelector('.classes')
+    if (offset === 0) {
+      daysEl.style = size
+      classesEl.style = size
+    } else {
+      daysEl.style = ''
+      classesEl.style = ''
+    }
+  }
+
+  const drawDays = () => {
+    const { start, todayOffset } = visibleRange()
+    const dayDivs = Array.from(document.querySelectorAll('div.days div'))
+    const dayParts = dayDivs.map((el) => Array.from(el.children))
+
+    const startDate = new Date(
+      now.getTime() - (todayOffset - offset * 7) * 1000 * 60 * 60 * 24
+    )
+
+    const dayText = Array(options.show)
+      .fill()
+      .map((_, i) => {
+        const currentDay = new Date(
+          startDate.getTime() + i * 1000 * 60 * 60 * 24
+        )
+        const day = STRINGS.days[currentDay.getDay()]
+        const date = `${
+          STRINGS.months[currentDay.getMonth()]
+        } ${currentDay.getDate()}`
+        return { day, date }
+      })
+
+    dayText.forEach(({ day, date }, i) => {
+      const [dayEl, dateEl] = dayParts[i]
+      dayEl.textContent = day
+      dateEl.textContent = date
+    })
+    dayDivs.map((el, i) => {
+      const day = (start + i) % 7
+      el.classList.remove('today')
+      el.classList.remove('weekend')
+      if (day >= 5) {
+        el.classList.add('weekend')
+      }
+    })
+    if (offset === 0) {
+      dayDivs[todayOffset].classList.add('today')
+    }
+  }
+
+  const drawTime = () => {
+    const timeDivs = Array.from(document.querySelectorAll('div.times p'))
+    const nowOffset = now.getHours() - options.start
+
+    timeDivs.map((el) => el.classList.remove('now'))
+    if (offset === 0 && 0 <= nowOffset && nowOffset < timeDivs.length) {
+      timeDivs[nowOffset].classList.add('now')
+    }
+  }
+
+  const drawLine = () => {
+    const lineEl = document.querySelector('div.line')
+    const nowTime = now.getHours() + now.getMinutes() / 60
+
+    if (options.start <= nowTime && nowTime < options.end) {
+      const percentage =
+        (nowTime - options.start) / (options.end - options.start)
+      lineEl.style.top = `${percentage * 100}%`
+      lineEl.style.visibility = ''
+    } else {
+      lineEl.style.visibility = 'hidden'
+    }
+  }
+
+  const drawClasses = () => {
+    const make = (tag, { className, text, children = [] }) => {
+      const el = document.createElement(tag)
+      if (className) {
+        el.className = className
+      }
+      if (text) {
+        el.textContent = text
+      }
+      children.forEach((child) => el.appendChild(child))
+      return el
+    }
+
+    const toDiv = (classInfo) => {
+      const location = make('a', {
+        className: 'location',
+        text: classInfo.location,
+      })
+      if (classInfo.locationLink) {
+        location.target = '_blank'
+        location.rel = 'noopener'
+        location.href = classInfo.locationLink
+      }
+
+      const top = make('div', { className: 'top', children: [location] })
+
+      if (classInfo.alternativeTimesLink) {
+        const alternativeTimes = make('a', {
+          className: 'alternative',
+          text: 'Alt. times',
+        })
+        alternativeTimes.target = '_blank'
+        alternativeTimes.rel = 'noopener'
+        alternativeTimes.href = classInfo.alternativeTimesLink
+        top.appendChild(alternativeTimes)
+      }
+
+      const name = make('p', { className: 'name', text: classInfo.title })
+      const info = make('p', {
+        className: 'info',
+        text: `${classInfo.type}${
+          classInfo.teacher ? ` - ${classInfo.teacher}` : ''
+        }`,
+      })
+      const code = make('p', { className: 'code', text: classInfo.code })
+      const div = make('div', {
+        className: 'class',
+        children: [top, name, info, code],
+      })
+
+      div.style = `grid-row: t${classInfo.start}-start / t${
+        classInfo.end
+      }-start; background: ${getColour(classInfo.code)}`
+
+      div.dataset.start = classInfo.start
+      div.dataset.end = classInfo.end
+
+      return div
+    }
+
+    const { start, todayOffset } = visibleRange()
+    const visible = timetable.filter((classInfo) =>
+      classInfo.days.some((day) => start <= day && day <= start + options.show)
+    )
+    const visibleByDay = Array(options.show)
+      .fill()
+      .map((_, i) =>
+        visible.filter((classInfo) => classInfo.days.includes(start + i))
+      )
+    const classDivs = Array.from(document.querySelectorAll('div.classes .day'))
+
+    classDivs.forEach((div, i) => {
+      div.classList.remove('today')
+      if (offset === 0 && i === todayOffset) {
+        div.classList.add('today')
+      }
+      if (start !== lastStart) {
+        div.innerHTML = ''
+      }
+    })
+
+    visibleByDay.map((classes, index) => {
+      const classDiv = classDivs[index]
+      classes.forEach((classInfo) => {
+        if (start !== lastStart) {
+          const div = toDiv(classInfo)
+          classDiv.appendChild(div)
+        }
+      })
+    })
+
+    const nowHour = now.getHours()
+    if (offset === 0) {
+      Array.from(classDivs[todayOffset].children).forEach((div) => {
+        div.classList.remove('now')
+        if (div.dataset.start <= nowHour && nowHour < div.dataset.end) {
+          div.classList.add('now')
+        }
+      })
+    }
+  }
+
+  const nowHour = now.getHours()
+  const { start } = visibleRange()
+  if (nowHour !== lastHour || start !== lastStart) {
+    setSize()
+    drawDays()
+    drawTime()
+    drawClasses()
+    lastHour = nowHour
+    lastStart = start
+  }
+  drawLine()
+}
+
+const notify = async ({ classInfo, timeTo }) => {
+  const reg = await navigator.serviceWorker.getRegistration()
+  const tag = `${classInfo.code}@${classInfo.start}`
+
+  const title = `${classInfo.code} starts in ${timeTo} minute${
+    timeTo === 1 ? '' : 's'
+  }`
+  const options = {
+    tag,
+    body: classInfo.location
+      ? `Head to ${classInfo.location}`
+      : 'No location given',
+    badge: 'icons/badge.png',
+    icon: 'icons/android-chrome-512x512.png',
+    data: {
+      url: window.location.href,
+      location: classInfo.locationLink,
+    },
+  }
+
+  if (timeTo > 0) {
+    console.log(`Notifying ${tag} ${timeTo}`)
+    if (reg.showNotification) {
+      options.actions = [
+        {
+          action: 'location',
+          title: "Where's that?",
+          icon: 'svg/location.svg',
+        },
+      ]
+      reg.showNotification(title, options)
+    } else {
+      const not = new Notification(title, options)
+      setTimeout(() => not.close(), 5000)
+    }
+  }
+}
+
+const getNext = (timetable) => {
+  const getTimeTo = (classInfo) => Math.round((classInfo.start - nowTime) * 60)
+
+  const now = getNow()
+  const nowTime = now.getHours() + now.getMinutes() / 60
+  const yearOffset = (getYear(now) - getYear(baseDate)) * 52 * 7
+  const today = getOffset(now) - yearOffset
+
+  const nextClass = timetable
+    .filter((classInfo) => classInfo.days.includes(today))
+    .map((classInfo) => ({ classInfo, timeTo: getTimeTo(classInfo) }))
+    .filter(({ timeTo }) => 0 <= timeTo && timeTo <= options.notifyBefore)
+
+  return nextClass
+}
+
+const notifyNext = (timetable) => {
+  const nextClasses = getNext(timetable)
+  if (nextClasses) {
+    nextClasses.map(notify)
+  }
+}
+
+const go = async () => {
+  const { identifier } = getCache()
+  if (identifier) {
+    document.body.classList.remove('noInfo')
+    try {
+      const timetable = await getTimetable()
+      setCache({ cached: true, yearRange: toRange(getYear()), timetable })
+      try {
+        notifyNext(timetable)
+        drawTimetable(timetable)
+        setInterval(() => drawTimetable(timetable), 100)
+        setInterval(() => notifyNext(timetable), 1000)
+
+        requestAnimationFrame(() => {
+          setTimeout(goToToday, 100)
+        })
+      } catch (e) {
+        console.error(e)
+      }
+    } catch (e) {
+      console.error(e)
+      document.body.classList.add('noInfo')
+      alert('There was a problem fetching your timetable, please try again')
+    }
+  } else {
+    document.body.classList.add('noInfo')
   }
 }
 
@@ -511,118 +750,27 @@ const mount = async () => {
     if ('serviceWorker' in navigator) {
       await navigator.serviceWorker.register('cs30.js')
     }
-  } catch ({message}) {
+  } catch ({ message }) {
     console.error(message)
   }
 }
 
-retrieve.addEventListener('submit', (e) => {
-  e.preventDefault()
-  if (!link.value) {
-    alert('No link provided')
-  } else {
-    const identifier = getIdentifier(link.value)
-    if (identifier) {
-      clearClasses()
-      clearInterval(drawInterval)
-      weekDraw = draw([])
-      drawInterval = setInterval(weekDraw, 50)
-      weekDraw(true)
+mount()
 
-      localStorage.removeItem('cache')
-      setData(identifier)
-      buildTimetable()
-    } else {
-      alert('Invalid link or identifier parameter not set')
-    }
-  }
-})
+once()
+go()
 
-update.addEventListener('click', async () => {
-  update.classList.add('updating')
-  const identifier = localStorage.getItem('identifier')
-  if (!identifier) {
-    update.classList.remove('updating')
-    document.body.classList.add('noInfo')
-    return alert('Identifier is missing, please paste link again')
-  }
-  if (!navigator.onLine) {
-    update.classList.remove('updating')
-    return alert('Network is offline')
-  }
-  localStorage.removeItem('cache')
-  await buildTimetable()
-  update.classList.remove('updating')
-})
-
-changeMode.addEventListener('click', () => {
-  if (document.body.classList.contains('dark')) {
-    localStorage.setItem('mode', '')
-  } else {
-    localStorage.setItem('mode', 'dark')
-  }
-  checkMode()
-})
-
-prev.addEventListener('click', () => {
-  weekOffset -= 1
-  lastDate = undefined
-})
-
-next.addEventListener('click', () => {
-  weekOffset += 1
-  lastDate = undefined
-})
-
-const checkForPermission = async () => {
-  if (!('Notification' in window)) {
-    return console.log('Notifications are not supported in this browser')
-  }
-
-  if (Notification.permission !== 'denied') {
-    await Notification.requestPermission()
-  }
-}
-
-const attachNotifier = () => {
-  if (JSON.stringify(nextClasses) !== JSON.stringify(nowClasses)) {
-    nextClasses.forEach(notify)
-  }
-}
-
-const checkNotify = () => {
-  if ('Notification' in window && navigator.serviceWorker) {
-    notifyCheckbox.addEventListener('click', () => {
-      shouldNotify = notifyCheckbox.checked
-      localStorage.setItem('shouldNotify', shouldNotify)
-    })
-
-    shouldNotify = localStorage.getItem('shouldNotify') !== 'false'
-
-    notifyCheckbox.checked = shouldNotify
-
-    setInterval(attachNotifier, 500)
-  } else {
-    notifyCheckbox.style.visibility = 'hidden'
-  }
-}
-
-setInterval(() => {
-  alreadyNotified = []
-}, 60000)
-
-checkMode()
-buildTimetable()
-// mount()
-
-checkForPermission()
-checkNotify()
-
-const goToday = () => {
+const goToToday = () => {
   const today = document.querySelector('.day.today')
-
+  const now = document.querySelector('.class.now')
   if (today) {
-    document.querySelector('.day.today').scrollIntoView({
+    today.scrollIntoView({
+      behavior: 'smooth',
+      block: 'nearest',
+      inline: 'end',
+    })
+  } else if (now) {
+    now.scrollIntoView({
       behavior: 'smooth',
       block: 'nearest',
       inline: 'end',
@@ -630,5 +778,4 @@ const goToday = () => {
   }
 }
 
-window.addEventListener('resize', goToday, true)
-setTimeout(goToday, 250)
+window.addEventListener('resize', goToToday, { passive: true })
