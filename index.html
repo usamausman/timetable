@@ -40,9 +40,10 @@
   <body>
     <script type="text/javascript">
       const checkMode = () => {
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
         const mode = localStorage.getItem('mode')
         const themeColor = document.head.querySelector('meta[name=theme-color]')
-        if (mode === 'dark') {
+        if (mode === 'dark' || !mode && prefersDark) {
           document.body.classList.add('dark')
         } else {
           document.body.classList.remove('dark')
@@ -165,6 +166,7 @@
       </div>
     </main>
     <form>
+      <h1>Setup</h1>
       <ol>
         <li>
           Go to
@@ -191,6 +193,6 @@
     <!-- <script src="js/script.js"></script> -->
     <script src="js/lib/ics.deps.min.js"></script>
     <script src="js/lib/ics.min.js"></script>
-    <script src="js/try.js"></script>
+    <script src="js/script.js"></script>
   </body>
 </html>
