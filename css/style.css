@@ -62,6 +62,9 @@ body.dark .class {
 
   width: 100vw;
   height: 100vh;
+
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: calc(1 * var(--gap));
   overflow-x: scroll;
 }
 
@@ -269,8 +272,6 @@ p {
   grid-column: 2;
   display: grid;
   grid-template-columns: var(--size);
-
-  scroll-snap-type: x mandatory;
 
   transition: background 0.25s ease;
 }
