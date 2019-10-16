@@ -29,6 +29,7 @@ const getNow = () => {
   // const base = new Date(2019, 9, 16, 10, 50)
   // const offset = new Date(base.getTime() + off * 4 * 1000)
   // off += 1
+  // return offset
   return new Date()
 }
 const baseDate = new Date(2018, 8, 24)
@@ -691,6 +692,13 @@ const notify = async ({ classInfo, timeTo }) => {
     } else {
       const not = new Notification(title, options)
       setTimeout(() => not.close(), 5000)
+    }
+  } else {
+    if (reg.getNotifications) {
+      const notifications = await reg.getNotifications()
+      if (notifications.length > 0) {
+        notifications[0].close()
+      }
     }
   }
 }
