@@ -95,7 +95,7 @@ const setCache = ({
   }
 }
 
-const doDownload = async (downloadButton) => {
+const doDownload = async () => {
   try {
     const { identifier } = getCache()
 
@@ -170,8 +170,7 @@ const attachToForm = () => {
       downloadButton.disabled = true
 
       setCache({ identifier })
-      await doDownload(downloadButton)
-      setCache({ identifier: undefined, timetable: undefined }) // for debugging
+      await doDownload()
 
       linkInput.disabled = false
       downloadButton.disabled = false
