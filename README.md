@@ -1,6 +1,6 @@
 # timetable
 
-A clearer layout for the University of Leeds timetable. Also available offline!
+A cleaner layout for the University of Leeds timetable. Also available offline!
 
 Refresh for new colours!
 
