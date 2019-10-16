@@ -28,7 +28,10 @@
     <meta name="theme-color" content="#ffffff" />
     <title>UoL Timetable</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="Description" content="A clearer layout for the University of Leeds timetable. Also available offline!">
+    <meta
+      name="Description"
+      content="A cleaner layout for the University of Leeds timetable. Also available offline!"
+    />
     <link
       rel="stylesheet"
       type="text/css"
@@ -40,15 +43,18 @@
   <body>
     <script type="text/javascript">
       const checkMode = () => {
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)')
+          .matches
         const mode = localStorage.getItem('mode')
         const themeColor = document.head.querySelector('meta[name=theme-color]')
-        if (mode === 'dark' || mode === null && prefersDark) {
+        if (mode === 'dark' || (mode === null && prefersDark)) {
           document.body.classList.add('dark')
         } else {
           document.body.classList.remove('dark')
         }
-        themeColor.content = getComputedStyle(document.body).getPropertyValue('--background')
+        themeColor.content = getComputedStyle(document.body)
+          .getPropertyValue('--background')
+          .trim()
       }
       checkMode()
     </script>
@@ -171,6 +177,8 @@
         <li>
           Go to
           <a
+            target="_blank"
+            rel="noopener"
             href="https://studentservices.leeds.ac.uk/pls/banprod/timetable_uol"
             >Student Services > Timetable</a
           >
@@ -183,12 +191,21 @@
       <div id="content">
         <div id="box">
           <label for="link">Link:</label>
-          <input id="link" name="link" type="text" placeholder="timetable.leeds.ac.uk/..." />
+          <input
+            id="link"
+            name="link"
+            type="text"
+            placeholder="timetable.leeds.ac.uk/..."
+          />
         </div>
         <button id="retrieve">Retrieve Timetable</button>
         <button id="download">Download .ics</button>
       </div>
-      <p>This website uses the <a href="https://github.com/nwcell/ics.js/">ics.js</a> library, which is licensed under the <a href="./ics-js-license.txt">MIT license</a>.</p>
+      <p>
+        This website uses the
+        <a href="https://github.com/nwcell/ics.js/">ics.js</a> library, which is
+        licensed under the <a href="./ics-js-license.txt">MIT license</a>.
+      </p>
     </form>
     <script src="js/lib/ics.deps.min.js"></script>
     <script src="js/lib/ics.min.js"></script>
