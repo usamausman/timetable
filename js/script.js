@@ -293,7 +293,7 @@ const fetchAndParseTimetable = async (url) => {
   const toClass = ({ info, dayIndex }) => {
     const extractLink = (text) => {
       const match = text.match(/.*href='([^']*).*/)
-      return match ? encodeURI(match[1]) : ''
+      return match ? encodeURI(match[1].replace(/\&amp;/g, '&')) : ''
     }
 
     const extractTime = (text) => Number(text.split(':')[0])
@@ -678,7 +678,7 @@ const notify = async ({ classInfo, timeTo }) => {
   }
 
   if (timeTo > 0) {
-    console.log(`Notifying ${tag} ${timeTo}`)
+    console.info(`Notifying ${tag} ${timeTo}`)
     if (reg.showNotification) {
       options.actions = [
         {
