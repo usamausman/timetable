@@ -26,9 +26,9 @@ const STRINGS = {
 
 // let off = 0
 const getNow = () => {
-  // const base = new Date(2019, 9, 16, 10, 50)
+  // const base = new Date(2019, 10, 14, 0, 0)
   // const offset = new Date(base.getTime() + off * 4 * 1000)
-  // off += 1
+  // off += 0
   // return offset
   return new Date()
 }
@@ -411,7 +411,16 @@ const options = {
   // sliding: false,
 }
 
-const getOffset = (date) => Math.floor((date - baseDate) / 1000 / 60 / 60 / 24)
+const getOffset = (date) =>
+  Math.floor(
+    (date.getTime() -
+      baseDate.getTime() +
+      (baseDate.getTimezoneOffset() - date.getTimezoneOffset()) * 60 * 1000) /
+      1000 /
+      60 /
+      60 /
+      24
+  )
 
 let offset = 0
 let lastHour = -1
