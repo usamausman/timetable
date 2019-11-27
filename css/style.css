@@ -3,6 +3,7 @@
   --time-slots-fr: 10fr;
   --gap: 8px;
   --left-bar: 70px;
+  --top-bar: 50px;
   --size: repeat(7, 1fr);
 
   --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
@@ -58,7 +59,7 @@ body.dark .class {
 
 .container {
   display: grid;
-  grid-template: auto var(--time-slots-fr) / auto 7fr;
+  grid-template: var(--top-bar) var(--time-slots-fr) / auto 7fr;
 
   width: 100vw;
   height: 100vh;
@@ -190,20 +191,21 @@ body.dark svg#mode .switch {
 }
 
 .days svg {
-  position: absolute;
+  position: fixed;
+  top: calc(var(--top-bar) / 2);
   height: 24px;
   cursor: pointer;
   z-index: 1;
 }
 
 .days svg.prev {
-  left: 0;
+  left: var(--left-bar);
+  transform: translateY(-50%);
 }
 
 .days svg.next {
   right: 0;
-
-  transform: rotateZ(180deg);
+  transform: translateY(-50%) rotateZ(180deg);
 }
 
 .days svg path {
