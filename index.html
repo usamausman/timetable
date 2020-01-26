@@ -175,19 +175,33 @@
       <h1>Setup</h1>
       <ol>
         <li>
+          Log in to
+          <a
+            target="_blank"
+            rel="noopener"
+            href="https://studentservices.leeds.ac.uk/"
+            >Student Services</a
+          >
+        </li>
+        <li>
           Go to
           <a
             target="_blank"
             rel="noopener"
             href="https://studentservices.leeds.ac.uk/pls/banprod/timetable_uol"
-            >Student Services > Timetable</a
+            >Modules/Timetable > View timetable</a
           >
         </li>
-        <li>Click any "Submit" button</li>
-        <li>Copy entire link</li>
-        <li>Paste link below</li>
-        <li>Click "Retrieve Timetable"</li>
+        <li>Click "Submit"</li>
+        <li>Copy and paste link below</li>
+        <li>Click "Get Timetable"</li>
       </ol>
+      <picture>
+        <img class="big light" src="images/big_light.png" />
+        <img class="big dark" src="images/big_dark.png" />
+        <img class="small light" src="images/small_light.png" />
+        <img class="small dark" src="images/small_dark.png" />
+      </picture>
       <div id="content">
         <div id="box">
           <label for="link">Link:</label>
@@ -198,8 +212,8 @@
             placeholder="timetable.leeds.ac.uk/..."
           />
         </div>
-        <button id="retrieve">Retrieve Timetable</button>
-        <button id="download">Download .ics</button>
+        <button id="retrieve">Get Timetable</button>
+        <button id="download">Download Timetable</button>
       </div>
       <p>
         This website uses the
@@ -210,6 +224,5 @@
     <script src="js/lib/ics.deps.min.js"></script>
     <script src="js/lib/ics.min.js"></script>
     <script src="js/script.js"></script>
-    <script async src="//static.getclicky.com/js"></script>
   </body>
 </html>
