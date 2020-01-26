@@ -44,11 +44,29 @@ const getYear = (date) => {
   return year
 }
 
-const toRange = (year) => `${year}${(year % 100) + 1}`
+const getYearOffset = () => (getYear() - getYear(baseDate)) * 52 * 7
 
-const timetableLink = `http://timetable.leeds.ac.uk/teaching/${toRange(
-  getYear()
-)}/reporting`
+const getOffset = () => {
+  const now = getNow()
+  return (
+    Math.floor(
+      (now.getTime() -
+        baseDate.getTime() +
+        (baseDate.getTimezoneOffset() - now.getTimezoneOffset()) * 60 * 1000) /
+        1000 /
+        60 /
+        60 /
+        24
+    ) - getYearOffset()
+  )
+}
+
+const toRange = () => {
+  const year = getYear()
+  return `${year}${(year % 100) + 1}`
+}
+
+const timetableLink = `http://timetable.leeds.ac.uk/teaching/${toRange()}/reporting`
 
 const buildURL = (identifier) =>
   `https://cors-anywhere.herokuapp.com/${timetableLink}/textspreadsheet;?objectclass=student+set&idtype=id&identifier=${identifier}&template=SWSCUST+Student+Set+Individual+semester&days=1-7&periods=1-21&weeks=1-44`
@@ -97,10 +115,7 @@ const setCache = ({
 
 const doDownload = async () => {
   try {
-    const { identifier } = getCache()
-
-    const url = buildURL(identifier)
-    const timetable = await fetchAndParseTimetable(url)
+    const timetable = await getTimetable()
 
     const calendar = ics()
     timetable.forEach(
@@ -124,10 +139,9 @@ const doDownload = async () => {
         const formattedLocation =
           location + (locationLink ? ` (${locationLink})` : '')
 
-        const yearOffset = (getYear(getNow()) - getYear(baseDate)) * 52 * 7
         days.forEach((day) => {
           const startDate = new Date(baseDate)
-          startDate.setDate(startDate.getDate() + yearOffset + day)
+          startDate.setDate(startDate.getDate() + getYearOffset() + day)
           startDate.setHours(start)
 
           const endDate = new Date(startDate)
@@ -174,7 +188,7 @@ const attachToForm = () => {
 
       linkInput.disabled = false
       downloadButton.disabled = false
-      downloadButton.textContent = 'Download .ics'
+      downloadButton.textContent = 'Download Timetable'
     } else {
       alert('Invalid link or `identifier` parameter is missing')
     }
@@ -281,117 +295,116 @@ const once = () => {
   localStorage.removeItem('cache')
 }
 
-// consider merge into getTimetable
-const fetchAndParseTimetable = async (url) => {
-  const clean = (text) =>
-    text
-      .replace(/\&nbsp;/g, '')
-      .replace(/;;+/g, '')
-      .replace(/"/g, "'")
-      .trim()
-
-  const toClass = ({ info, dayIndex }) => {
-    const extractLink = (text) => {
-      const match = text.match(/.*href='([^']*).*/)
-      return match ? encodeURI(match[1].replace(/\&amp;/g, '&')) : ''
-    }
-
-    const extractTime = (text) => Number(text.split(':')[0])
-
-    const commafy = (text) => text.replace(/;/g, ', ')
-
-    const link = extractLink(info[4].html)
-    const alternativeTimesLink = link ? timetableLink + link.slice(1) : ''
-
-    const days = info[9].text
-      .split(', ')
-      .flatMap((range) => {
-        if (range.indexOf('-') !== -1) {
-          const [start, end] = range.split('-').map(Number)
-          return Array(end - start + 1)
-            .fill()
-            .map((_, i) => i + start)
-        }
-        return Number(range)
-      })
-      .map((week) => {
-        if (week <= 11) {
-          return week
-        } else if (week <= 22) {
-          return week + 4
-        }
-        return week + 8
-      })
-      .map((week) => week * 7 + dayIndex)
-
-    const teacher = info[10].text
-      .split(';')
-      .map((name) =>
-        name
-          .split(',')
-          .reverse()
-          .map((el) => el.split(' ')[0])
-          .filter((el) => el !== 'Dr' && el !== 'Prof')
-          .join(' ')
-      )
-      .join(', ')
-
-    return {
-      code: commafy(info[0].text),
-      title: commafy(info[1].text),
-      type: info[2].text.split(';')[0],
-      location: info[3].text,
-      locationLink: extractLink(info[3].html),
-      note: info[5].text,
-      start: extractTime(info[7].text),
-      end: extractTime(info[8].text),
-      alternativeTimesLink,
-      days,
-      teacher,
-    }
-  }
-
-  const response = await fetch(url)
-  if (!response.ok) {
-    throw new Error("Can't fetch timetable")
-  }
-  const text = await response.text()
-
-  const parser = new DOMParser()
-  const root = parser.parseFromString(text, 'text/html').body
-  const timetableElements = Array.from(
-    root.querySelectorAll('table.spreadsheet')
-  )
-
-  const classesInfo = timetableElements
-    .map((el) =>
-      Array.from(el.querySelectorAll('tr')).filter(
-        (el) => el.className.indexOf('columnTitles') === -1
-      )
-    )
-    .flatMap((timetableForDay, dayIndex) =>
-      timetableForDay.map((el) => {
-        const info = Array.from(el.children)
-          .filter((el) => el.innerHTML)
-          .map((el) => ({
-            html: clean(el.innerHTML),
-            text: clean(el.innerText),
-          }))
-        return { info, dayIndex }
-      })
-    )
-
-  return classesInfo.map(toClass)
-}
-
 const getTimetable = async () => {
+  const fetchAndParseTimetable = async (url) => {
+    const clean = (text) =>
+      text
+        .replace(/\&nbsp;/g, '')
+        .replace(/;;+/g, '')
+        .replace(/"/g, "'")
+        .trim()
+
+    const toClass = ({ info, dayIndex }) => {
+      const extractLink = (text) => {
+        const match = text.match(/.*href='([^']*).*/)
+        return match ? encodeURI(match[1].replace(/\&amp;/g, '&')) : ''
+      }
+
+      const extractTime = (text) => Number(text.split(':')[0])
+
+      const commafy = (text) => text.replace(/;/g, ', ')
+
+      const link = extractLink(info[4].html)
+      const alternativeTimesLink = link ? timetableLink + link.slice(1) : ''
+
+      const days = info[9].text
+        .split(', ')
+        .flatMap((range) => {
+          if (range.indexOf('-') !== -1) {
+            const [start, end] = range.split('-').map(Number)
+            return Array(end - start + 1)
+              .fill()
+              .map((_, i) => i + start)
+          }
+          return Number(range)
+        })
+        .map((week) => {
+          if (week <= 11) {
+            return week
+          } else if (week <= 22) {
+            return week + 4
+          }
+          return week + 8
+        })
+        .map((week) => week * 7 + dayIndex)
+
+      const teacher = info[10].text
+        .split(';')
+        .map((name) =>
+          name
+            .split(',')
+            .reverse()
+            .map((el) => el.split(' ')[0])
+            .filter((el) => el !== 'Dr' && el !== 'Prof')
+            .join(' ')
+        )
+        .join(', ')
+
+      return {
+        code: commafy(info[0].text),
+        title: commafy(info[1].text),
+        type: info[2].text.split(';')[0],
+        location: info[3].text,
+        locationLink: extractLink(info[3].html),
+        note: info[5].text,
+        start: extractTime(info[7].text),
+        end: extractTime(info[8].text),
+        alternativeTimesLink,
+        days,
+        teacher,
+      }
+    }
+
+    const response = await fetch(url)
+    if (!response.ok) {
+      throw new Error("Can't fetch timetable")
+    }
+    const text = await response.text()
+
+    const parser = new DOMParser()
+    const root = parser.parseFromString(text, 'text/html').body
+    const timetableElements = Array.from(
+      root.querySelectorAll('table.spreadsheet')
+    )
+
+    const classesInfo = timetableElements
+      .map((el) =>
+        Array.from(el.querySelectorAll('tr')).filter(
+          (el) => el.className.indexOf('columnTitles') === -1
+        )
+      )
+      .flatMap((timetableForDay, dayIndex) =>
+        timetableForDay.map((el) => {
+          const info = Array.from(el.children)
+            .filter((el) => el.innerHTML)
+            .map((el) => ({
+              html: clean(el.innerHTML),
+              text: clean(el.innerText),
+            }))
+          return { info, dayIndex }
+        })
+      )
+
+    return classesInfo.map(toClass)
+  }
+
   const {
     identifier,
     cached,
     yearRange: cachedYearRange,
     timetable: cachedTimetable,
   } = getCache()
-  const yearRange = toRange(getYear())
+  const yearRange = toRange()
   if (!cached || yearRange !== cachedYearRange || !cachedTimetable) {
     const url = buildURL(identifier)
     const timetable = await fetchAndParseTimetable(url)
@@ -411,17 +424,6 @@ const options = {
   // sliding: false,
 }
 
-const getOffset = (date) =>
-  Math.floor(
-    (date.getTime() -
-      baseDate.getTime() +
-      (baseDate.getTimezoneOffset() - date.getTimezoneOffset()) * 60 * 1000) /
-      1000 /
-      60 /
-      60 /
-      24
-  )
-
 let offset = 0
 let lastHour = -1
 let lastStart = -1
@@ -437,8 +439,7 @@ const drawTimetable = (timetable) => {
   }
 
   const visibleRange = () => {
-    const yearOffset = (getYear(now) - getYear(baseDate)) * 52 * 7
-    const today = getOffset(now) - yearOffset
+    const today = getOffset()
     const todayWeekday = now.getDay()
 
     const show = options.show
@@ -711,23 +712,23 @@ const notify = async ({ classInfo, timeTo }) => {
   }
 }
 
-const getNext = (timetable) => {
-  const getTimeTo = (classInfo) => Math.round((classInfo.start - nowTime) * 60)
-
-  const now = getNow()
-  const nowTime = now.getHours() + now.getMinutes() / 60
-  const yearOffset = (getYear(now) - getYear(baseDate)) * 52 * 7
-  const today = getOffset(now) - yearOffset
-
-  const nextClass = timetable
-    .filter((classInfo) => classInfo.days.includes(today))
-    .map((classInfo) => ({ classInfo, timeTo: getTimeTo(classInfo) }))
-    .filter(({ timeTo }) => 0 <= timeTo && timeTo <= options.notifyBefore)
-
-  return nextClass
-}
-
 const notifyNext = (timetable) => {
+  const getNext = (timetable) => {
+    const getTimeTo = (classInfo) =>
+      Math.round((classInfo.start - nowTime) * 60)
+
+    const now = getNow()
+    const nowTime = now.getHours() + now.getMinutes() / 60
+    const today = getOffset()
+
+    const nextClass = timetable
+      .filter((classInfo) => classInfo.days.includes(today))
+      .map((classInfo) => ({ classInfo, timeTo: getTimeTo(classInfo) }))
+      .filter(({ timeTo }) => 0 <= timeTo && timeTo <= options.notifyBefore)
+
+    return nextClass
+  }
+
   const nextClasses = getNext(timetable)
   if (nextClasses) {
     nextClasses.map(notify)
@@ -740,7 +741,7 @@ const go = async () => {
     document.body.classList.remove('noInfo')
     try {
       const timetable = await getTimetable()
-      setCache({ cached: true, yearRange: toRange(getYear()), timetable })
+      setCache({ cached: true, yearRange: toRange(), timetable })
       try {
         notifyNext(timetable)
         drawTimetable(timetable)
