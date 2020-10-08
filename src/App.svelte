@@ -936,6 +936,7 @@
           <button on:click={getTimetable}>Get Timetable</button>
         {/await}
         <button on:click={getAndDownloadTimetable}>Download Timetable</button>
+        <button on:click={resetTimetable}>Reset</button>
       </div>
       {#await fetching}{:catch e}
         <p style="color: red;">{e.message}</p>
