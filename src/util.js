@@ -13,7 +13,7 @@ export const getMethod = (method) => {
 
   if (m.includes('on campus')) {
     return 'On Campus'
-  } else if (m.includes('live')) {
+  } else if (m.includes('live') || m.includes('online')) {
     if (m.includes('collaborate')) return 'Online: Collaborate'
     if (m.includes('teams')) return 'Online: Teams'
     if (m.includes('zoom')) return 'Online: Zoom'
