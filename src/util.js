@@ -17,6 +17,7 @@ export const getMethod = (method) => {
     if (m.includes('collaborate')) return 'Online: Collaborate'
     if (m.includes('teams')) return 'Online: Teams'
     if (m.includes('zoom')) return 'Online: Zoom'
+    if (m.includes('minerva')) return 'Online: See Minerva'
     return 'Online: Live'
   } else if (m.includes('pre-recorded')) {
     return 'Prerecorded: See Minerva'
