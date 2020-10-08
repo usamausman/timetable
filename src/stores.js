@@ -65,7 +65,7 @@ export const timetable = localStore(
     }
     return v
   },
-  (saved) => saved[0] && saved[0].times && saved
+  (saved) => saved && saved[0] && saved[0].times && saved
 )
 
 export const nextClass = derived(
