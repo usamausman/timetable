@@ -409,6 +409,7 @@
     close()
     $timetable = []
     $info.identifier = ''
+    $info.year = ''
   }
 
   const getAndDownloadTimetable = async () => {
