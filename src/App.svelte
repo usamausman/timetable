@@ -199,10 +199,10 @@
     const _class = {}
 
     if (els[0].innerText.indexOf('[') !== -1) {
-      const [_, title, method] = els[0].innerText.match(/(.*)\s*\[(.*)\]/)
+      const [_, title, method] = els[0].innerText.match(/(.*)\s*\[(.*)(\]|\})/)
       _class.title = title
 
-      if(method.includes('-')) {
+      if (method.includes('-')) {
         _class.method = method
       }
     } else {
