@@ -24,6 +24,7 @@ self.addEventListener('install', (event) => {
       .then((cache) =>
         cache.addAll([
           './',
+          './?app',
           './global.css',
           './build/bundle.css',
           './build/bundle.js',
@@ -48,7 +49,11 @@ self.addEventListener('install', (event) => {
 })
 
 self.addEventListener('fetch', (event) => {
-  if (event.request.url.includes('cors-anywhere')) {
+  if (
+    event.request.url.includes('cors-anywhere') ||
+    event.request.url.includes('gc.zgo.at') ||
+    event.request.url.includes('goatcounter.com')
+  ) {
     event.respondWith(fetch(event.request))
   } else {
     event.respondWith(fromCache(event.request))
