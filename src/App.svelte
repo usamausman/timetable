@@ -90,7 +90,7 @@
   let showOptions
   let data
 
-  let url = `http://timetable.leeds.ac.uk/teaching/202021/reporting/Individual;?objectclass=student+set&idtype=id&identifier=1634114&template=SWSCUST+Student+Set+Individual+week&periods=1-21&weeks=6`
+  let url
 
   const notify = async ({ class: _class, minutesTill }) => {
     if (minutesTill >= 0) {
@@ -108,7 +108,6 @@
       const options = {
         tag: `${_class.modules.map((m) => m.text).join(',')}@${_class.from}`,
         body: 'No location given',
-        // renotify: true,
         icon: 'icon/badge.png',
         actions: [],
       }
@@ -265,7 +264,6 @@
       const root = parser.parseFromString(text, 'text/html').body
 
       // 1-indexed week, which is a Monday
-      // convert to UTC
       const startDate = addDays(
         new Date(
           Date.parse(root.querySelector('span.header-3-0-22').innerText)
@@ -290,12 +288,6 @@
     }
 
     return (fetching = inner())
-    // return (fetching = new Promise((resolve, reject) => {
-    //   setTimeout(() => {
-    //     // resolve($timetable)
-    //     reject(new Error('lol'))
-    //   }, 1000)
-    // }))
   }
 
   const refreshTimetable = async () => {
