@@ -457,11 +457,6 @@
 
   onMount(resize)
   onMount(register)
-  onMount(() => {
-    if (!$options) {
-      $options.dark = window.matchMedia('(prefers-color-scheme: dark)').matches
-    }
-  })
 
   onMount(async () => {
     // remove old localStorage data

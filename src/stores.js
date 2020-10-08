@@ -39,7 +39,7 @@ export const date = derived(time, ($time) => startOfDay($time).getTime())
 export const options = localStore('options', {
   start: 9,
   end: 18,
-  dark: false,
+  dark: window.matchMedia('(prefers-color-scheme: dark)').matches,
   notifications: false,
   notificationsMinutesBefore: 5,
 })
