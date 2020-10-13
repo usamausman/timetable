@@ -77,17 +77,14 @@
   }
 
   .icon {
-    margin-top: 0.25rem;
-
     display: flex;
   }
 
   .icon svg {
     display: inline-block;
     width: 1em;
-    height: 1em;
+    height: 1.1em;
     flex-shrink: 0;
-    margin-top: 0.1rem;
   }
 
   .icon > svg + * {
