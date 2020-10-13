@@ -695,28 +695,9 @@
     padding: 0.25rem;
   }
 
-  nav button {
-    /* margin: 0 0.25rem; */
-    /* padding: 0.5rem 0.75rem; */
-    /* border-radius: 0;
-    background: var(--text); */
-    /* color: var(--text); */
-    /* border: solid 1px var(--text); */
-    /* border-right: none; */
-  }
-
-  nav button:first-of-type {
-    /* border-radius: 2rem 0 0 2rem; */
-  }
-
-  nav button:nth-child(3) {
+  nav button.today {
     background: var(--today);
     color: var(--now);
-  }
-
-  nav button:last-of-type {
-    /* border-radius: 0 2rem 2rem 0; */
-    /* border-right: solid 1px var(--text); */
   }
 
   div.days {
@@ -892,6 +873,10 @@
 
 <svelte:window on:resize={resize} on:scroll={scroll} />
 
+<svelte:head>
+  <meta name="theme-color" content={$options.dark ? '#222' : '#fff'} />
+</svelte:head>
+
 <main
   class:dark={$options.dark}
   style="--vh: {vh}px; --segments: {hourSegments};">
@@ -983,6 +968,7 @@
             }}
             id="bk">&lt;</button>
           <button
+            class="today"
             on:click={() => {
               offset = 0
             }}
