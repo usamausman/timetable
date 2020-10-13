@@ -22,7 +22,7 @@ const localStore = (key, initial, parser = (k, v) => v, check = (v) => v) => {
 export const time = readable(new Date(), (set) => {
   let n = 0
   const interval = setInterval(() => {
-    let a = new Date(2020, 9, 13, 10, 55)
+    let a = new Date()
     set(a)
   }, 100)
 
