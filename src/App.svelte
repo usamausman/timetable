@@ -875,6 +875,9 @@
 
 <svelte:head>
   <meta name="theme-color" content={$options.dark ? '#222' : '#fff'} />
+  {#if $options.dark}
+    <style>body { background: #222; }</style>
+  {/if}
 </svelte:head>
 
 <main
