@@ -5,6 +5,7 @@ import {
   startOfMinute,
   startOfToday,
   differenceInMinutes,
+  set,
 } from 'date-fns'
 import { zonedTimeToUtc } from 'date-fns-tz'
 import { utcToZonedTime } from 'date-fns-tz/esm'
@@ -21,7 +22,7 @@ const localStore = (key, initial, parser = (k, v) => v, check = (v) => v) => {
 export const time = readable(new Date(), (set) => {
   let n = 0
   const interval = setInterval(() => {
-    let a = new Date()
+    let a = new Date(2020, 9, 13, 10, 55)
     set(a)
   }, 100)
 
@@ -64,24 +65,30 @@ export const timetable = localStore(
   (saved) => saved && saved[0] && saved[0].times && saved
 )
 
+const t = (date, { hour: hours, minute: minutes }) =>
+  set(date, { hours, minutes })
+
 export const nextClass = derived(
   [minute, options, timetable],
   ([$minute, $options, $timetable]) => {
     if ($options.notifications) {
       const checkTime = addMinutes($minute, $options.notificationsMinutesBefore)
       const checkDay = startOfDay(checkTime)
-      const checkHour = checkTime.getHours()
 
       return $timetable
         .filter((_class) =>
           _class.times.some((t) => t.getTime() === checkDay.getTime())
         )
-        .filter((_class) => _class.from <= checkHour && checkHour <= _class.to)
+        .filter(
+          (_class) =>
+            t(checkDay, _class.from) <= checkTime &&
+            checkTime <= t(checkDay, _class.from)
+        )
         .map((_class) => {
           const now = new Date($minute)
-          const start = startOfDay(now).setHours(_class.from)
+          const start = t(checkDay, _class.from)
 
-          return { class: _class, minutesTill: differenceInMinutes(start, now) }
+          return { _class, minutesTill: -differenceInMinutes(now, start) }
         })
     }
 

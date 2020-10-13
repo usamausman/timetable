@@ -92,7 +92,7 @@
 
   let url
 
-  const notify = async ({ class: _class, minutesTill }) => {
+  const notify = async ({ _class, minutesTill }) => {
     if (minutesTill >= 0) {
       let title = _class.modules.map((m) => m.text).join(', ')
       if (minutesTill > 0) {
