@@ -114,10 +114,10 @@
 
       if (_class.location.text) {
         options.body = `Go to ${_class.location.text}`
-        options.actions.push({
-          action: 'directions',
-          title: 'Directions',
-        })
+        // options.actions.push({
+        //   action: 'directions',
+        //   title: 'Directions',
+        // })
       }
 
       const notification = reg.showNotification(title, options)
