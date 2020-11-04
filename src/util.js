@@ -1,9 +1,6 @@
 import { differenceInMinutes, format } from 'date-fns'
 import { utcToZonedTime } from 'date-fns-tz'
 
-export const showHour = (hour) =>
-  `${hour <= 12 ? hour : hour - 12}\xa0${hour < 12 ? 'am' : 'pm'}`
-
 export const showTime = (time) =>
   time.getMinutes() === 0 ? format(time, 'h a') : format(time, 'p')
 

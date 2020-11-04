@@ -13,9 +13,9 @@
     nextClass,
     line,
   } from './stores'
-  import { addDays, format, isSameDay } from 'date-fns'
-  import { fade, fly, scale } from 'svelte/transition'
-  import { showHour, showTime, getTitle, getMethod } from './util'
+  import { format, isSameDay, add } from 'date-fns'
+  import { fade, scale } from 'svelte/transition'
+  import { showTime, getTitle, getMethod } from './util'
   import { createEvents } from 'ics'
 
   import Class from './Class.svelte'
@@ -37,7 +37,7 @@
     const baseDate = new Date(base)
 
     return [...Array(count)].map((_, i) => {
-      const day = addDays(baseDate, offset + i)
+      const day = add(baseDate, { days: offset + i })
 
       const classes = timetable.filter((_class) =>
         _class.times.some((date) => isSameDay(date, day))
@@ -61,11 +61,12 @@
     })
   }
 
-  const getTimes = (currentHour, from, to) => {
+  const getTimes = (base, offset, currentHour, from, to) => {
+    const day = add(base, { days: offset })
     return [...Array(to - from)].map((_, i) => {
       const hour = from + i
       return {
-        time: showTime({ hour, minute: 0 }),
+        time: showTime(add(day, { hours: hour })),
         now: currentHour === hour,
       }
     })
@@ -131,7 +132,7 @@
 
   $: $nextClass.map(notify)
   $: days = getDays($date, offset, count, $timetable)
-  $: times = getTimes($hour, $options.start, $options.end)
+  $: times = getTimes($date, offset, $hour, $options.start, $options.end)
 
   const timetableLink = (year) =>
     `http://timetable.leeds.ac.uk/teaching/${year}/reporting`
@@ -192,7 +193,7 @@
         }
       })
 
-    return weeks.map((w) => addDays(startDate, w * 7 + i))
+    return weeks.map((w) => add(startDate, { days: w * 7 + i }))
   }
 
   const parseInfo = (els, startDate, weekday) => {
@@ -267,11 +268,11 @@
       const root = parser.parseFromString(text, 'text/html').body
 
       // 1-indexed week, which is a Monday
-      const startDate = addDays(
+      const startDate = add(
         new Date(
           Date.parse(root.querySelector('span.header-3-0-22').innerText)
         ),
-        -8
+        { days: -8 }
       )
 
       const weekdays = Array.from(
