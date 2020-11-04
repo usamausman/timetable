@@ -4,23 +4,17 @@
 
 <script>
   import { hourSegments } from './App.svelte'
-  import { showTime, getTitle, getMethod } from './util'
+
   import { add } from 'date-fns'
+
   import { options } from './stores'
+  import { getMethod, getTitle, r, showTime } from './util'
 
   export let click = () => {}
-
-  let clickFull = (e) => {
-    if (!full) click()
-    else e.stopPropagation()
-  }
-
   export let info = {}
   export let full = false
 
   const interval = 60 / hourSegments
-
-  const r = (a, b) => Math.floor(Math.random() * (b - a)) + a
 
   const getColour = (modules) => {
     const tag = modules.map((m) => m.text).join(',')
@@ -28,6 +22,11 @@
       colours[tag] = `rgb(${r(160, 220)}, ${r(160, 220)}, ${r(160, 220)})`
     }
     return colours[tag]
+  }
+
+  const clickFull = (e) => {
+    if (!full) click()
+    else e.stopPropagation()
   }
 
   $: row = (time) =>
@@ -108,7 +107,6 @@
     opacity: 0.5;
   }
 
-  .open,
   .close {
     cursor: pointer;
     font-weight: bold;

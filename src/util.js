@@ -1,8 +1,8 @@
 import { differenceInMinutes, format } from 'date-fns'
 import { utcToZonedTime } from 'date-fns-tz'
 
-export const showTime = (time) =>
-  time.getMinutes() === 0 ? format(time, 'h a') : format(time, 'p')
+export const getElements = (el, selector) =>
+  Array.from(el.querySelectorAll(selector))
 
 export const getMethod = (method) => {
   const m = method.toLowerCase().replace(/(\[\])/g, '')
@@ -42,6 +42,11 @@ export const getTitle = (info) => {
     return info.title
   }
 }
+
+export const r = (a, b) => Math.floor(Math.random() * (b - a)) + a
+
+export const showTime = (time) =>
+  time.getMinutes() === 0 ? format(time, 'h a') : format(time, 'p')
 
 export const tzOffset = (time) =>
   differenceInMinutes(utcToZonedTime(time, 'Europe/London'), time)

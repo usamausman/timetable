@@ -4,82 +4,24 @@
 
 <script lang="ts">
   import { onMount } from 'svelte'
+  import { fade, scale } from 'svelte/transition'
+
+  import Class from './Class.svelte'
+
+  import { add, format, isSameDay } from 'date-fns'
+  import { zonedTimeToUtc } from 'date-fns-tz'
+  import { createEvents } from 'ics'
+
   import {
+    line,
     hour,
     date,
     options,
-    timetable,
     info,
+    timetable,
     nextClass,
-    line,
   } from './stores'
-  import { format, isSameDay, add } from 'date-fns'
-  import { fade, scale } from 'svelte/transition'
-  import { showTime, getTitle, getMethod } from './util'
-  import { createEvents } from 'ics'
-
-  import Class from './Class.svelte'
-  import { zonedTimeToUtc, utcToZonedTime } from 'date-fns-tz'
-
-  const resize = () => {
-    let temp = Math.floor(document.body.offsetWidth / 160)
-    temp = Math.max(2, Math.min(temp, 7))
-    count = temp
-
-    vh = window.innerHeight / 100
-  }
-
-  const scroll = () => {
-    shadow = window.scrollY > 0
-  }
-
-  const getDays = (base, offset, count, timetable) => {
-    const baseDate = new Date(base)
-
-    return [...Array(count)].map((_, i) => {
-      const day = add(baseDate, { days: offset + i })
-
-      const classes = timetable.filter((_class) => isSameDay(_class.time, day))
-
-      return {
-        day,
-        date: {
-          day: format(day, 'EEEE'),
-          date: format(
-            day,
-            day.getFullYear() === baseDate.getFullYear()
-              ? 'd MMM'
-              : 'd MMM yyyy'
-          ),
-        },
-        classes,
-        today: offset + i === 0,
-        weekend: day.getDay() === 0 || day.getDay() === 6,
-      }
-    })
-  }
-
-  const getTimes = (base, offset, currentHour, from, to) => {
-    const day = add(base, { days: offset })
-    return [...Array(to - from)].map((_, i) => {
-      const hour = from + i
-      return {
-        time: showTime(add(day, { hours: hour })),
-        now: currentHour === hour,
-      }
-    })
-  }
-
-  const timesForDate = (date) => {}
-
-  const show = (_class) => {
-    showClass = true
-    data = _class
-  }
-
-  let count = 7
-  let vh
-  let shadow
+  import { getElements, getMethod, getTitle, showTime } from './util'
 
   let offset = 0
 
@@ -89,60 +31,18 @@
   let showOptions
   let data
 
+  let count = 7
+  let vh
+  let shadow
   let url
 
-  const notify = async ({ _class, minutesTill }) => {
-    if (minutesTill >= 0) {
-      let title = _class.modules.map((m) => m.text).join(', ')
-      if (minutesTill > 0) {
-        title += ` starts in ${minutesTill} minute${
-          minutesTill === 1 ? '' : 's'
-        }`
-      } else {
-        title += ` has started`
-      }
-
-      const reg = await navigator.serviceWorker.getRegistration()
-
-      const options = {
-        tag: `${_class.modules
-          .map((m) => m.text)
-          .join(',')}@${_class.time.getTime()}+${minutesTill}`,
-        body: 'No location given',
-        icon: 'icon/badge.png',
-        actions: [],
-      }
-
-      if (_class.location.text) {
-        options.body = `Go to ${_class.location.text}`
-        // options.actions.push({
-        //   action: 'directions',
-        //   title: 'Directions',
-        // })
-      }
-
-      const notification = reg.showNotification(title, options)
-    }
-  }
-
-  const timeOffset = (date) => {
-    const ukTime = utcToZonedTime(date, 'Europe/London')
-    return (new Date(date).getTime() - ukTime.getTime()) / 1000 / 60
-  }
-
-  $: $nextClass.map(notify)
-  $: days = getDays($date, offset, count, $timetable)
-  $: times = getTimes($date, offset, $hour, $options.start, $options.end)
-
-  const timetableLink = (year) =>
+  const timetableURL = (year) =>
     `http://timetable.leeds.ac.uk/teaching/${year}/reporting`
 
   const buildURL = (year, identifier) =>
-    `https://cors-anywhere.herokuapp.com/${timetableLink(
+    `https://cors-anywhere.herokuapp.com/${timetableURL(
       year
     )}/textspreadsheet;?objectclass=student+set&idtype=id&identifier=${identifier}&template=SWSCUST+Student+Set+Individual+semester&days=1-7&periods=1-21&weeks=1-44`
-
-  const get = (el, selector) => Array.from(el.querySelectorAll(selector))
 
   const makeLink = ({ innerText: text, href: link = '' }) => {
     return { text: text.trim(), link }
@@ -152,7 +52,7 @@
     el,
     { multiple = true, required = true } = { multiple: true, required: true }
   ) => {
-    const els = get(el, 'a')
+    const els = getElements(el, 'a')
 
     // has links
     if (els.length) {
@@ -232,7 +132,7 @@
     if (_class.alternativeTimes && _class.alternativeTimes.link) {
       let link = _class.alternativeTimes.link
       _class.alternativeTimes.link =
-        timetableLink($info.year) + link.substr(link.indexOf('/Individual'))
+        timetableURL($info.year) + link.substr(link.indexOf('/Individual'))
     }
 
     const notes = els[5].innerText.split(';').map((t) => t.trim())
@@ -300,10 +200,6 @@
     }
 
     return (fetching = inner())
-  }
-
-  const refreshTimetable = async () => {
-    $timetable = await fetchTimetable($info.year, $info.identifier)
   }
 
   const getTimetable = async () => {
@@ -410,6 +306,47 @@
     }
   }
 
+  const getTimes = (base, offset, currentHour, from, to) => {
+    const day = add(base, { days: offset })
+    return [...Array(to - from)].map((_, i) => {
+      const hour = from + i
+      return {
+        time: showTime(add(day, { hours: hour })),
+        now: currentHour === hour,
+      }
+    })
+  }
+
+  const getDays = (base, offset, count, timetable) => {
+    const baseDate = new Date(base)
+
+    return [...Array(count)].map((_, i) => {
+      const day = add(baseDate, { days: offset + i })
+
+      const classes = timetable.filter((_class) => isSameDay(_class.time, day))
+
+      return {
+        day,
+        date: {
+          day: format(day, 'EEEE'),
+          date: format(
+            day,
+            day.getFullYear() === baseDate.getFullYear()
+              ? 'd MMM'
+              : 'd MMM yyyy'
+          ),
+        },
+        classes,
+        today: offset + i === 0,
+        weekend: day.getDay() === 0 || day.getDay() === 6,
+      }
+    })
+  }
+
+  const refreshTimetable = async () => {
+    $timetable = await fetchTimetable($info.year, $info.identifier)
+  }
+
   const resetTimetable = () => {
     close()
     $timetable = []
@@ -423,30 +360,27 @@
     resetTimetable()
   }
 
+  const scroll = () => {
+    shadow = window.scrollY > 0
+  }
+
+  const show = (_class) => {
+    showClass = true
+    data = _class
+  }
+
   const close = () => {
     showClass = false
     showOptions = false
   }
 
-  const check = async (v) => {
-    if (v) {
-      if (Notification.permission === 'granted') {
-        $options.notifications = true
-        return
-      }
+  const resize = () => {
+    let temp = Math.floor(document.body.offsetWidth / 160)
+    temp = Math.max(2, Math.min(temp, 7))
+    count = temp
 
-      if (Notification.permission === 'default') {
-        const permission = await Notification.requestPermission()
-        if (permission === 'granted') {
-          $options.notifications = true
-        } else {
-          $options.notifications = false
-        }
-      }
-    }
+    vh = window.innerHeight / 100
   }
-
-  $: check($options.notifications)
 
   const register = async () => {
     if (!('serviceWorker' in navigator)) {
@@ -463,7 +397,6 @@
 
   onMount(resize)
   onMount(register)
-
   onMount(async () => {
     // remove old localStorage data
     if (localStorage.getItem('cached')) {
@@ -485,6 +418,63 @@
       }
     }
   })
+
+  const check = async (v) => {
+    if (v) {
+      if (Notification.permission === 'granted') {
+        $options.notifications = true
+        return
+      }
+
+      if (Notification.permission === 'default') {
+        const permission = await Notification.requestPermission()
+        if (permission === 'granted') {
+          $options.notifications = true
+        } else {
+          $options.notifications = false
+        }
+      }
+    }
+  }
+
+  const notify = async ({ _class, minutesTill }) => {
+    if (minutesTill >= 0) {
+      let title = _class.modules.map((m) => m.text).join(', ')
+      if (minutesTill > 0) {
+        title += ` starts in ${minutesTill} minute${
+          minutesTill === 1 ? '' : 's'
+        }`
+      } else {
+        title += ` has started`
+      }
+
+      const reg = await navigator.serviceWorker.getRegistration()
+
+      const options = {
+        tag: `${_class.modules
+          .map((m) => m.text)
+          .join(',')}@${_class.time.getTime()}+${minutesTill}`,
+        body: 'No location given',
+        icon: 'icon/badge.png',
+        actions: [],
+      }
+
+      if (_class.location.text) {
+        options.body = `Go to ${_class.location.text}`
+        // options.actions.push({
+        //   action: 'directions',
+        //   title: 'Directions',
+        // })
+      }
+
+      reg.showNotification(title, options)
+    }
+  }
+
+  $: check($options.notifications)
+  $: $nextClass.map(notify)
+  $: times = getTimes($date, offset, $hour, $options.start, $options.end)
+  $: days = getDays($date, offset, count, $timetable)
 </script>
 
 <style>
