@@ -3,12 +3,8 @@ import {
   addMinutes,
   startOfDay,
   startOfMinute,
-  startOfToday,
   differenceInMinutes,
-  set,
 } from 'date-fns'
-import { zonedTimeToUtc } from 'date-fns-tz'
-import { utcToZonedTime } from 'date-fns-tz/esm'
 
 const localStore = (key, initial, parser = (k, v) => v, check = (v) => v) => {
   const saved = JSON.parse(localStorage.getItem(key), parser)
