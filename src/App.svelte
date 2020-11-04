@@ -105,7 +105,9 @@
       const reg = await navigator.serviceWorker.getRegistration()
 
       const options = {
-        tag: `${_class.modules.map((m) => m.text).join(',')}@${_class.from}`,
+        tag: `${_class.modules
+          .map((m) => m.text)
+          .join(',')}@${_class.time.getTime()}+${minutesTill}`,
         body: 'No location given',
         icon: 'icon/badge.png',
         actions: [],
