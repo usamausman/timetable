@@ -28,7 +28,8 @@ export const getTitle = (info) => {
     const segment = info.title.split('/')[info.modules.length]
     const [type, number] = segment.toLowerCase().split(' ')
 
-    if (type === 'lab') return 'Lab ' + number
+    if (type === 'drop-in') return 'Drop-In ' + number
+    else if (type === 'lab') return 'Lab ' + number
     else if (type === 'lec') return 'Lecture ' + number
     else if (type === 'prc') return 'Practical ' + number
     else if (type === 'smr') return 'Seminar ' + number
