@@ -1,4 +1,6 @@
-import { format } from 'date-fns'
+import { differenceInMinutes, format } from 'date-fns'
+import { utcToZonedTime } from 'date-fns-tz'
+
 export const showHour = (hour) =>
   `${hour <= 12 ? hour : hour - 12}\xa0${hour < 12 ? 'am' : 'pm'}`
 
@@ -26,7 +28,9 @@ export const getMethod = (method) => {
 export const getTitle = (info) => {
   if (info.title.includes('/')) {
     const segment = info.title.split('/')[info.modules.length]
-    const [type, number] = segment.toLowerCase().split(' ')
+    let [type, number] = segment.toLowerCase().split(' ')
+
+    number = number || 1
 
     if (type === 'drop-in') return 'Drop-In ' + number
     else if (type === 'lab') return 'Lab ' + number
@@ -41,3 +45,6 @@ export const getTitle = (info) => {
     return info.title
   }
 }
+
+export const tzOffset = (time) =>
+  differenceInMinutes(utcToZonedTime(time, 'Europe/London'), time)
