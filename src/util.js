@@ -1,12 +1,9 @@
+import { format } from 'date-fns'
 export const showHour = (hour) =>
   `${hour <= 12 ? hour : hour - 12}\xa0${hour < 12 ? 'am' : 'pm'}`
 
-export const showTime = ({ hour, minute }) =>
-  minute === 0
-    ? showHour(hour)
-    : `${hour <= 12 ? hour : hour - 12}:${String(minute).padStart(2, '0')}\xa0${
-        hour < 12 ? 'am' : 'pm'
-      }`
+export const showTime = (time) =>
+  time.getMinutes() === 0 ? format(time, 'h a') : format(time, 'p')
 
 export const getMethod = (method) => {
   const m = method.toLowerCase().replace(/(\[\])/g, '')
