@@ -58,11 +58,8 @@ export const timetable = localStore(
     }
     return v
   },
-  (saved) => saved && saved[0] && saved[0].times && saved
+  (saved) => saved && saved[0] && saved[0].time && saved
 )
-
-const t = (date, { hour: hours, minute: minutes }) =>
-  set(date, { hours, minutes })
 
 export const nextClass = derived(
   [minute, options, timetable],
@@ -72,17 +69,14 @@ export const nextClass = derived(
       const checkDay = startOfDay(checkTime)
 
       return $timetable
-        .filter((_class) =>
-          _class.times.some((t) => t.getTime() === checkDay.getTime())
-        )
         .filter(
           (_class) =>
-            t(checkDay, _class.from) <= checkTime &&
-            checkTime <= t(checkDay, _class.from)
+            addMinutes(checkTime, -$options.notificationsMinutesBefore) <=
+              _class.time && _class.time <= checkTime
         )
         .map((_class) => {
           const now = new Date($minute)
-          const start = t(checkDay, _class.from)
+          const start = _class.time
 
           return { _class, minutesTill: -differenceInMinutes(now, start) }
         })

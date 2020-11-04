@@ -5,6 +5,7 @@
 <script>
   import { hourSegments } from './App.svelte'
   import { showTime, getTitle, getMethod } from './util'
+  import { add } from 'date-fns'
   import { options } from './stores'
 
   export let click = () => {}
@@ -30,7 +31,9 @@
   }
 
   $: row = (time) =>
-    (time.hour - $options.start) * hourSegments + time.minute / interval + 1
+    (time.getHours() - $options.start) * hourSegments +
+    time.getMinutes() / interval +
+    1
 </script>
 
 <style>
@@ -122,7 +125,7 @@
 <div
   class="class"
   class:full
-  style="grid-row: {row(info.from)} / {row(info.to)}; background: {getColour(info.modules)}"
+  style="grid-row: {row(info.time)} / span {info.duration / interval}; background: {getColour(info.modules)}"
   on:click={clickFull}>
   <div class="top">
     <p class="modules hide">
@@ -177,7 +180,11 @@
           d="M30.5 96a49.9 49.9 0 01-15.9-10.6A49.8 49.8 0 014 69.4 49.7 49.7 0 010 50a49.7 49.7 0 014-19.5 49.8 49.8 0 0110.6-15.9A49.9 49.9 0 0130.6 4 49.7 49.7 0 0150 0a49.7 49.7 0 0119.5 4 49.9 49.9 0 0115.9 10.6 49.8 49.8 0 0110.7 16A49.7 49.7 0 01100 50a49.7 49.7 0 01-4 19.5 49.8 49.8 0 01-10.6 15.9 49.9 49.9 0 01-16 10.7A49.7 49.7 0 0150 100a49.7 49.7 0 01-19.5-4zm4-82.9a39.9 39.9 0 00-12.8 8.6 39.9 39.9 0 00-8.6 12.7A39.8 39.8 0 0010 50a39.8 39.8 0 003.1 15.6 39.9 39.9 0 008.6 12.7 39.9 39.9 0 0012.7 8.6A39.8 39.8 0 0050 90a39.8 39.8 0 0015.6-3.1 39.9 39.9 0 0012.7-8.6 39.9 39.9 0 008.6-12.7A39.7 39.7 0 0090 50a39.7 39.7 0 00-3.1-15.6 39.9 39.9 0 00-8.6-12.7 39.9 39.9 0 00-12.7-8.6A39.8 39.8 0 0050 10a39.8 39.8 0 00-15.6 3.1zM45 55V20h10v25h15v10z" />
       </svg>
 
-      <p>{showTime(info.from)} to {showTime(info.to)}</p>
+      <p>
+        {showTime(info.time)}
+        to
+        {showTime(add(info.time, { minutes: info.duration }))}
+      </p>
     </div>
   {/if}
   {#if info.location.text}

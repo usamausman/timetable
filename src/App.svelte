@@ -39,9 +39,7 @@
     return [...Array(count)].map((_, i) => {
       const day = add(baseDate, { days: offset + i })
 
-      const classes = timetable.filter((_class) =>
-        _class.times.some((date) => isSameDay(date, day))
-      )
+      const classes = timetable.filter((_class) => isSameDay(_class.time, day))
 
       return {
         day,
@@ -172,7 +170,7 @@
     }
   }
 
-  const makeTimes = (weeksEl, startDate, i) => {
+  const makeTimes = (weeksEl, startDate, i, hours, minutes) => {
     const weeks = weeksEl.innerText
       .split(', ')
       .flatMap((t) => {
@@ -193,7 +191,7 @@
         }
       })
 
-    return weeks.map((w) => add(startDate, { days: w * 7 + i }))
+    return weeks.map((w) => add(startDate, { days: w * 7 + i, hours, minutes }))
   }
 
   const parseInfo = (els, startDate, weekday) => {
@@ -235,13 +233,11 @@
 
     _class.link = getLink(els[6], { multiple: false, required: false })
 
-    _class.times = makeTimes(els[9], startDate, weekday)
-
     const [fromHour, fromMinute] = els[7].innerText.split(':').map(Number)
-    _class.from = { hour: fromHour, minute: fromMinute }
-
     const [toHour, toMinute] = els[8].innerText.split(':').map(Number)
-    _class.to = { hour: toHour, minute: toMinute }
+
+    // _class.times = makeTimes(els[9], startDate, weekday, fromHour, fromMinute)
+    _class.duration = toHour * 60 + toMinute - (fromHour * 60 + fromMinute)
 
     _class.teachers = els[10].innerHTML
       .replace(/&nbsp;/g, ' ')
@@ -250,7 +246,12 @@
       .map((t) => t.split(',').reverse().join(' '))
       .filter((t) => t)
 
-    return _class
+    // return _class
+    return makeTimes(els[9], startDate, weekday, fromHour, fromMinute).map(
+      (time) => {
+        return { ..._class, time }
+      }
+    )
   }
 
   const fetchTimetable = async (year, identifier) => {
@@ -287,7 +288,7 @@
       weekdays.unshift(weekdays.pop())
 
       return weekdays.flatMap((classes, weekday) =>
-        classes.map((_class) => parseInfo(_class, startDate, weekday))
+        classes.flatMap((_class) => parseInfo(_class, startDate, weekday))
       )
     }
 
@@ -320,26 +321,22 @@
     const year = Number($info.year.substr(0, 4))
     const name = `Leeds ${year}-${year + 1}`
 
-    const all = $timetable.flatMap((_class) =>
-      _class.times.map((t) => {
-        const options = {
-          start: [
-            t.getFullYear(),
-            t.getMonth() + 1,
-            t.getDate(),
-            _class.from.hour,
-            _class.from.minute,
-          ],
-          end: [
-            t.getFullYear(),
-            t.getMonth() + 1,
-            t.getDate(),
-            _class.to.hour,
-            _class.to.minute,
-          ],
-          location: (_class.location && _class.location.text) || undefined,
-          calName: name,
-        }
+    const all = $timetable.flatMap((_class) => {
+      const options = {
+        start: [
+          _class.time.getFullYear(),
+          _class.time.getMonth() + 1,
+          _class.time.getDate(),
+          _class.time.getHours(),
+          _class.time.getMinutes(),
+        ],
+        duration: {
+          hours: Math.floor(_class.duration / 60),
+          minutes: _class.duration % 60,
+        },
+        location: (_class.location && _class.location.text) || undefined,
+        calName: name,
+      }
 
         options.title =
           _class.moduleTitles.length > 0
