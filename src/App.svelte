@@ -199,7 +199,7 @@
 
     if (els[0].innerText.indexOf('[') !== -1) {
       const [_, title, method] = els[0].innerText.match(/(.*)\s*\[(.*)(\]|\})/)
-      _class.title = title
+      _class.title = title.trim()
 
       if (method.includes('-')) {
         _class.method = method
@@ -338,60 +338,60 @@
         calName: name,
       }
 
-        options.title =
-          _class.moduleTitles.length > 0
-            ? _class.moduleTitles.join(', ')
-            : '[no title]'
+      options.title =
+        _class.moduleTitles.length > 0
+          ? _class.moduleTitles.join(', ')
+          : '[no title]'
+      options.title += ` - ${getTitle(_class)}`
 
-        if (_class.method) {
-          options.title += ` (${getMethod(_class.method)})`
-        }
+      if (_class.method) {
+        options.title += ` (${getMethod(_class.method)})`
+      }
 
-        const descriptionLines = []
+      const descriptionLines = []
 
+      let text = ''
+      if (_class.modules.length === 1) text = 'Module: '
+      else text = 'Modules: '
+      text += _class.modules.map((m) => m.text).join(', ')
+      descriptionLines.push(text)
+
+      if (_class.teachers.length > 0) {
         let text = ''
-        if (_class.modules.length === 1) text = 'Module: '
-        else text = 'Modules: '
-        text += _class.modules.map((m) => m.text).join(', ')
+        if (_class.teachers.length === 1) text = 'Teacher: '
+        else text = 'Teachers: '
+        text += _class.teachers.join(', ')
         descriptionLines.push(text)
+      }
 
-        if (_class.teachers.length > 0) {
-          let text = ''
-          if (_class.teachers.length === 1) text = 'Teacher: '
-          else text = 'Teachers: '
-          text += _class.teachers.join(', ')
-          descriptionLines.push(text)
+      if (_class.location && _class.location.link) {
+        descriptionLines.push('Location: ' + _class.location.link)
+      }
+
+      if (_class.notes || _class.link) {
+        descriptionLines.push('')
+        if (_class.notes) {
+          descriptionLines.push(_class.notes.join('\n'))
         }
 
-        if (_class.location && _class.location.link) {
-          descriptionLines.push('Location: ' + _class.location.link)
-        }
-
-        if (_class.notes || _class.link) {
-          descriptionLines.push('')
-          if (_class.notes) {
-            descriptionLines.push(_class.notes.join('\n'))
-          }
-
-          if (_class.link) {
-            descriptionLines.push(
-              `Link: ${_class.link.text} (${_class.link.link})`
-            )
-          }
-        }
-
-        if (_class.alternativeTimes) {
-          descriptionLines.push('')
+        if (_class.link) {
           descriptionLines.push(
-            'Alternative Times: ' + _class.alternativeTimes.link
+            `Link: ${_class.link.text} (${_class.link.link})`
           )
         }
+      }
 
-        options.description = descriptionLines.join('\n')
+      if (_class.alternativeTimes) {
+        descriptionLines.push('')
+        descriptionLines.push(
+          'Alternative Times: ' + _class.alternativeTimes.link
+        )
+      }
 
-        return options
-      })
-    )
+      options.description = descriptionLines.join('\n')
+
+      return options
+    })
 
     const { error, value: calendar } = createEvents(all)
 
@@ -874,7 +874,11 @@
 <svelte:head>
   <meta name="theme-color" content={$options.dark ? '#222' : '#fff'} />
   {#if $options.dark}
-    <style>body { background: #222; }</style>
+    <style>
+      body {
+        background: #222;
+      }
+    </style>
   {/if}
 </svelte:head>
 
@@ -1049,7 +1053,7 @@
                 <div class="uniform input">
                   <label for="notifications">Notifications</label>
                   <input
-                    disabled={!('Notification' in window) || Notification.permission === 'denied'}
+                    disabled={!('Notification' in window) || window.Notification.permission === 'denied'}
                     type="checkbox"
                     id="notifications"
                     bind:checked={$options.notifications} />
@@ -1059,13 +1063,13 @@
                     Notifications are not supported.
                   </p>
                 {/if}
-                {#if Notification.permission === 'denied'}
+                {#if window.Notification.permission === 'denied'}
                   <p style="color: var(--now);">
                     Permission for notifications was denied.
                   </p>
                 {/if}
                 <fieldset
-                  disabled={!$options.notifications || !('Notification' in window) || Notification.permission === 'denied'}>
+                  disabled={!$options.notifications || !('Notification' in window) || window.Notification.permission === 'denied'}>
                   <div class="inline input">
                     <p>Notify me</p>
                     <input
