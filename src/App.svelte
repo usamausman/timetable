@@ -417,6 +417,12 @@
         localStorage.removeItem('cached')
       }
     }
+
+    // reset class times
+    const t = JSON.parse(localStorage.getItem('timetable'))
+    if (t && t.length === 0) {
+      $timetable = await fetchTimetable($info.year, $info.identifier)
+    }
   })
 
   const check = async (v) => {
