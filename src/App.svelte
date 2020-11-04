@@ -19,7 +19,7 @@
   import { createEvents } from 'ics'
 
   import Class from './Class.svelte'
-  import { utcToZonedTime } from 'date-fns-tz'
+  import { zonedTimeToUtc, utcToZonedTime } from 'date-fns-tz'
 
   const resize = () => {
     let temp = Math.floor(document.body.offsetWidth / 160)
@@ -193,7 +193,12 @@
         }
       })
 
-    return weeks.map((w) => add(startDate, { days: w * 7 + i, hours, minutes }))
+    return weeks.map((w) =>
+      zonedTimeToUtc(
+        add(startDate, { days: w * 7 + i, hours, minutes }),
+        'Europe/London'
+      )
+    )
   }
 
   const parseInfo = (els, startDate, weekday) => {
