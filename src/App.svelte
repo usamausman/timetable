@@ -876,18 +876,17 @@
 
 <svelte:head>
   <meta name="theme-color" content={$options.dark ? '#222' : '#fff'} />
-  {#if $options.dark}
-    <style>
+  {#if $options.dark}<style>
       body {
         background: #222;
       }
-    </style>
-  {/if}
+    </style>{/if}
 </svelte:head>
 
 <main
   class:dark={$options.dark}
-  style="--vh: {vh}px; --segments: {hourSegments};">
+  style="--vh: {vh}px; --segments: {hourSegments};"
+>
   {#if !$info.identifier}
     <div class="info">
       <h1>University of Leeds Timetable</h1>
@@ -907,7 +906,8 @@
           <a
             target="_blank"
             rel="noopener noreferrer"
-            href="https://minerva.leeds.ac.uk/">Minerva</a>
+            href="https://minerva.leeds.ac.uk/">Minerva</a
+          >
         </li>
         <li>Click the timetable icon</li>
         <li>Choose either 'Week View' or 'Semester View'</li>
@@ -919,7 +919,8 @@
           bind:value={url}
           type="text"
           id="identifier"
-          placeholder="timetable.leeds.ac.uk/teaching/..." />
+          placeholder="timetable.leeds.ac.uk/teaching/..."
+        />
       </div>
       <div class="buttons">
         {#await fetching}
@@ -944,8 +945,11 @@
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 100 100"
-              on:click={() => (showOptions = true)}><path
-                d="M58.8 100H42a2 2 0 01-2-1.6l-2.7-13.8a36.9 36.9 0 01-10.2-5.8l-13.5 4.5a2 2 0 01-.6.1 2 2 0 01-1.7-1L2.9 68a2 2 0 01.4-2.5L14 56.1a37.5 37.5 0 01-.5-6.1 37.4 37.4 0 01.4-5.8L3.3 34.9a2 2 0 01-.4-2.5L11.3 18a2 2 0 011.7-1 2 2 0 01.6.1l13.2 4.5a36.9 36.9 0 0110.5-6.1l2.8-13.8A2 2 0 0142 0h16.6a2 2 0 012 1.6l2.8 13.8a36.9 36.9 0 0110.5 6L87 17a2 2 0 01.7 0 2 2 0 011.7 1L98 32.3a2 2 0 01-.4 2.5l-10.6 9.3a37.5 37.5 0 01.5 5.8 37.4 37.4 0 01-.5 6.1l10.6 9.3a2 2 0 01.4 2.5l-8.4 14.5a2 2 0 01-1.7 1 2 2 0 01-.7-.1l-13.4-4.6a36.9 36.9 0 01-10.2 6l-2.8 13.7a2 2 0 01-2 1.6zm-8.4-69a18.9 18.9 0 00-7.4 1.5 19 19 0 00-6 4 19 19 0 00-4.1 6.1 18.9 18.9 0 00-1.5 7.4 18.9 18.9 0 001.5 7.4 19 19 0 004 6 19 19 0 006 4.1 18.9 18.9 0 007.5 1.5 18.9 18.9 0 007.4-1.5 19 19 0 006-4 19 19 0 004.1-6.1 18.9 18.9 0 001.5-7.4 18.9 18.9 0 00-1.5-7.4 19 19 0 00-4-6 19 19 0 00-6.1-4.1 18.9 18.9 0 00-7.4-1.5z" /></svg>
+              on:click={() => (showOptions = true)}
+              ><path
+                d="M58.8 100H42a2 2 0 01-2-1.6l-2.7-13.8a36.9 36.9 0 01-10.2-5.8l-13.5 4.5a2 2 0 01-.6.1 2 2 0 01-1.7-1L2.9 68a2 2 0 01.4-2.5L14 56.1a37.5 37.5 0 01-.5-6.1 37.4 37.4 0 01.4-5.8L3.3 34.9a2 2 0 01-.4-2.5L11.3 18a2 2 0 011.7-1 2 2 0 01.6.1l13.2 4.5a36.9 36.9 0 0110.5-6.1l2.8-13.8A2 2 0 0142 0h16.6a2 2 0 012 1.6l2.8 13.8a36.9 36.9 0 0110.5 6L87 17a2 2 0 01.7 0 2 2 0 011.7 1L98 32.3a2 2 0 01-.4 2.5l-10.6 9.3a37.5 37.5 0 01.5 5.8 37.4 37.4 0 01-.5 6.1l10.6 9.3a2 2 0 01.4 2.5l-8.4 14.5a2 2 0 01-1.7 1 2 2 0 01-.7-.1l-13.4-4.6a36.9 36.9 0 01-10.2 6l-2.8 13.7a2 2 0 01-2 1.6zm-8.4-69a18.9 18.9 0 00-7.4 1.5 19 19 0 00-6 4 19 19 0 00-4.1 6.1 18.9 18.9 0 00-1.5 7.4 18.9 18.9 0 001.5 7.4 19 19 0 004 6 19 19 0 006 4.1 18.9 18.9 0 007.5 1.5 18.9 18.9 0 007.4-1.5 19 19 0 006-4 19 19 0 004.1-6.1 18.9 18.9 0 001.5-7.4 18.9 18.9 0 00-1.5-7.4 19 19 0 00-4-6 19 19 0 00-6.1-4.1 18.9 18.9 0 00-7.4-1.5z"
+              /></svg
+            >
           </div>
           <div>
             <svg
@@ -955,12 +959,15 @@
               on:click={() => ($options.dark = !$options.dark)}>
               <path
                 d="M50 100.2L39.4 89.6l-14.5 3.9L21 79 6.5 75l3.9-14.5L-.2 50l10.6-10.6-3.9-14.5L21 21 25 6.5l14.5 3.9L50-.2l10.6 10.6 14.5-3.9L79 21 93.5 25l-3.9 14.5L100.2 50 89.6 60.6l3.9 14.5L79 79 75 93.5l-14.5-3.9L50 100.2zM50 15a34.8 34.8 0 00-13.6 2.8 34.9 34.9 0 00-11.2 7.5 34.9 34.9 0 00-7.5 11A34.8 34.8 0 0015 50a34.8 34.8 0 002.7 13.6 34.9 34.9 0 007.5 11.2 34.9 34.9 0 0011.2 7.5A34.8 34.8 0 0050 85a34.8 34.8 0 0013.6-2.7 34.9 34.9 0 0011.1-7.5 34.9 34.9 0 007.5-11.2A34.8 34.8 0 0085 50a34.8 34.8 0 00-2.8-13.6 34.9 34.9 0 00-7.5-11.2 34.9 34.9 0 00-11-7.5A34.8 34.8 0 0050 15z"
-                id="outer" />
+                id="outer"
+              />
               <path
                 d="M50 85a34.8 34.8 0 01-13.6-2.8 34.9 34.9 0 01-11.1-7.5 34.9 34.9 0 01-7.5-11A34.8 34.8 0 0115 50a34.8 34.8 0 012.8-13.6 34.9 34.9 0 017.5-11.1 34.9 34.9 0 0111-7.5A34.8 34.8 0 0150 15a34.8 34.8 0 0113.6 2.7 34.9 34.9 0 0111.1 7.5 34.9 34.9 0 017.5 11.2A34.8 34.8 0 0185 50a34.8 34.8 0 01-2.8 13.6 34.9 34.9 0 01-7.5 11.1 34.9 34.9 0 01-11 7.5A34.8 34.8 0 0150 85zm0-62.5v55a27.3 27.3 0 0010.7-2.2 27.4 27.4 0 008.7-5.9 27.4 27.4 0 006-8.7A27.3 27.3 0 0077.4 50a27.3 27.3 0 00-2.2-10.7 27.4 27.4 0 00-5.9-8.7 27.4 27.4 0 00-8.7-6A27.3 27.3 0 0050 22.6z"
-                id="inner" />
+                id="inner"
+              />
               <path
-                d="M50 77.5v-55a27.3 27.3 0 0110.7 2.2 27.4 27.4 0 018.7 5.9 27.4 27.4 0 016 8.7A27.3 27.3 0 0177.4 50a27.3 27.3 0 01-2.2 10.7 27.4 27.4 0 01-5.9 8.7 27.4 27.4 0 01-8.7 6A27.3 27.3 0 0150 77.4z" />
+                d="M50 77.5v-55a27.3 27.3 0 0110.7 2.2 27.4 27.4 0 018.7 5.9 27.4 27.4 0 016 8.7A27.3 27.3 0 0177.4 50a27.3 27.3 0 01-2.2 10.7 27.4 27.4 0 01-5.9 8.7 27.4 27.4 0 01-8.7 6A27.3 27.3 0 0150 77.4z"
+              />
             </svg>
           </div>
         </div>
@@ -969,28 +976,33 @@
             on:click={() => {
               offset -= 7
             }}
-            id="bk7">&lt;&lt;</button>
+            id="bk7">&lt;&lt;</button
+          >
           <button
             on:click={() => {
               offset -= 1
             }}
-            id="bk">&lt;</button>
+            id="bk">&lt;</button
+          >
           <button
             class="today"
             on:click={() => {
               offset = 0
             }}
-            id="fd">today</button>
+            id="fd">today</button
+          >
           <button
             on:click={() => {
               offset += 1
             }}
-            id="fd">&gt;</button>
+            id="fd">&gt;</button
+          >
           <button
             on:click={() => {
               offset += 7
             }}
-            id="fd7">&gt;&gt;</button>
+            id="fd7">&gt;&gt;</button
+          >
         </nav>
         <div class="days">
           {#each days as { date, today, weekend }}
@@ -1007,7 +1019,9 @@
           {#if i > 0}
             <p
               class:now
-              style="grid-row: time-start {i * hourSegments + 1} / span {hourSegments}">
+              style="grid-row: time-start {i * hourSegments +
+                1} / span {hourSegments}"
+            >
               <span>{time}</span>
             </p>
           {/if}
@@ -1042,7 +1056,8 @@
                     min="0"
                     max={$options.end}
                     id="start"
-                    bind:value={$options.start} />
+                    bind:value={$options.start}
+                  />
                 </div>
                 <div class="uniform input">
                   <label for="end">End Time</label>
@@ -1051,15 +1066,18 @@
                     min={$options.start}
                     max="24"
                     id="end"
-                    bind:value={$options.end} />
+                    bind:value={$options.end}
+                  />
                 </div>
                 <div class="uniform input">
                   <label for="notifications">Notifications</label>
                   <input
-                    disabled={!('Notification' in window) || window.Notification.permission === 'denied'}
+                    disabled={!('Notification' in window) ||
+                      window.Notification.permission === 'denied'}
                     type="checkbox"
                     id="notifications"
-                    bind:checked={$options.notifications} />
+                    bind:checked={$options.notifications}
+                  />
                 </div>
                 {#if !('Notification' in window)}
                   <p style="color: var(--now);">
@@ -1072,14 +1090,18 @@
                   </p>
                 {/if}
                 <fieldset
-                  disabled={!$options.notifications || !('Notification' in window) || window.Notification.permission === 'denied'}>
+                  disabled={!$options.notifications ||
+                    !('Notification' in window) ||
+                    window.Notification.permission === 'denied'}
+                >
                   <div class="inline input">
                     <p>Notify me</p>
                     <input
                       type="number"
                       min="0"
                       max="60"
-                      bind:value={$options.notificationsMinutesBefore} />
+                      bind:value={$options.notificationsMinutesBefore}
+                    />
                     <p>minutes before a class</p>
                   </div>
                 </fieldset>
@@ -1092,11 +1114,17 @@
                   {#await fetching}
                     <button disabled>Refreshing Timetable...</button>
                   {:then _}
-                    <button on:click={refreshTimetable}>Refresh Timetable</button>
+                    <button on:click={refreshTimetable}
+                      >Refresh Timetable</button
+                    >
                   {:catch e}
-                    <button on:click={refreshTimetable}>Refresh Timetable</button>
+                    <button on:click={refreshTimetable}
+                      >Refresh Timetable</button
+                    >
                   {/await}
-                  <button on:click={downloadTimetable}>Download Timetable</button>
+                  <button on:click={downloadTimetable}
+                    >Download Timetable</button
+                  >
                   <button on:click={resetTimetable}>Reset Timetable</button>
                 </div>
 
