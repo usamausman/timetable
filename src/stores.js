@@ -6,6 +6,16 @@ import {
   differenceInMinutes,
 } from 'date-fns'
 
+const parseDate = (k, v) => {
+  if (
+    typeof v === 'string' &&
+    v.match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/)
+  ) {
+    return new Date(v)
+  }
+  return v
+}
+
 const localStore = (key, initial, parser = (k, v) => v, check = (v) => v) => {
   const saved = JSON.parse(localStorage.getItem(key), parser)
   const store = writable(check(saved) || initial)
@@ -44,20 +54,12 @@ export const options = localStore('options', {
 export const info = localStore('info', {
   identifier: '',
   year: '',
-})
+}, parseDate)
 
 export const timetable = localStore(
   'timetable',
   [],
-  (k, v) => {
-    if (
-      typeof v === 'string' &&
-      v.match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/)
-    ) {
-      return new Date(v)
-    }
-    return v
-  },
+  parseDate,
   (saved) => saved && saved[0] && saved[0].time && saved
 )
 
