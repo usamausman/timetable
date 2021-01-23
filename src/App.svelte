@@ -519,6 +519,7 @@
     --class: #ccc;
     --now: #f00;
     --text: #333;
+    --danger: #b00;
 
     background: var(--bg);
     color: var(--text);
@@ -542,6 +543,7 @@
     --class: #333;
     --now: #f00;
     --text: #aaa;
+    --danger: #c44;
   }
 
   label {
@@ -582,6 +584,10 @@
     opacity: 0.7;
 
     cursor: initial;
+  }
+
+  button.danger {
+    background: var(--danger);
   }
 
   button + button {
@@ -1154,7 +1160,9 @@
                   <button on:click={downloadTimetable}
                     >Download Timetable</button
                   >
-                  <button on:click={resetTimetable}>Reset Timetable</button>
+                </div>
+                <div class="buttons">
+                  <button class="danger" on:click={resetTimetable}>Reset Timetable</button>
                 </div>
 
                 <!-- <div class="uniform input">
