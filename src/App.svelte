@@ -847,7 +847,7 @@
     border-radius: 0.5rem;
     margin: 1rem;
     padding: 1rem;
-    max-width: 20rem;
+    max-width: 24rem;
     width: 100%;
   }
 
@@ -862,6 +862,10 @@
   .bg .options .buttons {
     display: flex;
     justify-content: flex-end;
+  }
+
+  .bg .options .buttons button {
+    width: 100%;
   }
 
   fieldset {
