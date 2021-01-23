@@ -8,7 +8,7 @@
 
   import Class from './Class.svelte'
 
-  import { add, format, isSameDay } from 'date-fns'
+  import { add, differenceInDays, format, isSameDay } from 'date-fns'
   import { zonedTimeToUtc } from 'date-fns-tz'
   import { createEvents } from 'ics'
 
@@ -422,10 +422,26 @@
     if($info.lastFetched === undefined) {
       $info.lastFetched = new Date()
     }
+
+    if($options.refreshAfter === undefined) {
+      $options.refreshAfter = 7
+    }
+
     // reset class times
     const t = JSON.parse(localStorage.getItem('timetable'))
     if (t && t.length === 0 && $info.year && $info.identifier) {
       $timetable = await fetchTimetable($info.year, $info.identifier)
+    }
+
+    if($options.refreshAfter >= 0) {
+      const t = $info.lastFetched.getTime()
+
+      if (differenceInDays(t, $date) >= $options.refreshAfter) {
+        console.log('auto-refreshing')
+        refreshTimetable()
+      }
+    } else {
+      console.log('no need to refresh')
     }
   })
 
@@ -534,7 +550,7 @@
   }
 
   input[type='text'],
-  input[type='number'] {
+  input[type='number'], select {
     background: var(--bg-mid);
     color: var(--text);
     margin: 0;
@@ -1069,27 +1085,37 @@
                   />
                 </div>
                 <div class="uniform input">
-                  <label for="notifications">Notifications</label>
-                  <input
-                    disabled={!('Notification' in window) ||
-                      window.Notification.permission === 'denied'}
-                    type="checkbox"
-                    id="notifications"
-                    bind:checked={$options.notifications}
-                  />
+                  <label for="refreshAfter">Auto-refresh</label>
+                  <select bind:value={$options.refreshAfter}
+                  id="refreshAfter">
+                    <option value={-1}>Never</option>
+                    <option value={0}>Always</option>
+                    <option value={1}>After 1 day</option>
+                    <option value={7}>After 7 days</option>
+                  </select>
                 </div>
-                {#if !('Notification' in window)}
-                  <p style="color: var(--now);">
-                    Notifications are not supported.
-                  </p>
-                {/if}
-                {#if window.Notification.permission === 'denied'}
-                  <p style="color: var(--now);">
-                    Permission for notifications was denied.
-                  </p>
-                {/if}
+                  <div class="uniform input">
+                    <label for="notifications">Notifications</label>
+                    <input
+                      disabled={!('Notification' in window) ||
+                        window.Notification.permission === 'denied'}
+                      type="checkbox"
+                      id="notifications"
+                      bind:checked={$options.notifications}
+                    />
+                  </div>
+                  {#if !('Notification' in window)}
+                    <p style="color: var(--now);">
+                      Notifications are not supported.
+                    </p>
+                  {/if}
+                  {#if window.Notification.permission === 'denied'}
+                    <p style="color: var(--now);">
+                      Permission for notifications was denied.
+                    </p>
+                  {/if}
                 <fieldset
-                  disabled={!$options.notifications ||
+                disabled={!$options.notifications ||
                     !('Notification' in window) ||
                     window.Notification.permission === 'denied'}
                 >
