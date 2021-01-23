@@ -551,6 +551,10 @@
     padding-right: 1rem;
   }
 
+  :global(input)#identifier {
+    width: 100%;
+  }
+
   input[type='text'],
   input[type='number'], select {
     background: var(--bg-mid);
