@@ -419,11 +419,11 @@
       }
     }
 
-    if($info.lastFetched === undefined) {
+    if ($info.lastFetched === undefined) {
       $info.lastFetched = new Date()
     }
 
-    if($options.refreshAfter === undefined) {
+    if ($options.refreshAfter === undefined) {
       $options.refreshAfter = 7
     }
 
@@ -433,15 +433,11 @@
       $timetable = await fetchTimetable($info.year, $info.identifier)
     }
 
-    if($options.refreshAfter >= 0) {
-      const t = $info.lastFetched.getTime()
-
-      if (differenceInDays(t, $date) >= $options.refreshAfter) {
-        console.log('auto-refreshing')
-        refreshTimetable()
-      }
-    } else {
-      console.log('no need to refresh')
+    if (
+      $options.refreshAfter >= 0 &&
+      differenceInDays($info.lastFetched, $date) >= $options.refreshAfter
+    ) {
+      refreshTimetable()
     }
   })
 
@@ -551,12 +547,13 @@
     padding-right: 1rem;
   }
 
-  :global(input)#identifier {
+  :global(input#identifier) {
     width: 100%;
   }
 
   input[type='text'],
-  input[type='number'], select {
+  input[type='number'],
+  select {
     background: var(--bg-mid);
     color: var(--text);
     margin: 0;
@@ -1100,36 +1097,35 @@
                 </div>
                 <div class="uniform input">
                   <label for="refreshAfter">Auto-refresh</label>
-                  <select bind:value={$options.refreshAfter}
-                  id="refreshAfter">
+                  <select bind:value={$options.refreshAfter} id="refreshAfter">
                     <option value={-1}>Never</option>
                     <option value={0}>Always</option>
                     <option value={1}>After 1 day</option>
                     <option value={7}>After 7 days</option>
                   </select>
                 </div>
-                  <div class="uniform input">
-                    <label for="notifications">Notifications</label>
-                    <input
-                      disabled={!('Notification' in window) ||
-                        window.Notification.permission === 'denied'}
-                      type="checkbox"
-                      id="notifications"
-                      bind:checked={$options.notifications}
-                    />
-                  </div>
-                  {#if !('Notification' in window)}
-                    <p style="color: var(--now);">
-                      Notifications are not supported.
-                    </p>
-                  {/if}
-                  {#if window.Notification.permission === 'denied'}
-                    <p style="color: var(--now);">
-                      Permission for notifications was denied.
-                    </p>
-                  {/if}
+                <div class="uniform input">
+                  <label for="notifications">Notifications</label>
+                  <input
+                    disabled={!('Notification' in window) ||
+                      window.Notification.permission === 'denied'}
+                    type="checkbox"
+                    id="notifications"
+                    bind:checked={$options.notifications}
+                  />
+                </div>
+                {#if !('Notification' in window)}
+                  <p style="color: var(--now);">
+                    Notifications are not supported.
+                  </p>
+                {/if}
+                {#if window.Notification.permission === 'denied'}
+                  <p style="color: var(--now);">
+                    Permission for notifications was denied.
+                  </p>
+                {/if}
                 <fieldset
-                disabled={!$options.notifications ||
+                  disabled={!$options.notifications ||
                     !('Notification' in window) ||
                     window.Notification.permission === 'denied'}
                 >
@@ -1166,7 +1162,9 @@
                   >
                 </div>
                 <div class="buttons">
-                  <button class="danger" on:click={resetTimetable}>Reset Timetable</button>
+                  <button class="danger" on:click={resetTimetable}
+                    >Reset Timetable</button
+                  >
                 </div>
 
                 <!-- <div class="uniform input">
