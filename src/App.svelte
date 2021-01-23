@@ -420,7 +420,7 @@
 
     // reset class times
     const t = JSON.parse(localStorage.getItem('timetable'))
-    if (t && t.length === 0) {
+    if (t && t.length === 0 && $info.year && $info.identifier) {
       $timetable = await fetchTimetable($info.year, $info.identifier)
     }
   })
@@ -533,7 +533,6 @@
   input[type='number'] {
     background: var(--bg-mid);
     color: var(--text);
-    width: 100%;
     margin: 0;
     border: none;
     border-radius: 0.25rem;
@@ -642,10 +641,6 @@
 
   div.options div {
     width: 100%;
-  }
-
-  div.options div + div {
-    margin-left: 0.25rem;
   }
 
   div.options svg {
@@ -824,7 +819,7 @@
   }
 
   .uniform label {
-    min-width: 90px;
+    min-width: 100px;
   }
 
   .bg .options {
