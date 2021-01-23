@@ -166,6 +166,7 @@
       let res
       try {
         res = await fetch(buildURL(year, identifier))
+        $info.lastFetched = new Date()
       } catch {
         throw new Error(
           'Timetable could not be fetched, please check your connection'
@@ -418,6 +419,9 @@
       }
     }
 
+    if($info.lastFetched === undefined) {
+      $info.lastFetched = new Date()
+    }
     // reset class times
     const t = JSON.parse(localStorage.getItem('timetable'))
     if (t && t.length === 0 && $info.year && $info.identifier) {

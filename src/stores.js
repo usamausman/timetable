@@ -54,6 +54,7 @@ export const options = localStore('options', {
 export const info = localStore('info', {
   identifier: '',
   year: '',
+  lastFetched: 0
 }, parseDate)
 
 export const timetable = localStore(
