@@ -138,7 +138,7 @@
     const notes = els[5].innerText.split(';').map((t) => t.trim())
     _class.notes = els[5].innerText.trim() ? notes : undefined
 
-    _class.link = getLink(els[6], { multiple: false, required: false })
+    _class.link = getLink(els[6], { multiple: true, required: false })
 
     const [fromHour, fromMinute] = els[7].innerText.split(':').map(Number)
     const [toHour, toMinute] = els[8].innerText.split(':').map(Number)
@@ -278,8 +278,8 @@
         }
 
         if (_class.link) {
-          descriptionLines.push(
-            `Link: ${_class.link.text} (${_class.link.link})`
+          _class.link.forEach((l) =>
+            descriptionLines.push(`Link: ${l.text} (${l.link})`)
           )
         }
       }
