@@ -1160,6 +1160,16 @@
                   </div>
                 </fieldset>
 
+                <details>
+                  <summary>
+                    Debug Info
+                  </summary>
+
+                  <code style="white-space: pre-wrap; overflow: scroll;">
+                    {JSON.stringify($info, null, 2)}
+                  </code>
+                </details>
+
                 {#await fetching}{:catch e}
                   <p style="color: red;">{e.message}</p>
                 {/await}
