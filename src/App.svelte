@@ -927,8 +927,8 @@
       </p>
       <h2>Steps</h2>
       <ol>
-        <li>
-          Log in to
+        <!-- <li>
+          Sign in to
           <a
             target="_blank"
             rel="noopener noreferrer"
@@ -936,8 +936,27 @@
           >
         </li>
         <li>Click the timetable icon</li>
-        <li>Choose either 'Week View' or 'Semester View'</li>
+        <li>Choose either 'Week View' or 'Semester View'</li> -->
+        <li>
+          Sign in to
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href="https://studentservices.leeds.ac.uk/">Student Services</a
+          >
+        </li>
+        <li>
+          Go to <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href="https://studentservices.leeds.ac.uk/pls/banprod/timetable_uol">Modules/Timetable &gt; View timetable</a
+          >
+        </li>
+        <li>
+          Click any 'Submit' button
+        </li>
         <li>Copy the URL of the timetable into the box below</li>
+        <li>Click 'Get Timetable' or 'Download Timetable'</li>
       </ol>
       <div class="input">
         <label class="small" for="identifier">URL:</label>
