@@ -475,7 +475,7 @@
       const options = {
         tag: `${_class.modules
           .map((m) => m.text)
-          .join(',')}@${_class.time.getTime()}+${minutesTill}`,
+          .join(',')}@${_class.time.getTime()}`,
         body: 'No location given',
         icon: 'icon/badge.png',
         actions: [],
