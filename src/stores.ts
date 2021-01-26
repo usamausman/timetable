@@ -81,6 +81,7 @@ export const nextClass = derived(
           const now = new Date($minute)
           const start = _class.time
 
+          return { _class, minutesTill: differenceInMinutes(start, now) }
         })
     }
 

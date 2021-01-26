@@ -5,25 +5,21 @@
 <script lang="ts">
   import { onMount } from 'svelte'
   import { fade, scale } from 'svelte/transition'
-
-  import type { Link, ClassInfo } from './types'
-
-  import Class from './Class.svelte'
-
   import { add, differenceInDays, format, isSameDay } from 'date-fns'
-  import { zonedTimeToUtc } from 'date-fns-tz'
-  import { createEvents, EventAttributes } from 'ics'
+  import { createEvents } from 'ics'
 
   import {
-    line,
-    hour,
     date,
-    options,
+    hour,
     info,
-    timetable,
+    line,
     nextClass,
+    options,
+    timetable,
   } from './stores'
-  import { getElements, getMethod, getTitle, showTime } from './util'
+  import { buildURL, showTime } from './util'
+
+  import Class, { notify, parseClass, toEvent } from './Class.svelte'
 
   let offset = 0
 
@@ -37,125 +33,6 @@
   let vh
   let shadow
   let url
-
-  const timetableURL = (year) =>
-    `http://timetable.leeds.ac.uk/teaching/${year}/reporting`
-
-  const buildURL = (year, identifier) =>
-    `https://cors-anywhere.herokuapp.com/${timetableURL(
-      year
-    )}/textspreadsheet;?objectclass=student+set&idtype=id&identifier=${identifier}&template=SWSCUST+Student+Set+Individual+semester&days=1-7&periods=1-21&weeks=1-44`
-
-  const makeLink = ({ innerText: text, href: link = '' }): Link => {
-    return { text: text.trim(), link }
-  }
-
-  const getLinks = (el, required = true): Link[] => {
-    const els = getElements(el, 'a')
-
-    if (els.length) {
-        return els.map(makeLink)
-    } else if (required) {
-      return el.innerText.split(';').map((innerText) => makeLink({ innerText }))
-    }
-  }
-
-  const getLink = (el, required = true): Link => {
-    const els = getElements(el, 'a')
-
-    // has links
-    if (els.length) {
-        return makeLink(els[0])
-    } else if (required) {
-        return makeLink(el)
-      }
-    }
-
-  const makeTimes = (weeksEl, startDate, i, hours, minutes): Date[] => {
-    const weeks = weeksEl.innerText
-      .split(', ')
-      .flatMap((t) => {
-        if (t.indexOf('-') !== -1) {
-          const [from, to] = t.split('-').map(Number)
-          return [...Array(to - from + 1)].map((_, i) => from + i)
-        } else {
-          return Number(t)
-        }
-      })
-      .map((w) => {
-        if (w <= 11) {
-          return w + 6
-        } else if (w > 11 && w <= 22) {
-          return w + 10
-        } else {
-          return w + 14
-        }
-      })
-
-    return weeks.map((w) =>
-      zonedTimeToUtc(
-        add(startDate, { days: w * 7 + i, hours, minutes }),
-        'Europe/London'
-      )
-    )
-  }
-
-  const parseInfo = (els, startDate, weekday): ClassInfo[] => {
-    declare const _class: ClassInfo
-
-    if (els[0].innerText.indexOf('[') !== -1) {
-      const [_, title, method] = els[0].innerText.match(/(.*)\s*\[(.*)(\]|\})/)
-      _class.title = title.trim()
-
-      if (method.includes('-')) {
-        _class.method = method
-      }
-    } else {
-      _class.title = els[0].innerText
-    }
-
-    _class.modules = getLinks(els[1])
-
-    _class.moduleTitles = els[2].innerText
-      .split(';')
-      .map((s) => s.trim())
-      .filter((t) => t)
-
-    _class.location = getLink(els[3])
-
-    _class.alternativeTimes = getLink(els[4], false)
-
-    if (_class.alternativeTimes && _class.alternativeTimes.link) {
-      let link = _class.alternativeTimes.link
-      _class.alternativeTimes.link =
-        timetableURL($info.year) + link.substr(link.indexOf('/Individual'))
-    }
-
-    const notes = els[5].innerText.split(';').map((t) => t.trim())
-    _class.notes = els[5].innerText.trim() ? notes : undefined
-
-    _class.link = getLinks(els[6], false)
-
-    const [fromHour, fromMinute] = els[7].innerText.split(':').map(Number)
-    const [toHour, toMinute] = els[8].innerText.split(':').map(Number)
-
-    // _class.times = makeTimes(els[9], startDate, weekday, fromHour, fromMinute)
-    _class.duration = toHour * 60 + toMinute - (fromHour * 60 + fromMinute)
-
-    _class.teachers = els[10].innerHTML
-      .replace(/&nbsp;/g, ' ')
-      .trim()
-      .split(';')
-      .map((t) => t.split(',').reverse().join(' '))
-      .filter((t) => t)
-
-    // return _class
-    return makeTimes(els[9], startDate, weekday, fromHour, fromMinute).map(
-      (time) => {
-        return { ..._class, time }
-      }
-    )
-  }
 
   const fetchTimetable = async (year, identifier) => {
     const inner = async () => {
@@ -194,7 +71,9 @@
       weekdays.unshift(weekdays.pop())
 
       return weekdays.flatMap((classes, weekday) =>
-        classes.flatMap((_class) => parseInfo(_class, startDate, weekday))
+        classes.flatMap((_class) =>
+          parseClass(_class, startDate, weekday, $info.year)
+        )
       )
     }
 
@@ -223,77 +102,7 @@
     const year = Number($info.year.substr(0, 4))
     const name = `Leeds ${year}-${year + 1}`
 
-    const all = $timetable.flatMap((_class) => {
-      const options: EventAttributes = {
-        start: [
-          _class.time.getFullYear(),
-          _class.time.getMonth() + 1,
-          _class.time.getDate(),
-          _class.time.getHours(),
-          _class.time.getMinutes(),
-        ],
-        duration: {
-          hours: Math.floor(_class.duration / 60),
-          minutes: _class.duration % 60,
-        },
-        location: (_class.location && _class.location.text) || undefined,
-        calName: name,
-      }
-
-      options.title =
-        _class.moduleTitles.length > 0
-          ? _class.moduleTitles.join(', ')
-          : '[no title]'
-      options.title += ` - ${getTitle(_class)}`
-
-      if (_class.method) {
-        options.title += ` (${getMethod(_class.method)})`
-      }
-
-      const descriptionLines = []
-
-      let text = ''
-      if (_class.modules.length === 1) text = 'Module: '
-      else text = 'Modules: '
-      text += _class.modules.map((m) => m.text).join(', ')
-      descriptionLines.push(text)
-
-      if (_class.teachers.length > 0) {
-        let text = ''
-        if (_class.teachers.length === 1) text = 'Teacher: '
-        else text = 'Teachers: '
-        text += _class.teachers.join(', ')
-        descriptionLines.push(text)
-      }
-
-      if (_class.location && _class.location.link) {
-        descriptionLines.push('Location: ' + _class.location.link)
-      }
-
-      if (_class.notes || _class.link) {
-        descriptionLines.push('')
-        if (_class.notes) {
-          descriptionLines.push(_class.notes.join('\n'))
-        }
-
-        if (_class.link) {
-          _class.link.forEach((l) =>
-            descriptionLines.push(`Link: ${l.text} (${l.link})`)
-          )
-        }
-      }
-
-      if (_class.alternativeTimes) {
-        descriptionLines.push('')
-        descriptionLines.push(
-          'Alternative Times: ' + _class.alternativeTimes.link
-        )
-      }
-
-      options.description = descriptionLines.join('\n')
-
-      return options
-    })
+    const all = $timetable.flatMap((c) => toEvent(c, name))
 
     const { error, value: calendar } = createEvents(all)
 
@@ -373,6 +182,24 @@
     showOptions = false
   }
 
+  const check = async (v) => {
+    if (v) {
+      if (Notification.permission === 'granted') {
+        $options.notifications = true
+        return
+      }
+
+      if (Notification.permission === 'default') {
+        const permission = await Notification.requestPermission()
+        if (permission === 'granted') {
+          $options.notifications = true
+        } else {
+          $options.notifications = false
+        }
+      }
+    }
+  }
+
   const resize = () => {
     let temp = Math.floor(document.body.offsetWidth / 160)
     temp = Math.max(2, Math.min(temp, 7))
@@ -438,58 +265,6 @@
       refreshTimetable()
     }
   })
-
-  const check = async (v) => {
-    if (v) {
-      if (Notification.permission === 'granted') {
-        $options.notifications = true
-        return
-      }
-
-      if (Notification.permission === 'default') {
-        const permission = await Notification.requestPermission()
-        if (permission === 'granted') {
-          $options.notifications = true
-        } else {
-          $options.notifications = false
-        }
-      }
-    }
-  }
-
-  const notify = async ({ _class, minutesTill }) => {
-    if (minutesTill >= 0) {
-      let title = _class.modules.map((m) => m.text).join(', ')
-      if (minutesTill > 0) {
-        title += ` starts in ${minutesTill} minute${
-          minutesTill === 1 ? '' : 's'
-        }`
-      } else {
-        title += ` has started`
-      }
-
-      const reg = await navigator.serviceWorker.getRegistration()
-
-      const options = {
-        tag: `${_class.modules
-          .map((m) => m.text)
-          .join(',')}@${_class.time.getTime()}`,
-        body: 'No location given',
-        icon: 'icon/badge.png',
-        actions: [],
-      }
-
-      if (_class.location.text) {
-        options.body = `Go to ${_class.location.text}`
-        // options.actions.push({
-        //   action: 'directions',
-        //   title: 'Directions',
-        // })
-      }
-
-      reg.showNotification(title, options)
-    }
-  }
 
   $: check($options.notifications)
   $: $nextClass.map(notify)
@@ -947,12 +722,11 @@
           Go to <a
             target="_blank"
             rel="noopener noreferrer"
-            href="https://studentservices.leeds.ac.uk/pls/banprod/timetable_uol">Modules/Timetable &gt; View timetable</a
+            href="https://studentservices.leeds.ac.uk/pls/banprod/timetable_uol"
+            >Modules/Timetable &gt; View timetable</a
           >
         </li>
-        <li>
-          Click any 'Submit' button
-        </li>
+        <li>Click any 'Submit' button</li>
         <li>Copy the URL of the timetable into the box below</li>
         <li>Click 'Get Timetable' or 'Download Timetable'</li>
       </ol>
@@ -999,7 +773,8 @@
               xmlns="http://www.w3.org/2000/svg"
               id="mode"
               viewBox="0 0 100 100"
-              on:click={() => ($options.dark = !$options.dark)}>
+              on:click={() => ($options.dark = !$options.dark)}
+            >
               <path
                 d="M50 100.2L39.4 89.6l-14.5 3.9L21 79 6.5 75l3.9-14.5L-.2 50l10.6-10.6-3.9-14.5L21 21 25 6.5l14.5 3.9L50-.2l10.6 10.6 14.5-3.9L79 21 93.5 25l-3.9 14.5L100.2 50 89.6 60.6l3.9 14.5L79 79 75 93.5l-14.5-3.9L50 100.2zM50 15a34.8 34.8 0 00-13.6 2.8 34.9 34.9 0 00-11.2 7.5 34.9 34.9 0 00-7.5 11A34.8 34.8 0 0015 50a34.8 34.8 0 002.7 13.6 34.9 34.9 0 007.5 11.2 34.9 34.9 0 0011.2 7.5A34.8 34.8 0 0050 85a34.8 34.8 0 0013.6-2.7 34.9 34.9 0 0011.1-7.5 34.9 34.9 0 007.5-11.2A34.8 34.8 0 0085 50a34.8 34.8 0 00-2.8-13.6 34.9 34.9 0 00-7.5-11.2 34.9 34.9 0 00-11-7.5A34.8 34.8 0 0050 15z"
                 id="outer"
@@ -1160,7 +935,7 @@
 
                 <details>
                   <summary>
-                    Debug Info
+                    <span>Debug Info</span>
                   </summary>
 
                   <code style="white-space: pre-wrap; overflow: scroll;">
