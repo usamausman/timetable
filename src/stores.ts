@@ -70,7 +70,6 @@ export const nextClass = derived(
   ([$minute, $options, $timetable]) => {
     if ($options.notifications) {
       const checkTime = addMinutes($minute, $options.notificationsMinutesBefore)
-      const checkDay = startOfDay(checkTime)
 
       return $timetable
         .filter(
@@ -82,7 +81,6 @@ export const nextClass = derived(
           const now = new Date($minute)
           const start = _class.time
 
-          return { _class, minutesTill: -differenceInMinutes(now, start) }
         })
     }
 

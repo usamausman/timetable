@@ -5,6 +5,9 @@ import livereload from 'rollup-plugin-livereload'
 import { terser } from 'rollup-plugin-terser'
 import hmr from 'rollup-plugin-hot'
 
+import autoPreprocess from 'svelte-preprocess'
+import typescript from 'rollup-plugin-typescript2'
+
 // Set this to true to pass the --single flag to sirv (this serves your
 // index.html for any unmatched route, which is a requirement for SPA
 // routers using History API / pushState)
@@ -28,7 +31,7 @@ const production = !dev
 const hot = watch && !useLiveReload
 
 export default {
-  input: 'src/main.js',
+  input: 'src/main.ts',
   output: {
     sourcemap: true,
     format: 'iife',
@@ -46,6 +49,7 @@ export default {
       css: css => {
         css.write('public/build/bundle.css')
       },
+      preprocess: autoPreprocess(),
       hot: hot && {
         // Optimistic will try to recover from runtime
         // errors during component init
@@ -68,8 +72,10 @@ export default {
     resolve({
       browser: true,
       dedupe: ['svelte'],
+      extensions: ['.js', '.ts']
     }),
     commonjs(),
+    typescript({ sourceMap: !production }),
 
     // In dev mode, call `npm run start:dev` once
     // the bundle has been generated

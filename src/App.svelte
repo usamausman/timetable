@@ -6,11 +6,13 @@
   import { onMount } from 'svelte'
   import { fade, scale } from 'svelte/transition'
 
+  import type { Link, ClassInfo } from './types'
+
   import Class from './Class.svelte'
 
   import { add, differenceInDays, format, isSameDay } from 'date-fns'
   import { zonedTimeToUtc } from 'date-fns-tz'
-  import { createEvents } from 'ics'
+  import { createEvents, EventAttributes } from 'ics'
 
   import {
     line,
@@ -44,35 +46,32 @@
       year
     )}/textspreadsheet;?objectclass=student+set&idtype=id&identifier=${identifier}&template=SWSCUST+Student+Set+Individual+semester&days=1-7&periods=1-21&weeks=1-44`
 
-  const makeLink = ({ innerText: text, href: link = '' }) => {
+  const makeLink = ({ innerText: text, href: link = '' }): Link => {
     return { text: text.trim(), link }
   }
 
-  const getLink = (
-    el,
-    { multiple = true, required = true } = { multiple: true, required: true }
-  ) => {
+  const getLinks = (el, required = true): Link[] => {
+    const els = getElements(el, 'a')
+
+    if (els.length) {
+        return els.map(makeLink)
+    } else if (required) {
+      return el.innerText.split(';').map((innerText) => makeLink({ innerText }))
+    }
+  }
+
+  const getLink = (el, required = true): Link => {
     const els = getElements(el, 'a')
 
     // has links
     if (els.length) {
-      if (multiple) {
-        return els.map(makeLink)
-      } else {
         return makeLink(els[0])
-      }
     } else if (required) {
-      if (multiple) {
-        return el.innerText
-          .split(';')
-          .map((innerText) => makeLink({ innerText }))
-      } else {
         return makeLink(el)
       }
     }
-  }
 
-  const makeTimes = (weeksEl, startDate, i, hours, minutes) => {
+  const makeTimes = (weeksEl, startDate, i, hours, minutes): Date[] => {
     const weeks = weeksEl.innerText
       .split(', ')
       .flatMap((t) => {
@@ -101,8 +100,8 @@
     )
   }
 
-  const parseInfo = (els, startDate, weekday) => {
-    const _class = {}
+  const parseInfo = (els, startDate, weekday): ClassInfo[] => {
+    declare const _class: ClassInfo
 
     if (els[0].innerText.indexOf('[') !== -1) {
       const [_, title, method] = els[0].innerText.match(/(.*)\s*\[(.*)(\]|\})/)
@@ -115,19 +114,16 @@
       _class.title = els[0].innerText
     }
 
-    _class.modules = getLink(els[1])
+    _class.modules = getLinks(els[1])
 
     _class.moduleTitles = els[2].innerText
       .split(';')
       .map((s) => s.trim())
       .filter((t) => t)
 
-    _class.location = getLink(els[3], { multiple: false })
+    _class.location = getLink(els[3])
 
-    _class.alternativeTimes = getLink(els[4], {
-      multiple: false,
-      required: false,
-    })
+    _class.alternativeTimes = getLink(els[4], false)
 
     if (_class.alternativeTimes && _class.alternativeTimes.link) {
       let link = _class.alternativeTimes.link
@@ -138,7 +134,7 @@
     const notes = els[5].innerText.split(';').map((t) => t.trim())
     _class.notes = els[5].innerText.trim() ? notes : undefined
 
-    _class.link = getLink(els[6], { multiple: true, required: false })
+    _class.link = getLinks(els[6], false)
 
     const [fromHour, fromMinute] = els[7].innerText.split(':').map(Number)
     const [toHour, toMinute] = els[8].innerText.split(':').map(Number)
@@ -179,7 +175,9 @@
       // 1-indexed week, which is a Monday
       const startDate = add(
         new Date(
-          Date.parse(root.querySelector('span.header-3-0-22').innerText)
+          Date.parse(
+            (root.querySelector('span.header-3-0-22') as HTMLElement).innerText
+          )
         ),
         { days: -8 }
       )
@@ -226,7 +224,7 @@
     const name = `Leeds ${year}-${year + 1}`
 
     const all = $timetable.flatMap((_class) => {
-      const options = {
+      const options: EventAttributes = {
         start: [
           _class.time.getFullYear(),
           _class.time.getMonth() + 1,
