@@ -26,11 +26,7 @@ const localStore = (key, initial, parser = (k, v) => v, check = (v) => v) => {
 }
 
 export const time = readable(new Date(), (set) => {
-  let n = 0
-  const interval = setInterval(() => {
-    let a = new Date()
-    set(a)
-  }, 100)
+  const interval = setInterval(() => set(new Date()), 100)
 
   return () => {
     clearInterval(interval)
@@ -49,14 +45,18 @@ export const options = localStore('options', {
   dark: window.matchMedia('(prefers-color-scheme: dark)').matches,
   notifications: false,
   notificationsMinutesBefore: 5,
-  refreshAfter: 7
+  refreshAfter: 7,
 })
 
-export const info = localStore('info', {
-  identifier: '',
-  year: '',
-  lastFetched: 0
-}, parseDate)
+export const info = localStore(
+  'info',
+  {
+    identifier: '',
+    year: '',
+    lastFetched: 0,
+  },
+  parseDate
+)
 
 export const timetable = localStore(
   'timetable',
@@ -75,7 +75,7 @@ export const nextClass = derived(
         .filter(
           (_class) =>
             addMinutes(checkTime, -$options.notificationsMinutesBefore) <=
-            _class.time && _class.time <= checkTime
+              _class.time && _class.time <= checkTime
         )
         .map((_class) => {
           const now = new Date($minute)
