@@ -22,6 +22,7 @@
   import Class, { notify, parseClass, toEvent } from './Class.svelte'
 
   let offset = 0
+  let shouldAlign = false
 
   let fetching
 
@@ -204,6 +205,7 @@
     let temp = Math.floor(document.body.offsetWidth / 160)
     temp = Math.max(2, Math.min(temp, 7))
     count = temp
+    shouldAlign = count === 7
 
     vh = window.innerHeight / 100
   }
@@ -268,8 +270,15 @@
 
   $: check($options.notifications)
   $: $nextClass.map(notify)
-  $: times = getTimes($date, offset, $hour, $options.start, $options.end)
-  $: days = getDays($date, offset, count, $timetable)
+  $: alignToWeek = shouldAlign ? -((new Date($date).getDay() + 6) % 7) : 0
+  $: times = getTimes(
+    $date,
+    offset + alignToWeek,
+    $hour,
+    $options.start,
+    $options.end
+  )
+  $: days = getDays($date, offset + alignToWeek, count, $timetable)
 </script>
 
 <style>
