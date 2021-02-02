@@ -5,7 +5,7 @@ export const timetableURL = (year) =>
   `http://timetable.leeds.ac.uk/teaching/${year}/reporting`
 
 export const buildURL = (year, identifier) =>
-  `https://cors-anywhere.herokuapp.com/${timetableURL(
+  `https://timetable-cors.ew.r.appspot.com/${timetableURL(
     year
   )}/textspreadsheet;?objectclass=student+set&idtype=id&identifier=${identifier}&template=SWSCUST+Student+Set+Individual+semester&days=1-7&periods=1-21&weeks=1-44`
 
@@ -40,4 +40,23 @@ export const getLinks = (el, required = true): Link[] => {
   } else if (required) {
     return el.innerText.split(';').map((t) => makeLink({ innerText: t }))
   }
+}
+
+export const getNewLinks = (el): Link[] => {
+  const t = el.innerText.trim()
+  let links = undefined
+
+  // if has links
+  if (t[0] === '*') {
+    const parts = t.substring(1).split(';') // remove *
+    links = []
+
+    if (parts.length > 1) {
+      for (let i = 0; i < parts.length; i += 2) {
+        links.push(makeLink({ innerText: parts[i + 1], href: parts[i] }))
+      }
+    }
+  }
+
+  return links
 }

@@ -50,7 +50,7 @@ self.addEventListener('install', (event) => {
 
 self.addEventListener('fetch', (event) => {
   if (
-    event.request.url.includes('cors-anywhere') ||
+    event.request.url.includes('timetable-cors') ||
     event.request.url.includes('gc.zgo.at') ||
     event.request.url.includes('goatcounter.com')
   ) {
