@@ -5,8 +5,15 @@
 
   import { options } from './stores'
   import type { ClassInfo } from './types'
-  import { getLink, getLinks, r, showTime, timetableURL } from './util'
-  
+  import {
+    getLink,
+    getLinks,
+    getNewLinks,
+    r,
+    showTime,
+    timetableURL,
+  } from './util'
+
   import { hourSegments } from './App.svelte'
 
   const getTag = (c: ClassInfo) =>
@@ -114,7 +121,7 @@
     const notes = els[5].innerText.split(';').map((t) => t.trim())
     _class.notes = els[5].innerText.trim() ? notes : undefined
 
-    _class.link = getLinks(els[6], false)
+    _class.link = getNewLinks(els[6])
 
     const [fromHour, fromMinute] = els[7].innerText.split(':').map(Number)
     const [toHour, toMinute] = els[8].innerText.split(':').map(Number)
