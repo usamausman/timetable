@@ -262,9 +262,9 @@
 
     if (
       $options.refreshAfter >= 0 &&
-      differenceInDays($info.lastFetched, $date) >= $options.refreshAfter
-    ) {
-      refreshTimetable()
+      differenceInDays($date, $info.lastFetched) >= $options.refreshAfter
+      ) {
+        refreshTimetable()
     }
   })
 
