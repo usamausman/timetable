@@ -73,7 +73,7 @@
 
       return weekdays.flatMap((classes, weekday) =>
         classes.flatMap((_class) =>
-          parseClass(_class, startDate, weekday, $info.year)
+          parseClass(_class, startDate, weekday, year)
         )
       )
     }
