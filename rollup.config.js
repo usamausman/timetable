@@ -1,6 +1,7 @@
 import svelte from 'rollup-plugin-svelte-hot'
 import resolve from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
+import replace from '@rollup/plugin-replace'
 import livereload from 'rollup-plugin-livereload'
 import { terser } from 'rollup-plugin-terser'
 import hmr from 'rollup-plugin-hot'
@@ -39,6 +40,11 @@ export default {
     file: 'public/build/bundle.js',
   },
   plugins: [
+    replace({
+      preventAssignment: true,
+      'process.env.NODE_ENV': process.env.NODE_ENV,
+      __buildDate__: JSON.stringify(new Date())
+    }),
     svelte({
       // Enable run-time checks when not in production
       dev: !production,

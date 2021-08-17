@@ -5,7 +5,13 @@
 <script lang="ts">
   import { onMount } from 'svelte'
   import { fade, scale } from 'svelte/transition'
-  import { add, differenceInDays, format, isSameDay } from 'date-fns'
+  import {
+    add,
+    differenceInDays,
+    format,
+    formatDistance,
+    isSameDay,
+  } from 'date-fns'
   import { createEvents } from 'ics'
 
   import {
@@ -263,8 +269,8 @@
     if (
       $options.refreshAfter >= 0 &&
       differenceInDays($date, $info.lastFetched) >= $options.refreshAfter
-      ) {
-        refreshTimetable()
+    ) {
+      refreshTimetable()
     }
   })
 
@@ -947,9 +953,20 @@
                     <span>Debug Info</span>
                   </summary>
 
-                  <code style="white-space: pre-wrap; overflow: scroll;">
-                    {JSON.stringify($info, null, 2)}
-                  </code>
+                  <div>
+                    <code>
+                      Built {formatDistance(
+                        new Date(__buildDate__),
+                        new Date(),
+                        { addSuffix: true }
+                      )} ({__buildDate__})
+                    </code>
+                  </div>
+                  <div>
+                    <code style="white-space: pre-wrap; overflow: scroll;">
+                      {JSON.stringify($info, null, 2)}
+                    </code>
+                  </div>
                 </details>
 
                 {#await fetching}{:catch e}
