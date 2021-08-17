@@ -38,7 +38,8 @@
   }
 
   const getTitle = (info: ClassInfo): string => {
-    if (info.title.includes('/')) {
+    // should be of format module/module/type number
+    if (info.title.split('/').length > info.modules.length) {
       const segment = info.title.split('/')[info.modules.length]
       let [type, number] = segment.toLowerCase().split(' ')
 
