@@ -7,10 +7,6 @@ const config = {
 	preprocess: preprocess(),
 
 	kit: {
-		adapter: adapter({
-			pages: 'build',
-			assets: 'build'
-		}),
 		target: '#svelte',
 		vite: {
 			resolve: {
@@ -19,7 +15,14 @@ const config = {
 					$helper: path.resolve('./src/helpers')
 				}
 			}
-		}
+		},
+		paths: {
+			base: process.env.NODE_ENV === 'production' ? '/timetable' : ''
+		},
+		adapter: adapter({
+			pages: 'build',
+			assets: 'build'
+		}),
 	}
 };
 
