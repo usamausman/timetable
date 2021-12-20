@@ -367,16 +367,16 @@
 						on:click={() => {
 							offset -= 7;
 						}}
-						id="bk7">&lt;&lt;</button
+						id="bk7">◀◀</button
 					>
 					<button
 						on:click={() => {
 							offset -= 1;
 						}}
-						id="bk">&lt;</button
+						id="bk">◀</button
 					>
 					<button
-						class="today"
+						class="goto"
 						on:click={() => {
 							offset = 0;
 						}}
@@ -386,13 +386,13 @@
 						on:click={() => {
 							offset += 1;
 						}}
-						id="fd">&gt;</button
+						id="fd">▶</button
 					>
 					<button
 						on:click={() => {
 							offset += 7;
 						}}
-						id="fd7">&gt;&gt;</button
+						id="fd7">▶▶</button
 					>
 				</nav>
 				<div class="days">
@@ -771,9 +771,20 @@
 		padding: 0.25rem;
 	}
 
-	nav button.today {
-		background: var(--today);
-		color: var(--now);
+	nav button {
+		margin: 0;
+		background: none;
+		color: var(--text);
+
+		text-transform: uppercase;
+	}
+
+	nav button.goto {
+		background: var(--text);
+		color: var(--bg); /* make this white */
+
+		font-size: 0.75rem;
+		font-weight: 700;
 	}
 
 	div.days {
