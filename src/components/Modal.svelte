@@ -8,6 +8,9 @@
 	<section class="bg" transition:fade={{ duration: 250 }} on:click|self={close}>
 		<div class="modal" transition:scale={{ duration: 250, start: 1.05 }} on:click|self={close}>
 			<svelte:component this={$modal.component} {...$modal.props} />
+			<div class="close">
+				<Button icon on:click={close}>✕</Button>
+			</div>
 		</div>
 	</section>
 {/if}
@@ -33,5 +36,16 @@
 		justify-content: center;
 		align-items: center;
 		width: 100%;
+	}
+
+	.close {
+		align-self: flex-start;
+		transform: translateX(-100%);
+
+		background: var(--bg);
+		box-shadow: 0 0 0.25rem 0 rgba(0, 0, 0, 0.25);
+
+		border-radius: 2rem;
+		overflow: hidden;
 	}
 </style>

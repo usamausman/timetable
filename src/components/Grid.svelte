@@ -11,12 +11,15 @@
 
 	import Class from '@comp/Class.svelte';
 	import Options from '@comp/Options.svelte';
+	import Button from '@comp/Button.svelte';
 
 	export let scrolled: boolean;
 
 	let offset = 0;
 	let count = 0;
 	let shouldAlign = false;
+
+	const go = (n) => (offset += n);
 
 	const getTimes = (base, offset, currentHour, from, to) => {
 		const day = add(base, { days: offset });
@@ -106,36 +109,13 @@
 			</div>
 		</div>
 		<nav>
-			<button
-				on:click={() => {
-					offset -= 7;
-				}}
-				id="bk7">◀◀</button
-			>
-			<button
-				on:click={() => {
-					offset -= 1;
-				}}
-				id="bk">◀</button
-			>
-			<button
-				class="goto"
-				on:click={() => {
-					offset = 0;
-				}}>{count === 7 ? 'this week' : 'today'}</button
-			>
-			<button
-				on:click={() => {
-					offset += 1;
-				}}
-				id="fd">▶</button
-			>
-			<button
-				on:click={() => {
-					offset += 7;
-				}}
-				id="fd7">▶▶</button
-			>
+			<Button icon on:click={() => go(-7)}>◀◀</Button>
+			<Button icon on:click={() => go(-1)}>◀</Button>
+			<Button on:click={() => (offset = 0)}>
+				{count === 7 ? 'this week' : 'today'}
+			</Button>
+			<Button icon on:click={() => go(1)}>▶</Button>
+			<Button icon on:click={() => go(7)}>▶▶</Button>
 		</nav>
 		<div class="days">
 			{#each days as { date, today, weekend }}
@@ -262,24 +242,9 @@
 		position: relative;
 		display: flex;
 		justify-content: center;
+		align-items: center;
 
 		padding: 0.25rem;
-	}
-
-	nav button {
-		margin: 0;
-		background: none;
-		color: var(--text);
-
-		text-transform: uppercase;
-	}
-
-	nav button.goto {
-		background: var(--text);
-		color: var(--bg); /* make this white */
-
-		font-size: 0.75rem;
-		font-weight: 700;
 	}
 
 	div.days {
