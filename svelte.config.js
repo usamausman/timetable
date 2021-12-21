@@ -7,12 +7,12 @@ const config = {
 	preprocess: preprocess(),
 
 	kit: {
-		target: '#svelte',
+		target: 'body',
 		vite: {
 			resolve: {
 				alias: {
-					$comp: path.resolve('./src/components'),
-					$helper: path.resolve('./src/helpers')
+					"@comp": path.resolve('./src/components'),
+					"@helper": path.resolve('./src/helpers')
 				}
 			}
 		},
