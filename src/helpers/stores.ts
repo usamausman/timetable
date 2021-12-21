@@ -1,7 +1,28 @@
 import { readable, writable, derived } from 'svelte/store';
+import type { Writable } from 'svelte/store';
 import { addMinutes, startOfDay, startOfMinute, differenceInMinutes } from 'date-fns';
 
 import { browser } from '$app/env';
+import type { ClassInfo, Info, Options } from 'src/global';
+
+export const defaultInfo: Info = {
+	year: '',
+	identifier: '',
+	lastFetched: new Date(0)
+};
+
+export const defaultTimetable: ClassInfo[] = [];
+
+export const defaultOptions: Options = {
+	start: 9,
+	end: 18,
+	dark: browser && window.matchMedia('(prefers-color-scheme: dark)').matches,
+	notifications: false,
+	notificationsMinutesBefore: 5,
+	refreshAfter: 7
+};
+
+const defaultModal = { component: null, props: {} };
 
 const parseDate = (k, v) => {
 	if (typeof v === 'string' && v.match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/)) {
@@ -33,28 +54,15 @@ export const minute = derived(time, ($time) => startOfMinute($time).getTime());
 
 export const date = derived(time, ($time) => startOfDay($time).getTime());
 
-export const options = localStore('options', {
-	start: 9,
-	end: 18,
-	dark: browser && window.matchMedia('(prefers-color-scheme: dark)').matches,
-	notifications: false,
-	notificationsMinutesBefore: 5,
-	refreshAfter: 7
-});
+export const modal = writable(defaultModal);
 
-export const info = localStore(
-	'info',
-	{
-		identifier: '',
-		year: '',
-		lastFetched: 0
-	},
-	parseDate
-);
+export const options: Writable<Options> = localStore('options', defaultOptions);
 
-export const timetable = localStore(
+export const info: Writable<Info> = localStore('info', defaultInfo, parseDate);
+
+export const timetable: Writable<ClassInfo[]> = localStore(
 	'timetable',
-	[],
+	defaultTimetable,
 	parseDate,
 	(saved) => saved && saved[0] && saved[0].time && saved
 );
@@ -89,15 +97,13 @@ export const line = derived(
 		($time.getHours() - $options.start + $time.getMinutes() / 60) / ($options.end - $options.start)
 );
 
-const empty = { component: null, props: {} };
-export const modal = writable(empty);
-
 export const open = (component, props) =>
 	modal.set({
 		component,
 		props
 	});
-export const close = () => modal.set(empty);
+
+export const close = () => modal.set(defaultModal);
 
 export const resetAll = () => {
 	close();
