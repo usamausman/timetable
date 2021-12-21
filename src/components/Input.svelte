@@ -9,7 +9,7 @@
 
 	export let disabled = false;
 
-	export let value = '';
+	export let value: string | number = '';
 	export let checked = false;
 
 	export let type: 'text' | 'number' | 'select' | 'checkbox';

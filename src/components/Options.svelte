@@ -9,6 +9,19 @@
 
 	import { resetAll } from '@helper/stores';
 	import Button from '@comp/Button.svelte';
+
+	let disabled = !('Notification' in window) || window.Notification.permission === 'denied';
+
+	const checkPermission = async (v) => {
+		if (v && window.Notification.permission !== 'granted') {
+			$options.notifications = (await Notification.requestPermission()) === 'granted';
+		}
+
+		// force update
+		disabled = !('Notification' in window) || window.Notification.permission === 'denied';
+	};
+
+	$: checkPermission($options.notifications);
 </script>
 
 <section class="options" on:click|stopPropagation={() => {}}>
@@ -40,20 +53,15 @@
 		id="notifications"
 		type="checkbox"
 		bind:checked={$options.notifications}
-		disabled={!('Notification' in window) || window.Notification.permission === 'denied'}
+		bind:disabled
 	/>
-	{#if !('Notification' in window)}
+	{#if disabled && !('Notification' in window)}
 		<p style="color: var(--now);">Notifications are not supported by this browser.</p>
 	{/if}
-	{#if window.Notification.permission === 'denied'}
+	{#if disabled && window.Notification.permission === 'denied'}
 		<p style="color: var(--now);">Permission for notifications was denied.</p>
 	{/if}
-	<fieldset
-		class="push"
-		disabled={!$options.notifications ||
-			!('Notification' in window) ||
-			window.Notification.permission === 'denied'}
-	>
+	<fieldset class="push" disabled={!$options.notifications || disabled}>
 		<Input
 			display="inline"
 			id="minutesBefore"

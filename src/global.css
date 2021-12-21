@@ -147,6 +147,10 @@ button + button {
 	margin-left: 0.5rem;
 }
 
+svg {
+	max-height: 4rem;
+}
+
 svg path {
 	fill: currentColor;
 }
