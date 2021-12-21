@@ -1,5 +1,5 @@
 <script>
-	import App from '$comp/App.svelte';
+	import App from '@comp/App.svelte';
 </script>
 
 <svelte:head>

@@ -3,10 +3,12 @@ body {
 	position: relative;
 	width: 100%;
 	height: 100%;
+
+	background: var(--bg);
+	color: var(--text);
 }
 
 body {
-	color: #333;
 	margin: 0;
 	padding: 0;
 	box-sizing: border-box;
@@ -69,4 +71,99 @@ button:not(:disabled):active {
 
 button:focus {
 	border-color: #666;
+}
+
+/* COLOURS */
+
+body {
+	--bg: #fff;
+	--bg-90: #ffffffcc;
+
+	--today: #fdd;
+	--today-90: #ffddddcc;
+
+	--weekend: #eee;
+	--weekend-90: #eeeeeecc;
+
+	--bg-mid: #eee;
+
+	--class: #ccc;
+	--now: #f00;
+	--text: #333;
+	--danger: #b00;
+}
+
+:root.dark {
+	color-scheme: dark;
+}
+
+:root.dark body {
+	--bg: #222;
+	--bg-90: #222222cc;
+
+	--today: #422;
+	--today-90: #442222cc;
+
+	--weekend: #1d1d1d;
+	--weekend-90: #1d1d1dcc;
+
+	--bg-mid: #111;
+
+	--class: #333;
+	--now: #f00;
+	--text: #aaa;
+	--danger: #c44;
+}
+
+/* MINE */
+
+label {
+	display: inline-block;
+	padding-right: 1rem;
+}
+
+input[type='text'],
+input[type='number'],
+select {
+	background: var(--bg-mid);
+	color: var(--text);
+
+	margin: 0;
+	border: none;
+
+	border-radius: 0.25rem;
+	box-shadow: inset 0 -0.125rem 0 0 var(--text);
+}
+
+input[type='checkbox'] {
+	margin: 0;
+	margin-top: 0.25rem;
+}
+
+button {
+	margin: 0;
+	padding: 0.25rem 0.5rem;
+
+	display: inline;
+	background: var(--text);
+	color: var(--bg);
+
+	border: none;
+	border-radius: 0.25rem;
+
+	cursor: pointer;
+}
+
+button:disabled {
+	opacity: 0.7;
+
+	cursor: initial;
+}
+
+button + button {
+	margin-left: 0.5rem;
+}
+
+svg path {
+	fill: currentColor;
 }

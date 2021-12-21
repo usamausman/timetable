@@ -3,11 +3,11 @@
 	import { zonedTimeToUtc } from 'date-fns-tz';
 	import type { EventAttributes } from 'ics';
 
-	import { options } from '$helper/stores';
+	import { options } from '@helper/stores';
 	import type { ClassInfo } from 'src/global';
-	import { getLink, getLinks, getNewLinks, r, showTime, timetableURL } from '$helper/util';
+	import { getLink, getLinks, getNewLinks, r, showTime, timetableURL } from '@helper/util';
 
-	import { hourSegments } from '$comp/App.svelte';
+	import { hourSegments } from '@comp/Grid.svelte';
 
 	const getTag = (c: ClassInfo) => `${c.modules.map((m) => m.text).join(',')}@${c.time.getTime()}`;
 
@@ -419,7 +419,7 @@
 		cursor: pointer;
 	}
 
-	:global(main.dark) .class {
+	:global(.dark) .class {
 		background: var(--class) !important;
 	}
 
