@@ -237,7 +237,6 @@
 </script>
 
 <script lang="ts">
-	export let click = () => {};
 	export let info = {} as ClassInfo;
 	export let full = false;
 
@@ -251,11 +250,6 @@
 		return colours[tag];
 	};
 
-	const clickFull = (e) => {
-		if (!full) click();
-		else e.stopPropagation();
-	};
-
 	$: row = (time) =>
 		(time.getHours() - $options.start) * hourSegments + time.getMinutes() / interval + 1;
 </script>
@@ -266,7 +260,7 @@
 	style="grid-row: {row(info.time)} / span {info.duration / interval}; background: {getColour(
 		info.modules
 	)}"
-	on:click={clickFull}
+	on:click
 >
 	<div class="top">
 		<p class="modules hide">
@@ -299,9 +293,6 @@
 					/>
 				</svg>
 			</div>
-		{/if}
-		{#if full}
-			<p class="close" on:click={click}>✕</p>
 		{/if}
 	</div>
 	{#if info.moduleTitles.length > 0}
@@ -476,14 +467,6 @@
 
 	.none {
 		opacity: 0.5;
-	}
-
-	.close {
-		cursor: pointer;
-		font-weight: bold;
-		text-align: right;
-
-		margin-left: 0.5rem;
 	}
 
 	.class.full .titles {

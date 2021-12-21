@@ -88,3 +88,19 @@ export const line = derived(
 	([$time, $options]) =>
 		($time.getHours() - $options.start + $time.getMinutes() / 60) / ($options.end - $options.start)
 );
+
+const empty = { component: null, props: {} };
+export const modal = writable(empty);
+
+export const open = (component, props) =>
+	modal.set({
+		component,
+		props
+	});
+export const close = () => modal.set(empty);
+
+export const resetAll = () => {
+	close();
+	info.set(defaultInfo);
+	timetable.set(defaultTimetable);
+};

@@ -1,24 +1,10 @@
-<script context="module" lang="ts">
-	import { writable } from 'svelte/store';
-
-	const empty = { show: false, component: null, props: {} };
-
-	const modal = writable(empty);
-
-	export const open = (component, props) =>
-		modal.set({
-			show: true,
-			component,
-			props
-		});
-	export const close = () => modal.set(empty);
-</script>
-
 <script lang="ts">
 	import { fade, scale } from 'svelte/transition';
+	import { modal, close } from '@helper/stores';
+	import Button from '@comp/Button.svelte';
 </script>
 
-{#if $modal.show}
+{#if $modal.component !== null}
 	<section class="bg" transition:fade={{ duration: 250 }} on:click|self={close}>
 		<div class="modal" transition:scale={{ duration: 250, start: 1.05 }} on:click|self={close}>
 			<svelte:component this={$modal.component} {...$modal.props} />

@@ -1,5 +1,22 @@
 /// <reference types="@sveltejs/kit" />
 
+export interface PartialInfo {
+	year: string;
+	identifier: string;
+}
+export interface Info extends PartialInfo {
+	lastFetched: Date;
+}
+
+export interface Options {
+	start: number;
+	end: number;
+	dark: boolean;
+	notifications: boolean;
+	notificationsMinutesBefore: number;
+	refreshAfter: number;
+}
+
 export interface Link {
 	text: string;
 	link: string;

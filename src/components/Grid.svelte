@@ -6,11 +6,10 @@
 	import { onMount } from 'svelte';
 	import { add, format, isSameDay } from 'date-fns';
 
-	import { date, hour, line, options, timetable } from '@helper/stores';
+	import { date, hour, line, options, timetable, open } from '@helper/stores';
 	import { showTime } from '@helper/util';
 
 	import Class from '@comp/Class.svelte';
-	import { open } from '@comp/Modal.svelte';
 	import Options from '@comp/Options.svelte';
 
 	export let scrolled: boolean;
@@ -165,7 +164,7 @@
 					<div class="dot" style="--progress: {$line};" />
 				{/if}
 				{#each classes as info}
-					<Class {info} click={() => open(Class, { full: true, info })} />
+					<Class {info} on:click={() => open(Class, { full: true, info })} />
 				{/each}
 			</div>
 		{/each}
