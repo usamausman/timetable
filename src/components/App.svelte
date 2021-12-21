@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { add, differenceInDays } from 'date-fns';
-	import { createEvents } from 'ics';
+	import * as ics  from 'ics';
+	const { createEvents } = ics;
 
 	import { date, info, nextClass, options, timetable } from '@helper/stores';
 	import { buildURL } from '@helper/util';

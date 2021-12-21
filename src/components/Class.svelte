@@ -1,6 +1,7 @@
 <script context="module" lang="ts">
 	import { add } from 'date-fns';
-	import { zonedTimeToUtc } from 'date-fns-tz';
+	import * as dateFnsTz from 'date-fns-tz';
+	const { zonedTimeToUtc } = dateFnsTz;
 	import type { EventAttributes } from 'ics';
 
 	import { options } from '@helper/stores';
