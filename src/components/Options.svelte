@@ -5,11 +5,10 @@
 	import { BUILD_DATE } from '@helper/info';
 	import Input from '@comp/Input.svelte';
 
-	const fetching = false;
+	import { state, refreshSaved, downloadSaved } from '@helper/timetable';
 
-	const refreshTimetable = () => {};
-	const downloadTimetable = () => {};
-	const resetTimetable = () => {};
+	import { resetAll } from '@helper/stores';
+	import Button from '@comp/Button.svelte';
 </script>
 
 <section class="options" on:click|stopPropagation={() => {}}>
@@ -73,41 +72,26 @@
 			<span>Debug Info</span>
 		</summary>
 
-		<div class="push">
-			<div>
-				<code>
-					Built {formatDistance(new Date(BUILD_DATE), new Date(), {
-						addSuffix: true
-					})} ({BUILD_DATE})
-				</code>
-			</div>
-			<div>
-				<code style="white-space: pre-wrap; overflow: scroll;">
-					{JSON.stringify($info, null, 2)}
-				</code>
-			</div>
+		<div class="debug" style="margin-top: 0.5rem;">
+			<p>
+				Built {formatDistance(new Date(BUILD_DATE), new Date(), {
+					addSuffix: true
+				})} ({BUILD_DATE})
+			</p>
+			<code style="white-space: pre;">
+				{JSON.stringify($info, null, 2)}
+			</code>
 		</div>
 	</details>
 
-	{#await fetching}
-		<!-- empty -->
-	{:catch e}
-		<p style="color: red;">{e.message}</p>
-	{/await}
-
 	<div class="buttons">
-		{#await fetching}
-			<button disabled>Refreshing Timetable...</button>
-		{:then _}
-			<button on:click={refreshTimetable}>Refresh Timetable</button>
-		{:catch e}
-			<button on:click={refreshTimetable}>Refresh Timetable</button>
-		{/await}
-		<button on:click={downloadTimetable}>Download Timetable</button>
+		<Button wide on:click={refreshSaved} disabled={$state.fetching}>
+			{$state.fetching ? 'Refreshing Timetable...' : 'Refresh Timetable'}
+		</Button>
+		<Button wide on:click={downloadSaved}>Download Timetable</Button>
 	</div>
 	<div class="buttons">
-		<button style="color:green; background: blue;" on:click={resetTimetable}>Reset Timetable</button
-		>
+		<Button danger wide on:click={resetAll}>Reset All</Button>
 	</div>
 </section>
 
@@ -131,11 +115,6 @@
 
 	.options .buttons {
 		display: flex;
-		justify-content: flex-end;
-	}
-
-	.options .buttons button {
-		width: 100%;
 	}
 
 	fieldset {
@@ -151,7 +130,17 @@
 		opacity: 0.5;
 	}
 
+	summary {
+		cursor: pointer;
+	}
+
 	.push {
-		margin-left: 2rem;
+		margin-left: 1.5rem;
+	}
+
+	.debug {
+		border: solid 0.125rem var(--text);
+		border-radius: 0.25rem;
+		padding: 0.25rem;
 	}
 </style>

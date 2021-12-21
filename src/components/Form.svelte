@@ -1,12 +1,15 @@
 <script lang="ts">
 	import Input from '@comp/Input.svelte';
 
-	export let fetching;
-	export let getTimetable;
-	export let getAndDownloadTimetable;
-	export let resetTimetable;
+	import { Action, doURL, state } from '@helper/timetable';
 
-	export let url: string;
+	import { resetAll } from '@helper/stores';
+	import Button from '@comp/Button.svelte';
+
+	let url: string;
+
+	const get = () => doURL(Action.GET, url);
+	const download = () => doURL(Action.DOWNLOAD, url);
 </script>
 
 <div class="form">
@@ -45,21 +48,17 @@
 		placeholder="timetable.leeds.ac.uk/teaching/..."
 	/>
 	<div class="buttons">
-		{#await fetching}
-			<button disabled>Getting Timetable...</button>
-		{:then _}
-			<button on:click={getTimetable}>Get Timetable</button>
-		{:catch e}
-			<button on:click={getTimetable}>Get Timetable</button>
-		{/await}
-		<button on:click={getAndDownloadTimetable}>Download Timetable</button>
-		<button on:click={resetTimetable}>Reset</button>
+		<Button on:click={get} disabled={$state.fetching}>
+			{$state.fetching ? 'Getting Timetable...' : 'Get Timetable'}
+		</Button>
+		<Button on:click={download} disabled={$state.downloading}>
+			{$state.downloading ? 'Downloading Timetable...' : 'Download Timetable'}
+		</Button>
+		<Button danger on:click={resetAll}>Reset All</Button>
 	</div>
-	{#await fetching}
-		<!-- empty -->
-	{:catch e}
-		<p style="color: red;">{e.message}</p>
-	{/await}
+	{#if $state.error}
+		<p style="color: red;">{$state.message}</p>
+	{/if}
 </div>
 
 <style>
@@ -74,15 +73,5 @@
 		display: flex;
 		justify-content: center;
 		margin-top: 0.5rem;
-	}
-
-	div.input {
-		display: flex;
-		align-items: baseline;
-		flex-wrap: nowrap;
-	}
-
-	.input input {
-		flex: 1;
 	}
 </style>

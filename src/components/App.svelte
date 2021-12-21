@@ -7,8 +7,7 @@
 	import { date, info, nextClass, options, timetable } from '@helper/stores';
 	import { buildURL } from '@helper/util';
 
-	import { notify, parseClass, toEvent } from '@comp/Class.svelte';
-	import Grid, { hourSegments } from '@comp/Grid.svelte';
+	import { refreshSaved } from '@helper/timetable';
 	import Form from '@comp/Form.svelte';
 
 	import { browser } from '$app/env';
@@ -109,90 +108,20 @@
 		scrolled = window.scrollY > 0;
 	};
 
-	const check = async (v) => {
-		if (v) {
-			if (Notification.permission === 'granted') {
-				$options.notifications = true;
-				return;
-			}
-
-			if (Notification.permission === 'default') {
-				const permission = await Notification.requestPermission();
-				if (permission === 'granted') {
-					$options.notifications = true;
-				} else {
-					$options.notifications = false;
-				}
-			}
-		}
-	};
-
-	const resize = () => {
-		vh = window.innerHeight / 100;
-	};
-
-	const register = async () => {
-		if (!('serviceWorker' in navigator)) {
-			return;
-		}
-
-		// remove old service worker
-		(await navigator.serviceWorker.getRegistrations())
-			.filter((r) => r.active.scriptURL.includes('cs30'))
-			.forEach((r) => r.unregister());
-
-		// await navigator.serviceWorker.register('worker.js');
-	};
-
-	onMount(resize);
-	onMount(register);
-	onMount(async () => {
-		// remove old localStorage data
-		if (localStorage.getItem('cached')) {
-			if (localStorage.getItem('identifier') !== '') {
-				const oldInfo = {
-					identifier: localStorage.getItem('identifier'),
-					year: localStorage.getItem('yearRange')
-				};
-				$timetable = await fetchTimetable(oldInfo.year, oldInfo.identifier);
-				$info = oldInfo;
-				$options.notifications = !!JSON.parse(localStorage.getItem('notify'));
-				$options.dark = localStorage.getItem('mode') === 'dark';
-
-				localStorage.removeItem('identifier');
-				localStorage.removeItem('yearRange');
-				localStorage.removeItem('notify');
-				localStorage.removeItem('mode');
-				localStorage.removeItem('cached');
-			}
-		}
-
-		if ($info.lastFetched === undefined) {
-			$info.lastFetched = new Date();
-		}
-
-		if ($options.refreshAfter === undefined) {
-			$options.refreshAfter = 7;
-		}
-
-		// reset class times
-		const t = JSON.parse(localStorage.getItem('timetable'));
-		if (t && t.length === 0 && $info.year && $info.identifier) {
-			$timetable = await fetchTimetable($info.year, $info.identifier);
-		}
-
+	const refreshIfNeeded = () => {
 		if (
 			$info.year &&
 			$info.identifier &&
 			$options.refreshAfter >= 0 &&
 			differenceInDays($date, $info.lastFetched) >= $options.refreshAfter
 		) {
-			refreshTimetable();
+			refreshSaved();
 		}
-	});
+	};
 
-	$: check($options.notifications);
-	$: $nextClass.map(notify);
+	onMount(resize);
+	onMount(refreshIfNeeded);
+	// onMount(register);
 
 	$: browser && document.documentElement.classList.toggle('dark', $options.dark);
 </script>
@@ -205,7 +134,7 @@
 
 <main style="--vh: {vh}px;">
 	{#if !$info.identifier}
-		<Form bind:url {fetching} {getTimetable} {getAndDownloadTimetable} {resetTimetable} />
+		<Form />
 	{:else}
 		<Grid {scrolled} />
 	{/if}
