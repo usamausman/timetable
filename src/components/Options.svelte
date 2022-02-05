@@ -28,7 +28,7 @@
 <section class="options" on:click|stopPropagation={() => {}}>
 	<h2>Options</h2>
 	<Input
-		text="Start Time"
+		text="Start Time (UK)"
 		id="start"
 		type="number"
 		min={0}
@@ -36,7 +36,7 @@
 		bind:value={$options.start}
 	/>
 	<Input
-		text="End Time"
+		text="End Time (UK)"
 		id="end"
 		type="number"
 		min={$options.start}

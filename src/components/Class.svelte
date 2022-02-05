@@ -22,6 +22,7 @@
 
 	export let info = {} as ClassInfo;
 	export let full = false;
+	export let tzOffset = { hours: 0, minutes: 0 };
 
 	const interval = 60 / hourSegments;
 
@@ -34,7 +35,9 @@
 	};
 
 	$: row = (time) =>
-		(time.getHours() - $options.start) * hourSegments + time.getMinutes() / interval + 1;
+		(time.getHours() - $options.start - tzOffset.hours) * hourSegments +
+		(time.getMinutes() - tzOffset.minutes) / interval +
+		1;
 </script>
 
 <div

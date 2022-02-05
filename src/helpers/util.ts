@@ -1,4 +1,6 @@
 import { format } from 'date-fns';
+import * as dateFnsTzPkg from 'date-fns-tz';
+const { getTimezoneOffset } = dateFnsTzPkg;
 import type { Link } from 'src/global';
 
 export const timetableURL = (year) => `http://timetable.leeds.ac.uk/teaching/${year}/reporting`;
@@ -57,4 +59,15 @@ export const getNewLinks = (el): Link[] => {
 	}
 
 	return links;
+};
+
+export const timezoneOffsetToUK = (time: Date) => {
+	const ukOffset = getTimezoneOffset('Europe/London', time);
+	const hereOffset = getTimezoneOffset(Intl.DateTimeFormat().resolvedOptions().timeZone, time);
+	const diffMinutes = (hereOffset - ukOffset) / 1000 / 60;
+
+	return {
+		hours: Math.floor(diffMinutes / 60),
+		minutes: diffMinutes % 60
+	};
 };
