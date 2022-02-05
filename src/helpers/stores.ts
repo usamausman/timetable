@@ -31,11 +31,11 @@ const parseDate = (k, v) => {
 	return v;
 };
 
-const localStore = (key, initial, parser = (k, v) => v, check = (v) => v) => {
+const localStore = (key, initial, parser = (k, v) => v, validate = (v) => true) => {
 	const saved = JSON.parse(browser && localStorage.getItem(key), parser);
-	const store = writable(check(saved) || initial);
+	const store = writable(saved || initial);
 	store.subscribe((value) => {
-		browser && localStorage.setItem(key, JSON.stringify(value));
+		validate(value) && browser && localStorage.setItem(key, JSON.stringify(value));
 	});
 	return store;
 };
@@ -56,15 +56,19 @@ export const date = derived(time, ($time) => startOfDay($time).getTime());
 
 export const modal = writable(defaultModal);
 
-export const options: Writable<Options> = localStore('options', defaultOptions);
+export const options: Writable<Options> = localStore(
+	'options',
+	defaultOptions,
+	(k, v) => v,
+	(v: Options) => v.start < v.end
+);
 
 export const info: Writable<Info> = localStore('info', defaultInfo, parseDate);
 
 export const timetable: Writable<ClassInfo[]> = localStore(
 	'timetable',
 	defaultTimetable,
-	parseDate,
-	(saved) => saved && saved[0] && saved[0].time && saved
+	parseDate
 );
 
 export const nextClass = derived(
