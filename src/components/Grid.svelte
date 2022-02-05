@@ -13,6 +13,11 @@
 	import Options from '@comp/Options.svelte';
 	import Button from '@comp/Button.svelte';
 
+	import Mode from '@svg/mode.svg';
+	import Settings from '@svg/settings.svg';
+	import TwoTriangles from '@svg/two_triangles.svg';
+	import Triangle from '@svg/triangle.svg';
+
 	export let scrolled: boolean;
 
 	let offset = 0;
@@ -77,45 +82,33 @@
 >
 	<div class="top" class:shadow={scrolled}>
 		<div class="options">
-			<div>
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					viewBox="0 0 100 100"
-					on:click={() => open(Options, {})}
-					><path
-						d="M58.8 100H42a2 2 0 01-2-1.6l-2.7-13.8a36.9 36.9 0 01-10.2-5.8l-13.5 4.5a2 2 0 01-.6.1 2 2 0 01-1.7-1L2.9 68a2 2 0 01.4-2.5L14 56.1a37.5 37.5 0 01-.5-6.1 37.4 37.4 0 01.4-5.8L3.3 34.9a2 2 0 01-.4-2.5L11.3 18a2 2 0 011.7-1 2 2 0 01.6.1l13.2 4.5a36.9 36.9 0 0110.5-6.1l2.8-13.8A2 2 0 0142 0h16.6a2 2 0 012 1.6l2.8 13.8a36.9 36.9 0 0110.5 6L87 17a2 2 0 01.7 0 2 2 0 011.7 1L98 32.3a2 2 0 01-.4 2.5l-10.6 9.3a37.5 37.5 0 01.5 5.8 37.4 37.4 0 01-.5 6.1l10.6 9.3a2 2 0 01.4 2.5l-8.4 14.5a2 2 0 01-1.7 1 2 2 0 01-.7-.1l-13.4-4.6a36.9 36.9 0 01-10.2 6l-2.8 13.7a2 2 0 01-2 1.6zm-8.4-69a18.9 18.9 0 00-7.4 1.5 19 19 0 00-6 4 19 19 0 00-4.1 6.1 18.9 18.9 0 00-1.5 7.4 18.9 18.9 0 001.5 7.4 19 19 0 004 6 19 19 0 006 4.1 18.9 18.9 0 007.5 1.5 18.9 18.9 0 007.4-1.5 19 19 0 006-4 19 19 0 004.1-6.1 18.9 18.9 0 001.5-7.4 18.9 18.9 0 00-1.5-7.4 19 19 0 00-4-6 19 19 0 00-6.1-4.1 18.9 18.9 0 00-7.4-1.5z"
-					/></svg
-				>
+			<div on:click={() => ($options.dark = !$options.dark)}>
+				<Mode id="mode" />
 			</div>
-			<div>
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					id="mode"
-					viewBox="0 0 100 100"
-					on:click={() => ($options.dark = !$options.dark)}
-				>
-					<path
-						d="M50 100.2L39.4 89.6l-14.5 3.9L21 79 6.5 75l3.9-14.5L-.2 50l10.6-10.6-3.9-14.5L21 21 25 6.5l14.5 3.9L50-.2l10.6 10.6 14.5-3.9L79 21 93.5 25l-3.9 14.5L100.2 50 89.6 60.6l3.9 14.5L79 79 75 93.5l-14.5-3.9L50 100.2zM50 15a34.8 34.8 0 00-13.6 2.8 34.9 34.9 0 00-11.2 7.5 34.9 34.9 0 00-7.5 11A34.8 34.8 0 0015 50a34.8 34.8 0 002.7 13.6 34.9 34.9 0 007.5 11.2 34.9 34.9 0 0011.2 7.5A34.8 34.8 0 0050 85a34.8 34.8 0 0013.6-2.7 34.9 34.9 0 0011.1-7.5 34.9 34.9 0 007.5-11.2A34.8 34.8 0 0085 50a34.8 34.8 0 00-2.8-13.6 34.9 34.9 0 00-7.5-11.2 34.9 34.9 0 00-11-7.5A34.8 34.8 0 0050 15z"
-						id="outer"
-					/>
-					<path
-						d="M50 85a34.8 34.8 0 01-13.6-2.8 34.9 34.9 0 01-11.1-7.5 34.9 34.9 0 01-7.5-11A34.8 34.8 0 0115 50a34.8 34.8 0 012.8-13.6 34.9 34.9 0 017.5-11.1 34.9 34.9 0 0111-7.5A34.8 34.8 0 0150 15a34.8 34.8 0 0113.6 2.7 34.9 34.9 0 0111.1 7.5 34.9 34.9 0 017.5 11.2A34.8 34.8 0 0185 50a34.8 34.8 0 01-2.8 13.6 34.9 34.9 0 01-7.5 11.1 34.9 34.9 0 01-11 7.5A34.8 34.8 0 0150 85zm0-62.5v55a27.3 27.3 0 0010.7-2.2 27.4 27.4 0 008.7-5.9 27.4 27.4 0 006-8.7A27.3 27.3 0 0077.4 50a27.3 27.3 0 00-2.2-10.7 27.4 27.4 0 00-5.9-8.7 27.4 27.4 0 00-8.7-6A27.3 27.3 0 0050 22.6z"
-						id="inner"
-					/>
-					<path
-						d="M50 77.5v-55a27.3 27.3 0 0110.7 2.2 27.4 27.4 0 018.7 5.9 27.4 27.4 0 016 8.7A27.3 27.3 0 0177.4 50a27.3 27.3 0 01-2.2 10.7 27.4 27.4 0 01-5.9 8.7 27.4 27.4 0 01-8.7 6A27.3 27.3 0 0150 77.4z"
-					/>
-				</svg>
+			<div on:click={() => open(Options, {})}>
+				<Settings />
 			</div>
 		</div>
 		<nav>
-			<Button icon on:click={() => go(-7)}>◀◀</Button>
-			<Button icon on:click={() => go(-1)}>◀</Button>
+			<Button icon on:click={() => go(-7)}>
+				<TwoTriangles />
+			</Button>
+			<Button icon on:click={() => go(-1)}>
+				<Triangle />
+			</Button>
 			<Button on:click={() => (offset = 0)}>
 				{count === 7 ? 'this week' : 'today'}
 			</Button>
-			<Button icon on:click={() => go(1)}>▶</Button>
-			<Button icon on:click={() => go(7)}>▶▶</Button>
+			<Button icon on:click={() => go(1)}>
+				<div style="display: flex; transform: scaleX(-1);">
+					<Triangle />
+				</div>
+			</Button>
+			<Button icon on:click={() => go(7)}>
+				<div style="display: flex; transform: scaleX(-1);">
+					<TwoTriangles />
+				</div>
+			</Button>
 		</nav>
 		<div class="days">
 			{#each days as { date, today, weekend }}
@@ -192,13 +185,19 @@
 		grid-row: 1 / -1;
 
 		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+
+	div.options * + * {
+		margin-top: 0.5rem;
 	}
 
 	div.options div {
-		width: 100%;
+		width: 1.5rem;
 	}
 
-	div.options svg {
+	div.options :global(svg) {
 		cursor: pointer;
 	}
 
@@ -208,30 +207,29 @@
 
 	/* MODE ICON */
 
-	div.options svg#mode,
-	div.options svg#mode path {
+	:global(#mode),
+	:global(#mode path) {
 		transition: all 0.25s ease;
 	}
-
-	div.options svg#mode #inner {
-		opacity: 0;
-	}
-
-	div.options svg#mode path {
+	:global(#mode path) {
 		color: var(--text);
 		opacity: 1;
 	}
 
-	.dark div.options svg#mode {
+	:global(#mode #inner) {
+		opacity: 0;
+	}
+
+	:global(.dark #mode) {
 		transform: rotate(180deg);
 	}
 
-	.dark div.options svg#mode path {
+	:global(.dark #mode path) {
 		color: var(--bg);
 		opacity: 0;
 	}
 
-	.dark div.options svg#mode #inner {
+	:global(.dark #mode #inner) {
 		color: var(--text);
 		opacity: 1;
 	}

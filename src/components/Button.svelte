@@ -39,10 +39,16 @@
     display: flex;
     align-items: center;
     justify-content: center;
+
+		padding: 0;
+	}
+
+	.icon :global(svg) {
+		width: 100%;
 	}
 
 	.icon:not(:disabled):active {
-		background: var(--bg-mid);
+		box-shadow: inset 0 0 0 0.125rem var(--text);
 		opacity: 0.75;
 	}
 

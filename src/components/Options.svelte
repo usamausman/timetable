@@ -97,8 +97,6 @@
 			{$state.fetching ? 'Refreshing Timetable...' : 'Refresh Timetable'}
 		</Button>
 		<Button wide on:click={downloadSaved}>Download Timetable</Button>
-	</div>
-	<div class="buttons">
 		<Button danger wide on:click={resetAll}>Reset All</Button>
 	</div>
 </section>
@@ -123,6 +121,8 @@
 
 	.options .buttons {
 		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
 	}
 
 	fieldset {
