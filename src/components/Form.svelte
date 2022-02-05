@@ -71,9 +71,30 @@
 		padding: 1rem;
 	}
 
+	.form > :global(* + *), ol > :global(* + *) {
+		margin-top: 0.5rem;
+	}
+
 	.buttons {
 		display: flex;
 		justify-content: center;
+		flex-direction: column;
+		flex-wrap: wrap;
+	}
+
+	.buttons > :global(* + *) {
 		margin-top: 0.5rem;
+		margin-left: 0;
+	}
+
+	@media (min-width: 30rem) {
+		.buttons {
+			flex-direction: row;
+		}
+
+		.buttons > :global(* + *) {
+			margin-top: 0;
+			margin-left: 0.5rem;
+		}
 	}
 </style>

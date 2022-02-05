@@ -16,34 +16,41 @@
 	export let id: string;
 </script>
 
-<div
-	class="input"
-	class:block={display === 'block'}
-	class:inline={display === 'inline'}
-	class:wide={display === 'wide'}
->
-	{#if display === 'inline'}
-		<slot name="before" />
-	{:else}
+{#if display === 'inline'}
+	<div class="input inline">
+		<p>
+			<slot name="before" />
+			{#if type === 'text'}
+				<input type="text" {id} bind:value {placeholder} />
+			{:else if type === 'number'}
+				<input type="number" {id} bind:value {placeholder} {min} {max} />
+			{:else if type === 'select'}
+				<select {id} {disabled} bind:value>
+					<slot />
+				</select>
+			{:else if type === 'checkbox'}
+				<input type="checkbox" role="switch" {id} {disabled} bind:checked />
+			{/if}
+			<slot name="after" />
+		</p>
+	</div>
+{:else}
+	<div class="input" class:block={display === 'block'} class:wide={display === 'wide'}>
 		<label for={id}>{text}</label>
-	{/if}
 
-	{#if type === 'text'}
-		<input type="text" {id} bind:value {placeholder} />
-	{:else if type === 'number'}
-		<input type="number" {id} bind:value {placeholder} {min} {max} />
-	{:else if type === 'select'}
-		<select {id} {disabled} bind:value>
-			<slot />
-		</select>
-	{:else if type === 'checkbox'}
-		<input type="checkbox" role="switch" {id} {disabled} bind:checked />
-	{/if}
-
-	{#if display === 'inline'}
-		<slot name="after" />
-	{/if}
-</div>
+		{#if type === 'text'}
+			<input type="text" {id} bind:value {placeholder} />
+		{:else if type === 'number'}
+			<input type="number" {id} bind:value {placeholder} {min} {max} />
+		{:else if type === 'select'}
+			<select {id} {disabled} bind:value>
+				<slot />
+			</select>
+		{:else if type === 'checkbox'}
+			<input type="checkbox" role="switch" {id} {disabled} bind:checked />
+		{/if}
+	</div>
+{/if}
 
 <style>
 	.input {
@@ -52,7 +59,7 @@
 	}
 
 	.block label {
-		min-width: 100px;
+		min-width: 8rem;
 	}
 
 	.wide label {
@@ -64,6 +71,7 @@
 		width: auto;
 		margin: 0 0.25rem;
 	}
+
 	.wide input,
 	.wide select {
 		flex: 1;

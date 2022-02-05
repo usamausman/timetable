@@ -55,7 +55,6 @@ input[type='range'] {
 	height: 0;
 }
 
-
 /* COLOURS */
 
 body {
@@ -143,10 +142,6 @@ button:disabled {
 	opacity: 0.7;
 
 	cursor: initial;
-}
-
-button + button {
-	margin-left: 0.5rem;
 }
 
 svg {

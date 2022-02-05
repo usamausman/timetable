@@ -75,8 +75,8 @@
 			max={60}
 			value={$options.notificationsMinutesBefore}
 		>
-			<p slot="before">Notify me</p>
-			<p slot="after">minutes before a class</p>
+			<span slot="before">Notify me</span>
+			<span slot="after">minutes before a class</span>
 		</Input>
 	</fieldset>
 
@@ -112,8 +112,6 @@
 		border-radius: 0.5rem;
 		margin: 1rem;
 		padding: 1rem;
-		max-width: 24rem;
-		width: 100%;
 	}
 
 	.options h2 {
@@ -145,10 +143,6 @@
 
 	summary {
 		cursor: pointer;
-	}
-
-	.push {
-		margin-left: 1.5rem;
 	}
 
 	.debug {

@@ -3,16 +3,17 @@
 	export let danger = false;
 	export let wide = false;
 	export let icon = false;
+	export let round = false;
 </script>
 
-<button on:click {disabled} class:wide class:icon class:danger>
+<button on:click {disabled} class:wide class:round class:icon class:danger>
 	<slot />
 </button>
 
 <style>
 	button {
 		text-transform: uppercase;
-		padding: 0.5rem 0.6rem;
+		padding: 0.5rem 0.8rem;
 		font-size: 0.8rem;
 		font-weight: 700;
 		border: none;
@@ -28,6 +29,11 @@
 
 	.wide {
 		flex: 1;
+	}
+
+	.round {
+		background: var(--bg);
+		border-radius: 100%;
 	}
 
 	.icon {

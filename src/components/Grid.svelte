@@ -7,7 +7,7 @@
 	import { add, format, isSameDay } from 'date-fns';
 
 	import { date, hour, line, options, timetable, open } from '@helper/stores';
-	import { showTime } from '@helper/util';
+	import { showTime, timezoneOffsetToUK } from '@helper/util';
 
 	import Class from '@comp/Class.svelte';
 	import Options from '@comp/Options.svelte';
@@ -27,11 +27,17 @@
 	const go = (n) => (offset += n);
 
 	const getTimes = (base, offset, currentHour, from, to) => {
-		const day = add(base, { days: offset });
+		const day = add(base, { days: offset + 1, hours: -24 });
+
+		const start = add(day, { hours: $options.start });
+
+		const tz = timezoneOffsetToUK(start);
+
 		return [...Array(to - from)].map((_, i) => {
-			const hour = from + i;
+			const hours = from + i + tz.hours;
+			const minutes = tz.minutes;
 			return {
-				time: showTime(add(day, { hours: hour })),
+				time: showTime(add(day, { hours, minutes })),
 				now: currentHour === hour
 			};
 		});
@@ -72,6 +78,8 @@
 	$: alignToWeek = shouldAlign ? -((new Date($date).getDay() + 6) % 7) : 0;
 	$: times = getTimes($date, offset + alignToWeek, $hour, $options.start, $options.end);
 	$: days = getDays($date, offset + alignToWeek, count, $timetable);
+
+	$: tzOffset = timezoneOffsetToUK(add($date, { days: offset + alignToWeek, hours: 12 }));
 </script>
 
 <svelte:window on:resize={resize} />
@@ -137,7 +145,7 @@
 					<div class="dot" style="--progress: {$line};" />
 				{/if}
 				{#each classes as info}
-					<Class {info} on:click={() => open(Class, { full: true, info })} />
+					<Class {info} {tzOffset} on:click={() => open(Class, { full: true, info })} />
 				{/each}
 			</div>
 		{/each}
@@ -148,7 +156,7 @@
 	/* GRID */
 
 	section.grid {
-		--left: 60px;
+		--left: 4rem;
 		--times: calc((var(--end) - var(--start)) * var(--segments));
 
 		min-height: calc(100 * var(--vh, 1vh));
@@ -179,7 +187,7 @@
 	/* OPTIONS */
 
 	div.top div.options {
-		padding: 0.25rem;
+		padding: 0.5rem;
 		background: var(--bg-90);
 
 		grid-row: 1 / -1;
@@ -242,7 +250,11 @@
 		justify-content: center;
 		align-items: center;
 
-		padding: 0.25rem;
+		padding: 0.5rem 0 0;
+	}
+
+	nav > :global(* + *) {
+		margin-left: 0.5rem;
 	}
 
 	div.days {
@@ -256,7 +268,7 @@
 
 	div.days > div {
 		background: var(--bg-90);
-		box-shadow: 0 -40px 0 0 var(--bg-90);
+		box-shadow: 0 -2.5rem 0 0 var(--bg-90);
 
 		padding: 0.25rem;
 	}
@@ -266,7 +278,7 @@
 	}
 
 	div.days .date {
-		font-size: 12px;
+		font-size: 0.8rem;
 	}
 
 	.weekend {
