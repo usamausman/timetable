@@ -209,10 +209,6 @@
 		cursor: pointer;
 	}
 
-	div.options path {
-		fill: currentColor;
-	}
-
 	/* MODE ICON */
 
 	:global(#mode),

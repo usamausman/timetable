@@ -110,7 +110,6 @@
 	.options {
 		background: var(--bg);
 		border-radius: 0.5rem;
-		margin: 1rem;
 		padding: 1rem;
 	}
 

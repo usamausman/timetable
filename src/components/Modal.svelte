@@ -11,7 +11,7 @@
 		<div class="modal" transition:scale={{ duration: 250, start: 1.05 }} on:click|self={close}>
 			<svelte:component this={$modal.component} {...$modal.props} />
 			<div class="close">
-				<Button icon on:click={close}>
+				<Button round icon on:click={close}>
 					<X />
 				</Button>
 			</div>
@@ -41,6 +41,10 @@
 		justify-content: center;
 		margin: 0 auto;
 		padding: 1rem;
+	}
+
+	.modal > :global(*:first-child) {
+		width: clamp(18rem, 50vw, 26rem);
 	}
 
 	.close {

@@ -174,8 +174,6 @@
 
 	.class.full {
 		font-size: 1rem;
-		margin: 1rem;
-
 		cursor: initial;
 	}
 
