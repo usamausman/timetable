@@ -9,6 +9,7 @@
 
 	import { resetAll } from '@helper/stores';
 	import Button from '@comp/Button.svelte';
+	import ErrorMessage from '@comp/ErrorMessage.svelte';
 
 	let disabled = !('Notification' in window) || window.Notification.permission === 'denied';
 
@@ -55,13 +56,17 @@
 		bind:checked={$options.notifications}
 		bind:disabled
 	/>
-	{#if disabled && !('Notification' in window)}
-		<p style="color: var(--now);">Notifications are not supported by this browser.</p>
+	{#if disabled}
+		<ErrorMessage>
+			{#if !('Notification' in window)}
+				Notifications are not supported by this browser.
+			{/if}
+			{#if window.Notification.permission === 'denied'}
+				Your browser denied permission for notifications.
+			{/if}
+		</ErrorMessage>
 	{/if}
-	{#if disabled && window.Notification.permission === 'denied'}
-		<p style="color: var(--now);">Permission for notifications was denied.</p>
-	{/if}
-	<fieldset class="push" disabled={!$options.notifications || disabled}>
+	<fieldset disabled={!$options.notifications || disabled}>
 		<Input
 			display="inline"
 			id="minutesBefore"

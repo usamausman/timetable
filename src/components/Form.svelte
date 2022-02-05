@@ -1,4 +1,6 @@
 <script lang="ts">
+	import ErrorMessage from './ErrorMessage.svelte';
+
 	import Input from '@comp/Input.svelte';
 
 	import { Action, doURL, state } from '@helper/timetable';
@@ -47,6 +49,9 @@
 		bind:value={url}
 		placeholder="timetable.leeds.ac.uk/teaching/..."
 	/>
+	{#if $state.error}
+		<ErrorMessage>{$state.message}</ErrorMessage>
+	{/if}
 	<div class="buttons">
 		<Button on:click={get} disabled={$state.fetching}>
 			{$state.fetching ? 'Getting Timetable...' : 'Get Timetable'}
@@ -56,9 +61,6 @@
 		</Button>
 		<Button danger on:click={resetAll}>Reset All</Button>
 	</div>
-	{#if $state.error}
-		<p style="color: red;">{$state.message}</p>
-	{/if}
 </div>
 
 <style>

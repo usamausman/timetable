@@ -54,6 +54,6 @@
 
 	.danger {
 		background: var(--danger);
-    color: var(--bg);
+    color: var(--danger-text);
 	}
 </style>

@@ -74,6 +74,7 @@ body {
 	--now: #f00;
 	--text: #333;
 	--danger: #b00;
+	--danger-text: #fee;
 }
 
 :root.dark {
@@ -96,6 +97,7 @@ body {
 	--now: #f00;
 	--text: #aaa;
 	--danger: #c44;
+	--danger-text: #300;
 }
 
 /* MINE */
