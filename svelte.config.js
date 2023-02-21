@@ -8,7 +8,6 @@ const config = {
 	preprocess: preprocess(),
 
 	kit: {
-		target: 'body',
 		vite: {
 			plugins: [svg({
 				svgoOptions: {
@@ -31,7 +30,7 @@ const config = {
 			}
 		},
 		paths: {
-			base: process.env.NODE_ENV === 'production' ? '/timetable-dev' : ''
+			base: '/timetable'
 		},
 		adapter: adapter({
 			pages: 'build',

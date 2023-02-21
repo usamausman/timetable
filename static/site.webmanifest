@@ -1,7 +1,7 @@
 {
 	"name": "UoL Timetable",
 	"short_name": "UoL Timetable",
-	"start_url": "./?app",
+	"start_url": "/timetable/?app",
 	"icons": [
 		{
 			"src": "icon/android-chrome-192x192.png",
