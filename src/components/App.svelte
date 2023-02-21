@@ -1,15 +1,15 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { browser } from '$app/environment';
 	import { differenceInDays } from 'date-fns';
-	import { browser } from '$app/env';
+	import { onMount } from 'svelte';
 
-	import { date, info, nextClass, options } from '@helper/stores';
 	import { notify } from '@helper/classes';
+	import { date,info,nextClass,options } from '@helper/stores';
 
 	import { refreshSaved } from '@helper/timetable';
 
-	import Grid from '@comp/Grid.svelte';
 	import Form from '@comp/Form.svelte';
+	import Grid from '@comp/Grid.svelte';
 	import Modal from '@comp/Modal.svelte';
 
 	let vh;
@@ -36,7 +36,6 @@
 
 	onMount(resize);
 	onMount(refreshIfNeeded);
-	// onMount(register);
 
 	$: browser && document.documentElement.classList.toggle('dark', $options.dark);
 	$: $options.notifications && $nextClass.map(notify);

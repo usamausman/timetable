@@ -40,11 +40,11 @@
 		background: none;
 		color: var(--text);
 		font-size: 1rem;
-    width: 2rem;
-    height: 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+		width: 2rem;
+		height: 2rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 
 		padding: 0;
 	}
@@ -60,6 +60,6 @@
 
 	.danger {
 		background: var(--danger);
-    color: var(--danger-text);
+		color: var(--danger-text);
 	}
 </style>

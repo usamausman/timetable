@@ -1,7 +1,7 @@
 import { format } from 'date-fns';
 import * as dateFnsTzPkg from 'date-fns-tz';
-const { getTimezoneOffset } = dateFnsTzPkg;
 import type { Link } from 'src/global';
+const { getTimezoneOffset } = dateFnsTzPkg;
 
 export const timetableURL = (year) => `http://timetable.leeds.ac.uk/teaching/${year}/reporting`;
 

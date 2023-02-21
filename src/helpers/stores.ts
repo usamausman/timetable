@@ -1,8 +1,8 @@
-import { readable, writable, derived } from 'svelte/store';
+import { addMinutes, differenceInMinutes, startOfDay, startOfMinute } from 'date-fns';
 import type { Writable } from 'svelte/store';
-import { addMinutes, startOfDay, startOfMinute, differenceInMinutes } from 'date-fns';
+import { derived, readable, writable } from 'svelte/store';
 
-import { browser } from '$app/env';
+import { browser } from '$app/environment';
 import type { ClassInfo, Info, Options } from 'src/global';
 
 export const defaultInfo: Info = {

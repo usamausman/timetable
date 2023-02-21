@@ -1,6 +1,6 @@
-import type { ClassInfo } from 'src/global';
-import type { EventAttributes } from 'ics';
 import { zonedTimeToUtc } from 'date-fns-tz';
+import type { EventAttributes } from 'ics';
+import type { ClassInfo } from 'src/global';
 
 import { getLink, getLinks, getNewLinks, timetableURL } from '@helper/util';
 import { add } from 'date-fns';

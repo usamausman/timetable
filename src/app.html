@@ -15,14 +15,9 @@
 			name="description"
 			content="A cleaner layout for the University of Leeds timetable. Works offline!"
 		/>
-		<!-- <script
-      data-goatcounter="https://usamausmantimetable.goatcounter.com/count"
-      async
-      src="//gc.zgo.at/count.js"
-    ></script> -->
-		%svelte.head%
+		%sveltekit.head%
 	</head>
 	<body>
-		%svelte.body%
+		<div style="display: contents">%sveltekit.body%</div>
 	</body>
 </html>

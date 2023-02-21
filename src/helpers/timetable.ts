@@ -1,11 +1,11 @@
 import type { ClassInfo, PartialInfo } from 'src/global';
 
-import { get, writable } from 'svelte/store';
 import { add } from 'date-fns';
 import { createEvents } from 'ics';
+import { get, writable } from 'svelte/store';
 
-import { info, timetable } from '@helper/stores';
 import { parseClass, toEvent } from '@helper/classes';
+import { info, timetable } from '@helper/stores';
 import { buildURL } from '@helper/util';
 
 const defaultState = { fetching: false, downloading: false, error: false, message: '' };

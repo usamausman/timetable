@@ -85,8 +85,8 @@
 	<p class="hide">{getTitle(info)}</p>
 	{#if info.method}
 		<!-- <div class="icon"> -->
-			<!-- <Type /> -->
-			<p>{getMethod(info.method)}</p>
+		<!-- <Type /> -->
+		<p>{getMethod(info.method)}</p>
 		<!-- </div> -->
 	{/if}
 	{#if full}

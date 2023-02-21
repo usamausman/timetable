@@ -71,7 +71,8 @@
 		padding: 1rem;
 	}
 
-	.form > :global(* + *), ol > :global(* + *) {
+	.form > :global(* + *),
+	ol > :global(* + *) {
 		margin-top: 0.5rem;
 	}
 
