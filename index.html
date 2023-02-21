@@ -1,48 +1,94 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <link
-      rel="apple-touch-icon"
-      sizes="180x180"
-      href="icon/apple-touch-icon.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="32x32"
-      href="icon/favicon-32x32.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="16x16"
-      href="icon/favicon-16x16.png"
-    />
-    <link rel="manifest" href="site.webmanifest" />
-    <link rel="mask-icon" href="icon/safari-pinned-tab.svg" color="#222222" />
-    <link rel="shortcut icon" href="favicon.ico" />
-    <meta name="msapplication-TileColor" content="#b91d47" />
-    <meta name="msapplication-config" content="icon/browserconfig.xml" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <meta
-      name="description"
-      content="A cleaner layout for the University of Leeds timetable. Works offline!"
-    />
+	<head>
+		<meta charset="utf-8" />
+		<meta
+			name="description"
+			content="A cleaner layout for the University of Leeds timetable. Works offline!"
+		/>
+		<meta http-equiv="content-security-policy" content="">
+		<link href="/timetable/_app/immutable/assets/_layout.c717f575.css" rel="stylesheet">
+		<link href="/timetable/_app/immutable/assets/_page.8bcc86e2.css" rel="stylesheet">
+		<link rel="preload" as="script" crossorigin="anonymous" href="/timetable/_app/immutable/entry/start.b564c185.mjs">
+		<link rel="preload" as="script" crossorigin="anonymous" href="/timetable/_app/immutable/chunks/index.5d639881.mjs">
+		<link rel="preload" as="script" crossorigin="anonymous" href="/timetable/_app/immutable/chunks/singletons.4346b068.mjs">
+		<link rel="preload" as="script" crossorigin="anonymous" href="/timetable/_app/immutable/chunks/index.cbc35c55.mjs">
+		<link rel="preload" as="script" crossorigin="anonymous" href="/timetable/_app/immutable/chunks/paths.a045e744.mjs">
+		<link rel="preload" as="script" crossorigin="anonymous" href="/timetable/_app/immutable/entry/app.9bcbee0d.mjs">
+		<link rel="preload" as="script" crossorigin="anonymous" href="/timetable/_app/immutable/entry/_layout.svelte.aa7b4b5b.mjs">
+		<link rel="preload" as="script" crossorigin="anonymous" href="/timetable/_app/immutable/entry/_layout.ts.464e3015.mjs">
+		<link rel="preload" as="script" crossorigin="anonymous" href="/timetable/_app/immutable/chunks/_layout.79cb23d1.mjs">
+		<link rel="preload" as="script" crossorigin="anonymous" href="/timetable/_app/immutable/entry/_page.svelte.26512953.mjs"><title>UoL Timetable</title><!-- HEAD_svelte-4q5hfd_START --><link rel="apple-touch-icon" sizes="180x180" href="/timetable/icon/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="/timetable/icon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/timetable/icon/favicon-16x16.png"><link rel="manifest" href="/timetable/site.webmanifest"><link rel="mask-icon" href="/timetable/icon/safari-pinned-tab.svg" color="#222222"><link rel="shortcut icon" href="/timetable/favicon.ico"><meta name="msapplication-TileColor" content="#b91d47"><meta name="msapplication-config" content="/timetable/icon/browserconfig.xml"><meta name="viewport" content="width=device-width,initial-scale=1"><!-- HEAD_svelte-4q5hfd_END --><!-- HEAD_svelte-1ppde7x_START --><!-- HEAD_svelte-1ppde7x_END --><!-- HEAD_svelte-182sc8n_START --><meta name="theme-color" content="#fff"><!-- HEAD_svelte-182sc8n_END -->
+	</head>
+	<body>
+		<div style="display: contents">
 
-    <title>UoL Timetable</title>
 
-    <link rel="stylesheet" href="global.css" />
-    <link rel="stylesheet" href="build/bundle.css" />
 
-    <script defer src="build/bundle.js"></script>
-    <script
-      data-goatcounter="https://usamausmantimetable.goatcounter.com/count"
-      async
-      src="//gc.zgo.at/count.js"
-    ></script>
-  </head>
 
-  <body></body>
+
+
+
+
+
+
+<main style="--vh: undefinedpx;" class="svelte-1ine5a3"><div class="form svelte-1awr1pd"><h1>University of Leeds Timetable</h1>
+	<p>This app will keep a copy of your timetable so that you can see it even if you are offline! You
+		can also see the location of classes, with a link to find them on campus.
+	</p>
+	<p>If you prefer, you can also download the timetable to use in your own calendar app.</p>
+	<h2>Steps</h2>
+	<ol class="svelte-1awr1pd"><li>Sign in to
+			<a target="_blank" rel="noopener noreferrer" href="https://studentservices.leeds.ac.uk/">Student Services</a></li>
+		<li>Go to <a target="_blank" rel="noopener noreferrer" href="https://studentservices.leeds.ac.uk/pls/banprod/timetable_uol">Modules/Timetable &gt; View timetable</a></li>
+		<li>Click any &#39;Submit&#39; button</li>
+		<li>Copy the URL of the timetable into the box below</li>
+		<li>Click &#39;Get Timetable&#39; or &#39;Download Timetable&#39;</li></ol>
+	<div class="input svelte-1qajn4s  wide"><label for="url" class="svelte-1qajn4s">URL:</label>
+
+		<input type="text" id="url" placeholder="timetable.leeds.ac.uk/teaching/..." class="svelte-1qajn4s" value=""></div>
+	
+	<div class="buttons svelte-1awr1pd"><button  class="svelte-1ifkhg8">Get Timetable
+</button>
+		<button  class="svelte-1ifkhg8">Download Timetable
+</button>
+		<button  class="svelte-1ifkhg8    danger">Reset All
+</button></div>
+</div>
+	
+</main>
+
+
+			
+			<script>
+				{
+					__sveltekit_1q9s2et = {
+						env: {},
+						assets: "/timetable",
+						element: document.currentScript.parentElement
+					};
+
+					const data = [null,null];
+
+					Promise.all([
+						import("/timetable/_app/immutable/entry/start.b564c185.mjs"),
+						import("/timetable/_app/immutable/entry/app.9bcbee0d.mjs")
+					]).then(([kit, app]) => {
+						kit.start(app, __sveltekit_1q9s2et.element, {
+							node_ids: [0, 2],
+							data,
+							form: null,
+							error: null
+						});
+					});
+
+					if ('serviceWorker' in navigator) {
+						addEventListener('load', function () {
+							navigator.serviceWorker.register('/timetable/service-worker.js');
+						});
+					}
+				}
+			</script>
+		</div>
+	</body>
 </html>

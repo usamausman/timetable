@@ -1,0 +1,153 @@
+html,
+body {
+	position: relative;
+	width: 100%;
+	height: 100%;
+
+	background: var(--bg);
+	color: var(--text);
+}
+
+body {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell,
+		'Helvetica Neue', sans-serif;
+}
+
+p {
+	margin: 0;
+}
+
+a {
+	text-decoration: underline;
+	color: currentColor;
+	transition: opacity 0.25s ease;
+}
+
+a:hover {
+	opacity: 0.6;
+}
+
+label {
+	display: block;
+}
+
+input,
+button,
+select,
+textarea {
+	font-family: inherit;
+	font-size: inherit;
+	padding: 0.4em;
+	margin: 0 0 0.5em 0;
+	box-sizing: border-box;
+	border: 1px solid #ccc;
+	border-radius: 2px;
+}
+
+input:disabled {
+	color: #ccc;
+}
+
+input[type='range'] {
+	height: 0;
+}
+
+/* COLOURS */
+
+body {
+	--bg: #fff;
+	--bg-90: #ffffffcc;
+
+	--today: #fdd;
+	--today-90: #ffddddcc;
+
+	--weekend: #eee;
+	--weekend-90: #eeeeeecc;
+
+	--bg-mid: #eee;
+
+	--class: #ccc;
+	--now: #f00;
+	--text: #333;
+	--danger: #b00;
+	--danger-text: #fee;
+}
+
+:root.dark {
+	color-scheme: dark;
+}
+
+:root.dark body {
+	--bg: #222;
+	--bg-90: #222222cc;
+
+	--today: #422;
+	--today-90: #442222cc;
+
+	--weekend: #1d1d1d;
+	--weekend-90: #1d1d1dcc;
+
+	--bg-mid: #111;
+
+	--class: #333;
+	--now: #f00;
+	--text: #aaa;
+	--danger: #c44;
+	--danger-text: #300;
+}
+
+/* MINE */
+
+label {
+	display: inline-block;
+	padding-right: 1rem;
+}
+
+input[type='text'],
+input[type='number'],
+select {
+	background: var(--bg-mid);
+	color: var(--text);
+
+	margin: 0;
+	border: none;
+
+	border-radius: 0.25rem;
+	box-shadow: inset 0 -0.125rem 0 0 var(--text);
+}
+
+input[type='checkbox'] {
+	margin: 0;
+	margin-top: 0.25rem;
+}
+
+button {
+	margin: 0;
+	padding: 0.25rem 0.5rem;
+
+	display: inline;
+	background: var(--text);
+	color: var(--bg);
+
+	border: none;
+	border-radius: 0.25rem;
+
+	cursor: pointer;
+}
+
+button:disabled {
+	opacity: 0.7;
+
+	cursor: initial;
+}
+
+svg {
+	max-height: 4rem;
+}
+
+svg path {
+	fill: currentColor;
+}
