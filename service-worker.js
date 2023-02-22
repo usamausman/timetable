@@ -1,20 +1,20 @@
 const l = [
-  "/timetable/_app/immutable/entry/app.9bcbee0d.mjs",
-  "/timetable/_app/immutable/chunks/0.5985eb66.mjs",
-  "/timetable/_app/immutable/chunks/1.eccc8971.mjs",
-  "/timetable/_app/immutable/chunks/2.9d55a5f9.mjs",
+  "/timetable/_app/immutable/entry/app.e38ce7c2.mjs",
+  "/timetable/_app/immutable/chunks/0.43581d30.mjs",
+  "/timetable/_app/immutable/chunks/1.67249c8f.mjs",
+  "/timetable/_app/immutable/chunks/2.3fb928bb.mjs",
   "/timetable/_app/immutable/chunks/_layout.79cb23d1.mjs",
   "/timetable/_app/immutable/chunks/index.5d639881.mjs",
   "/timetable/_app/immutable/chunks/index.cbc35c55.mjs",
-  "/timetable/_app/immutable/chunks/paths.a045e744.mjs",
-  "/timetable/_app/immutable/chunks/singletons.4346b068.mjs",
-  "/timetable/_app/immutable/entry/start.b564c185.mjs",
-  "/timetable/_app/immutable/entry/error.svelte.025fb3d8.mjs",
+  "/timetable/_app/immutable/chunks/paths.7ae8e277.mjs",
+  "/timetable/_app/immutable/chunks/singletons.8bccdd5a.mjs",
+  "/timetable/_app/immutable/entry/start.4e63fe26.mjs",
+  "/timetable/_app/immutable/entry/error.svelte.a7ece311.mjs",
   "/timetable/_app/immutable/assets/_layout.c717f575.css",
-  "/timetable/_app/immutable/entry/_layout.svelte.aa7b4b5b.mjs",
+  "/timetable/_app/immutable/entry/_layout.svelte.72b20a82.mjs",
   "/timetable/_app/immutable/entry/_layout.ts.464e3015.mjs",
-  "/timetable/_app/immutable/assets/_page.8bcc86e2.css",
-  "/timetable/_app/immutable/entry/_page.svelte.26512953.mjs",
+  "/timetable/_app/immutable/assets/_page.e59708a5.css",
+  "/timetable/_app/immutable/entry/_page.svelte.7bbeade3.mjs",
   "/timetable/_app/immutable/assets/alternative_time.b3b35b56.svg",
   "/timetable/_app/immutable/assets/link.85164be1.svg",
   "/timetable/_app/immutable/assets/location.05c954b2.svg",
@@ -45,7 +45,7 @@ const l = [
   "/timetable/site.webmanifest"
 ], b = [
   "/timetable/"
-], c = "1677021699156", s = `cache-${c}`, i = [...l, ...n, ...b];
+], c = "1677024038036", s = `cache-${c}`, i = [...l, ...n, ...b];
 self.addEventListener("install", (e) => {
   async function t() {
     await (await caches.open(s)).addAll(i);
