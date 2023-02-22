@@ -65,10 +65,6 @@ const retrieve = async ({ year, identifier }: PartialInfo): Promise<ClassInfo[]>
 	}
 };
 
-const getTimetable = async (params: PartialInfo): Promise<ClassInfo[]> => {
-	return retrieve(params).then((v) => new Promise((resolve) => setTimeout(() => resolve(v), 2500)));
-};
-
 const saveTimetable = (params: PartialInfo, classes: ClassInfo[]) => {
 	info.update((o) => ({
 		...o,
@@ -103,23 +99,23 @@ export enum Action {
 const _parseAndDo = async (action: Action, params: PartialInfo) => {
 	if (action === Action.GET) {
 		state.update(() => ({ ...defaultState, fetching: true }));
-		saveTimetable(params, await getTimetable(params));
+		saveTimetable(params, await retrieve(params));
 		state.update(() => ({ ...defaultState, fetching: false }));
 	} else if (action === Action.DOWNLOAD) {
 		state.update(() => ({ ...defaultState, downloading: true }));
-		downloadTimetable(params, await getTimetable(params));
+		downloadTimetable(params, await retrieve(params));
 		state.update(() => ({ ...defaultState, downloading: false }));
 	}
 };
 
-export const doInfo = (action: Action, params: PartialInfo) => {
-	_parseAndDo(action, params);
+export const doInfo = async (action: Action, params: PartialInfo) => {
+	await _parseAndDo(action, params);
 };
 
-export const doURL = (action: Action, url: string) => {
+export const doURL = async (action: Action, url: string) => {
 	try {
 		const params = parseURL(url);
-		doInfo(action, params);
+		await doInfo(action, params);
 	} catch (err) {
 		console.error(err);
 		state.update(() => ({ ...defaultState, error: true, message: err.message }));

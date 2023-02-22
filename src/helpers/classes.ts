@@ -100,7 +100,7 @@ export const parseClass = (els, startDate, weekday, year): ClassInfo[] => {
 
 	if (_class.alternativeTimes && _class.alternativeTimes.link) {
 		let link = _class.alternativeTimes.link;
-		_class.alternativeTimes.link = timetableURL(year) + link.substr(link.indexOf('/Individual'));
+		_class.alternativeTimes.link = timetableURL(year) + link.substring(link.indexOf('/Individual'));
 	}
 
 	const notes = els[5].innerText.split(';').map((t) => t.trim());

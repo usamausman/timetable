@@ -6,9 +6,8 @@ const { getTimezoneOffset } = dateFnsTzPkg;
 export const timetableURL = (year) => `http://timetable.leeds.ac.uk/teaching/${year}/reporting`;
 
 export const buildURL = (year, identifier) =>
-	`https://timetable-cors.ew.r.appspot.com/${timetableURL(
-		year
-	)}/textspreadsheet;?objectclass=student+set&idtype=id&identifier=${identifier}&template=SWSCUST+Student+Set+Individual+semester&days=1-7&periods=1-21&weeks=1-44`;
+	timetableURL(year) +
+	`/textspreadsheet;?objectclass=student+set&idtype=id&identifier=${identifier}&template=SWSCUST+Student+Set+Individual+semester&days=1-7&periods=1-21&weeks=1-44`;
 
 export const r = (a: number, b: number): number => Math.floor(Math.random() * (b - a)) + a;
 

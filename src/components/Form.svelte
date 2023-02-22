@@ -16,6 +16,10 @@
 
 <div class="form">
 	<h1>University of Leeds Timetable</h1>
+	<span class="danger">
+		This app will not work anymore, you can
+		<a href="https://mytimetable.leeds.ac.uk">use MyTimetable instead</a>.
+	</span>
 	<p>
 		This app will keep a copy of your timetable so that you can see it even if you are offline! You
 		can also see the location of classes, with a link to find them on campus.
@@ -97,5 +101,12 @@
 			margin-top: 0;
 			margin-left: 0.5rem;
 		}
+	}
+
+	.danger {
+		padding: 0.25rem;
+		border-radius: 0.25rem;
+		background: var(--danger);
+		color: var(--danger-text);
 	}
 </style>
